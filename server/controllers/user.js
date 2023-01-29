@@ -120,8 +120,7 @@ const updateUser = async(req, res) => {
         if (req.body.username) {
             req.body.username = req.body.username.toLowerCase()
         }
-        console.log(req.body.username)
-            // Updating user
+        // Updating user
         let body = _.pick(req.body, ['name', 'email', 'username', 'acceptInvitations'])
 
         //Modify User
@@ -145,7 +144,10 @@ const updateUser = async(req, res) => {
                 email: userUpdated.email,
                 username: userUpdated.username,
                 token,
-                message: 'User Updated'
+                message: 'User Updated',
+                acceptInvitations: userUpdated.acceptInvitations,
+                platforms: userUpdated.platforms,
+                _id: userUpdated._id
             })
 
         })
@@ -170,7 +172,6 @@ const updateImg = async(req, res) => {
     }
 
     let file = req.files.img
-    console.log(file)
     let fileName = await verifyImage(file, res)
 
     res.json({
