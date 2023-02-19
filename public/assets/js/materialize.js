@@ -12773,8 +12773,36 @@ const customInitFunctions = () => {
     })(cash, M.anime);
 }
 
-const dateInit = (event) => {
+const navbarTrigger = () => {
+    var elems = document.querySelectorAll('.sidenav');
+    var instances = M.Sidenav.init(elems);
+}
 
+const closeNavbar = () => {
+    var elems = document.querySelectorAll('.sidenav');
+    var instance = M.Sidenav.getInstance(elems[0]);
+    instance.close();
+    instance.destroy()
+}
+
+const openGamesModal = () => {
+    var elems = document.querySelectorAll('.modal');
+    var instances = M.Modal.init(elems);
+    var instance = M.Modal.getInstance(elems[0]);
+    instance.open()
+}
+
+const closeModal = () => {
+    var elems = document.querySelectorAll('.modal');
+    var instances = M.Modal.init(elems);
+    var instance = M.Modal.getInstance(elems[0]);
+    instance.destroy()
+    const body = document.getElementsByTagName('body')[0]
+    body.removeAttribute('style')
+
+}
+
+const dateInit = (event) => {
 
     const options = {
         minDate: new Date(),

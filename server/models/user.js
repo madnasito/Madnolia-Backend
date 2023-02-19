@@ -8,7 +8,7 @@ let validRoles = {
 }
 
 let invitationOptions = {
-    values: ['ALL', 'PARTNERS', 'NOBODY']
+    values: ['ALL', 'PARTNERS', 'NOONE']
 }
 
 let validPlatforms = {

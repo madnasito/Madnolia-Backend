@@ -3,13 +3,12 @@ const _ = require('underscore')
 const User = require('../models/user')
 const Chat = require('../models/chat')
 const Game = require('../models/game')
-const { createGame } = require('./game')
+const { createGame, addGameMatch } = require('./game')
 
 // Creating a Match
 const createMatch = async(req, res) => {
 
     const body = req.body
-    const api_key = "8af7cb7fc9d949acac94ab83be57ed1b"
 
     const match = new Match({
         game_name: body.game_name,
@@ -22,13 +21,17 @@ const createMatch = async(req, res) => {
     })
 
 
-    const game = await Game.findOne({ game_id: body.game_id })
+    let game = await Game.findOne({ game_id: body.game_id })
 
-    console.log(game)
 
-    // console.log(game)
-    // return
-    console.log("Ahora")
+    if (game) {
+        addGameMatch(req, res)
+    }
+    if (!game) {
+        game = await createGame(req, res)
+        console.log(game)
+    }
+
     match.save((err, matchDB) => {
         if (err) {
             return res.status(500).json({

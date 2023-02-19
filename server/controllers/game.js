@@ -1,13 +1,8 @@
+const axios = require('axios')
+
 const Game = require('../models/game')
-const http = require('http')
 
 const api_key = "8af7cb7fc9d949acac94ab83be57ed1b"
-
-var options = {
-    host: 'https://api.rawg.io',
-    path: '/api/games/',
-    method: 'GET'
-}
 
 const createGame = async(req, res) => {
 
@@ -16,33 +11,69 @@ const createGame = async(req, res) => {
     Game.findOne({ game_id: body.game_id })
         .exec((err, game) => {
             if (err) {
-                return res.status(500).json({
-                    ok: false,
-                    err
-                })
-
+                addGameMatch(req, res)
             }
             if (!game) {
-                http.request({
-                    host: "www.api.rawg.io",
-                    path: `/api/games/${body.game_id}?key=${api_key}`,
-                    method: 'GET'
-                }, (res) => {
-                    var str = ''
 
-                    res.on('data', (chunk) => {
-                        str += chunk
+                axios.get(`https://api.rawg.io/api/games/${body.game_id}?key=${api_key}`)
+                    .then(response => {
+                        game_db = response.data
+                        let platforms_db = []
+                        game_db.platforms.forEach(element => {
+                            if (element.platform.id) {
+                                if (element.platform.id === Number(body.platform)) {
+                                    platforms_db.push({ platform_id: Number(element.platform.id), amount: 1 })
+                                } else {
+                                    platforms_db.push({ platform_id: Number(element.platform.id), amount: 0 })
+                                }
+                            }
+                        });
+                        let game = new Game({
+                            name: game_db.name,
+                            game_id: game_db.id,
+                            platforms: platforms_db,
+                            img: game_db.background_image
+                        })
+
+                        game.save((err, gameDB) => {
+                            if (err) {
+                                return res.status(500).json({
+                                    ok: false,
+                                    err
+                                })
+                            }
+
+                            return gameDB
+                        })
+                    }).catch(error => {
+                        return console.log(error)
+
                     })
-                    res.on('end', () => {
-                        res.send(str)
-                    })
-                })
-                console.log("mage")
-                res.send("nada")
+
             }
         })
 }
 
+const addGameMatch = async(req, res) => {
+
+    const game_id = req.body.game_id
+    const platform = req.body.platform
+
+    Game.updateOne({ game_id, "platforms.platform_id": platform }, {
+        $inc: {
+            "platforms.$.amount": 1
+        }
+    }, { new: true }, (err, gameDB) => {
+        if (err) {
+            return console.log(err)
+        }
+
+        console.log(gameDB)
+    })
+
+}
+
 module.exports = {
-    createGame
+    createGame,
+    addGameMatch
 }
