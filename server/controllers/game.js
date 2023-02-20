@@ -58,8 +58,7 @@ const addGameMatch = async(req, res) => {
 
     const game_id = req.body.game_id
     const platform = req.body.platform
-
-    Game.updateOne({ game_id, "platforms.platform_id": platform }, {
+    Game.findOneAndUpdate({ game_id: game_id, platforms: { $elemMatch: { platform_id: Number(platform) } } }, {
         $inc: {
             "platforms.$.amount": 1
         }
@@ -73,7 +72,21 @@ const addGameMatch = async(req, res) => {
 
 }
 
+const getGamesByPlatforms = async(req) => {
+
+    const platform = req.body.platform
+
+    Game.find({ platforms: { $elemMatch: { platform_id: Number(platform) } } }, (err, gamesDB) => {
+        if (err) {
+            return console.log(err)
+        }
+
+        console.log(gamesDB)
+    })
+}
+
 module.exports = {
     createGame,
-    addGameMatch
+    addGameMatch,
+    getGamesByPlatforms
 }

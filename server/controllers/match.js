@@ -3,7 +3,7 @@ const _ = require('underscore')
 const User = require('../models/user')
 const Chat = require('../models/chat')
 const Game = require('../models/game')
-const { createGame, addGameMatch } = require('./game')
+const { createGame, addGameMatch, getGamesByPlatforms } = require('./game')
 
 // Creating a Match
 const createMatch = async(req, res) => {
@@ -29,8 +29,9 @@ const createMatch = async(req, res) => {
     }
     if (!game) {
         game = await createGame(req, res)
-        console.log(game)
     }
+
+    getGamesByPlatforms(req)
 
     match.save((err, matchDB) => {
         if (err) {
