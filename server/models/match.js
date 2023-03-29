@@ -23,6 +23,10 @@ const matchSchema = new Schema({
         ref: 'User',
         required: true
     },
+    users: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    }],
     message: {
         type: String,
         default: 'Casual Match'
@@ -38,23 +42,21 @@ const matchSchema = new Schema({
     img: {
         type: String
     },
-    chat: {
-        message: [{
-            user: {
-                type: String,
-                required: true
-            },
-            date: {
-                type: Date
-            },
-            text: {
-                type: String,
-                required: true
-            }
-            // type: Schema.Types.ObjectId,
-            // ref: 'message'
-        }],
-    }
+    chat: [{
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        date: {
+            type: Number,
+        },
+        text: {
+            type: String,
+        },
+        _id: {
+            type: mongoose.Schema.Types.ObjectId
+        }
+    }]
 })
 
 module.exports = mongoose.model('Match', matchSchema)

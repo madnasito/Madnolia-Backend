@@ -67,26 +67,48 @@ const addGameMatch = async(req, res) => {
             return console.log(err)
         }
 
-        console.log(gameDB)
     })
 
 }
 
-const getGamesByPlatforms = async(req) => {
+const geTotalGameMatchesByPlatform = async(req) => {
 
-    const platform = req.body.platform
+    const game_id = req.params.game
+    const platform_id = Number(req.params.platform)
 
-    Game.find({ platforms: { $elemMatch: { platform_id: Number(platform) } } }, (err, gamesDB) => {
+    Game.find({ game_id, platforms: { $elemMatch: { platform_id } } }, (err, TotalDB) => {
+
         if (err) {
             return console.log(err)
         }
 
-        console.log(gamesDB)
     })
+
+}
+
+const getGamesByPlatforms = async(req, res) => {
+
+    const platform = req.params.platform
+
+    Game.find({ platforms: { $elemMatch: { platform_id: Number(platform) } } })
+        .limit(9)
+        .sort({ 'platforms.amount': -1 })
+        .exec((err, total) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                })
+            }
+            res.send(total)
+        })
+
 }
 
 module.exports = {
     createGame,
     addGameMatch,
-    getGamesByPlatforms
+    getGamesByPlatforms,
+    geTotalGameMatchesByPlatform
 }

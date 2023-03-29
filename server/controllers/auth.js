@@ -50,10 +50,23 @@ const login = async(req, res) => {
 
 const renewToken = async(req, res = response) => {
 
+
     // Generar el TOKEN - JWT
     const token = await jwt.sign({ user: req.user }, process.env.SEED, { expiresIn: process.env.END_TOKEN })
-    const user = await User.findOne({ _id: req.user })
+    const _user = await User.findOne({ _id: req.user })
 
+    const { platforms, games, _id, name, username, email, img, acceptInvitations, notifications } = _user
+    const user = {
+        platforms,
+        games,
+        _id,
+        name,
+        username,
+        email,
+        img,
+        notifications,
+        acceptInvitations
+    }
     res.json({
         ok: true,
         token,

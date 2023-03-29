@@ -5,6 +5,7 @@ const Chat = require('../models/chat')
 const Game = require('../models/game')
 const { createGame, addGameMatch, getGamesByPlatforms } = require('./game')
 
+
 // Creating a Match
 const createMatch = async(req, res) => {
 
@@ -17,7 +18,8 @@ const createMatch = async(req, res) => {
         date: body.date,
         user: req.user,
         name: body.name,
-        img: body.img
+        img: body.img,
+        users: body.users
     })
 
 
@@ -49,6 +51,16 @@ const createMatch = async(req, res) => {
                 })
             }
         })
+
+        User.updateMany({ _id: { $in: body.users } }, { $push: { 'invitations': matchDB._id }, $inc: { notifications: 1 } }, (err) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                })
+            }
+        })
+
 
         res.json({
             ok: true,
@@ -111,6 +123,9 @@ const getMatch = async(req, res) => {
 
     try {
         Match.findById(id)
+            // .select({ chat: { $slice: -10 } })
+            // .sort('chat.date')
+            .populate('chat.user', 'username img name')
             .exec((err, matchDB) => {
 
                 if (err) {
@@ -167,7 +182,7 @@ const playerMatches = async(req, res) => {
 
     Match.find({ user })
         .skip(skip)
-        .limit(6)
+        // .limit(6)
         .exec((err, matches) => {
             if (err) {
                 return res.status(404).json({
@@ -192,6 +207,7 @@ const matchesByPlatform = async(req, res) => {
     let topGames = {}
 
     Match.find({ platform, active: true })
+        .sort(-1)
         .exec((err, matches) => {
 
             if (err) {
@@ -218,41 +234,16 @@ const matchesByPlatform = async(req, res) => {
                     })
             }
 
-            console.log(topGames)
             res.send(matches)
         })
 
-}
-
-// Matches of Game
-const matchesByGame = (req, res) => {
-
-    const game = req.params.game
-    let skip = Number(req.query.skip) || 0
-
-    Match.find({ game_id: game, active: true })
-        .skip(skip)
-        .limit(6)
-        .exec((err, matches) => {
-
-            if (err) {
-                return res.status(404).json({
-                    ok: false,
-                    err
-                })
-            }
-
-            res.json({
-                matches
-            })
-        })
 }
 
 // Matches by game and platform
 const platformGameMatches = (req, res) => {
 
     let skip = Number(req.query.skip) || 0
-    const limit = 5
+    const limit = 20
     const game_id = req.params.game
     const platform = req.params.platform
 
@@ -268,6 +259,7 @@ const platformGameMatches = (req, res) => {
     Match.find({ game_id, platform, active: true })
         .skip(skip)
         .limit(limit)
+        // .sort({})
         .exec((err, matchesDB) => {
             if (err) {
                 return res.status(500).json({
@@ -285,4 +277,4 @@ const platformGameMatches = (req, res) => {
 
 
 // Exporting general Matches
-module.exports = { createMatch, getMatch, editMatch, deleteMatch, playerMatches, matchesByPlatform, matchesByGame, platformGameMatches }
+module.exports = { createMatch, getMatch, editMatch, deleteMatch, playerMatches, matchesByPlatform, platformGameMatches }

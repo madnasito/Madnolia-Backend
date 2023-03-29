@@ -75,10 +75,18 @@ const userSchema = new Schema({
         enum: invitationOptions,
         required: true
     },
+    invitations: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Match'
+    }],
     partners: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
-    }]
+    }],
+    notifications: {
+        type: Number,
+        default: 0
+    }
 })
 
 userSchema.methods.toJSON = function() {

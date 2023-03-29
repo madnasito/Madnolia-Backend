@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 
 
-let verifyToken = (req, res, next) => {
+const verifyToken = (req, res, next) => {
 
     let token = req.get("token")
 
@@ -23,7 +23,7 @@ let verifyToken = (req, res, next) => {
 
 }
 
-let verifyPasswordToken = (req, res, next) => {
+const verifyPasswordToken = (req, res, next) => {
 
     let token = req.params.token
 
@@ -43,8 +43,6 @@ let verifyPasswordToken = (req, res, next) => {
     })
 
 }
-
-
 
 
 module.exports = {

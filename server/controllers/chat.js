@@ -1,30 +1,25 @@
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
-const Chat = require('../models/chat')
+const Match = require('../models/match')
 
-const sendMessage = (req, res) => {
+const saveMessage = (message, user, match_id) => {
 
-    const body = req.body
-
-    let message = {
-        user: req.user,
-        date: new Date(),
-        text: body.message
+    const new_message = {
+        user,
+        date: new Date().getTime(),
+        text: message
     }
 
-    Chat.findOneAndUpdate({ match: body.match }, { $push: { 'message': message } }, (err, chatDB) => {
+
+    Match.updateOne({ _id: match_id }, { $push: { 'chat': new_message } }, { new: true }, (err) => {
         if (err) {
-            return res.status(404).json({
-                ok: false,
-                err
-            })
+            return console.log(err)
         }
-        res.send(chatDB)
+
     })
 
-    // res.send(body)
 }
 
 module.exports = {
-    sendMessage
+    saveMessage
 }

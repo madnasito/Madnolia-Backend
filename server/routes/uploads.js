@@ -10,8 +10,8 @@ const router = Router()
 
 router.use(expressFileUpload())
 
-router.put('/upload/:type/:id', verifyToken, fileUpload)
+router.put('/api/upload/:type/:id', verifyToken, fileUpload)
 
-router.get('/upload/:type/:user/:img', returnImage);
+router.get('/api/upload/:type/:user/:img', returnImage);
 
 module.exports = router

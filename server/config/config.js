@@ -3,6 +3,9 @@ process.env.PORT = process.env.PORT || 3000
 //Entorno
 process.env.NODE_ENV = process.env.NODE_ENV || 'dev';
 
+// front-end page
+process.env.URL = process.env.URL || "http://localhost:4200"
+
 //Vencimiento del token para sesiones
 //60 segundos * 60 minutos * 24 horas * 30 dias
 process.env.END_TOKEN = 1000 * 60 * 60 * 24 * 30;

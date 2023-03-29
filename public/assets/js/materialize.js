@@ -12773,6 +12773,16 @@ const customInitFunctions = () => {
     })(cash, M.anime);
 }
 
+const toastMessage = (message, classes) => {
+
+    M.toast({ html: message, classes })
+}
+
+const toastWithAction = (html) => {
+    M.toast({ html })
+}
+
+
 const navbarTrigger = () => {
     var elems = document.querySelectorAll('.sidenav');
     var instances = M.Sidenav.init(elems);
@@ -12782,7 +12792,7 @@ const closeNavbar = () => {
     var elems = document.querySelectorAll('.sidenav');
     var instance = M.Sidenav.getInstance(elems[0]);
     instance.close();
-    instance.destroy()
+    // instance.destroy()
 }
 
 const openGamesModal = () => {
@@ -12829,7 +12839,7 @@ const selectInit = () => {
     var instances = M.FormSelect.init(elems);
 }
 
-
-const toastMessage = (message, color) => {
-    M.toast({ html: message, classes: color })
+const initScroll = () => {
+    var elems = document.querySelectorAll('.scrollspy');
+    var instances = M.ScrollSpy.init(elems);
 }

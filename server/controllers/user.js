@@ -67,6 +67,19 @@ const getUserInfo = async(req, res) => {
 
 }
 
+const getUserInvitations = async(req, res) => {
+    const user = req.user
+
+    User.findById(user)
+        .populate('invitations')
+        .exec((err, userDB) => {
+            if (err) {
+                return
+            }
+            res.send(userDB)
+        })
+}
+
 const verifyUser = async(req, res) => {
 
     const username = req.params.username.toLowerCase()
@@ -157,6 +170,25 @@ const updateUser = async(req, res) => {
     }
 }
 
+const resetNotifications = (req, res) => {
+
+    const user = req.user
+
+    User.findOneAndUpdate({ _id: user }, { notifications: 0 }, { new: true }, (err, userDB) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err
+            })
+        }
+
+        res.json({
+            ok: true
+        })
+    })
+
+}
+
 // Control for updating PFP
 const updateImg = async(req, res) => {
 
@@ -183,50 +215,51 @@ const updateImg = async(req, res) => {
 }
 
 const updatePlatforms = async(req, res) => {
-        // Validate Token
+    // Validate Token
 
-        const uid = req.user
+    const uid = req.user
 
-        try {
-            const userDB = await User.findById(uid)
+    try {
+        const userDB = await User.findById(uid)
 
-            if (!userDB) {
-                return res.status(404).json({
-                    ok: false,
-                    err: {
-                        message: "The user does not exists"
-                    }
-                })
-            }
-
-            let platforms = {
-                platforms: req.body.platforms
-            }
-
-            User.findByIdAndUpdate(uid, platforms, (err, platformsDB) => {
-                // Verify Errors
-                if (err) {
-                    return res.status(400).json({
-                        ok: false,
-                        err
-                    })
+        if (!userDB) {
+            return res.status(404).json({
+                ok: false,
+                err: {
+                    message: "The user does not exists"
                 }
-
-                // Create Token for new User
-
-                // let token = jwt.sign({ user: userUpdated._id }, process.env.SEED, { expiresIn: process.env.END_TOKEN })
-
-                res.json({
-                    ok: true,
-                    message: "Platforms updated!"
-                })
             })
-
-        } catch (error) {
-
         }
+
+        let platforms = {
+            platforms: req.body.platforms
+        }
+
+        User.findByIdAndUpdate(uid, platforms, (err, platformsDB) => {
+            // Verify Errors
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    err
+                })
+            }
+
+            // Create Token for new User
+
+            // let token = jwt.sign({ user: userUpdated._id }, process.env.SEED, { expiresIn: process.env.END_TOKEN })
+
+            res.json({
+                ok: true,
+                message: "Platforms updated!"
+            })
+        })
+
+    } catch (error) {
+
     }
-    // Get partners of the user
+}
+
+// Get partners of the user
 const getPartners = async(req, res) => {
 
     // Validate Token
@@ -259,8 +292,8 @@ const searchUser = async(req, res) => {
 
     let regex = new RegExp(username, 'i');
 
-    User.find({ username: regex, status: true })
-        .limit(5)
+    User.find({ username: regex, status: true, status: true })
+        .limit(3)
         .exec((err, userDB) => {
             if (err) {
                 return status(404).json({
@@ -268,10 +301,9 @@ const searchUser = async(req, res) => {
                     err
                 })
             }
-            res.json({
-                ok: true,
-                userDB
-            })
+
+            res.send(userDB)
+
         })
 }
 
@@ -345,6 +377,7 @@ const recoverPassword = (req, res) => {
 module.exports = {
     createUser,
     getUserInfo,
+    getUserInvitations,
     updateUser,
     verifyUser,
     updatePlatforms,
@@ -352,5 +385,6 @@ module.exports = {
     getPartners,
     addPartner,
     recoverPassword,
-    updateImg
+    updateImg,
+    resetNotifications
 }
