@@ -10,9 +10,9 @@ class Users {
 
         const user = await User.findById(user_id)
 
-        const { name, username, img, _id } = user
+        const { name, username, thumb_img, _id } = user
 
-        this.users.push({ name, username, img, _id, socket_id, match: '' })
+        this.users.push({ name, username, thumb_img, _id, socket_id, match: '' })
 
         return this.users
     }

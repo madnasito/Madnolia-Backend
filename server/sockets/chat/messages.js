@@ -32,6 +32,9 @@ const chatSocket = (socket, users) => {
 
     socket.on('message', async(message) => {
         const user = await users.getUser(socket.id)
+        if (!user) {
+            return
+        }
         const { match, _id } = user
         const mensaje = createMessage(user, message)
         socket.broadcast.to(match).emit('message', mensaje)
@@ -54,7 +57,7 @@ const createMessage = (user, message) => {
         user: {
             _id: user._id,
             username: user.username,
-            img: user.img,
+            thumb_img: user.thumb_img,
             name: user.name
         },
         text: message

@@ -41,7 +41,7 @@ mongoose.connect(process.env.urlDB, { useNewUrlParser: true, useUnifiedTopology:
 // This is backend's comunication
 const io = socketIO(server, {
     cors: {
-        origins: ["http://localhost:4200"]
+        origins: ["*"]
     }
 })
 

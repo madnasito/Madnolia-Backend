@@ -12795,6 +12795,11 @@ const closeNavbar = () => {
     // instance.destroy()
 }
 
+const resetScroll = () => {
+    const body = document.getElementsByTagName('body')[0]
+    body.removeAttribute('style')
+}
+
 const openGamesModal = () => {
     var elems = document.querySelectorAll('.modal');
     var instances = M.Modal.init(elems);

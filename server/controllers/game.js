@@ -101,7 +101,10 @@ const getGamesByPlatforms = async(req, res) => {
                     err
                 })
             }
-            res.send(total)
+            res.json({
+                ok: true,
+                total
+            })
         })
 
 }

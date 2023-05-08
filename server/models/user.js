@@ -46,6 +46,9 @@ const userSchema = new Schema({
     img: {
         type: String
     },
+    thumb_img: {
+        type: String
+    },
     status: {
         type: Boolean,
         default: true

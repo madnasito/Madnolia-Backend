@@ -33,7 +33,6 @@ const createMatch = async(req, res) => {
         game = await createGame(req, res)
     }
 
-    getGamesByPlatforms(req)
 
     match.save((err, matchDB) => {
         if (err) {
@@ -125,7 +124,8 @@ const getMatch = async(req, res) => {
         Match.findById(id)
             // .select({ chat: { $slice: -10 } })
             // .sort('chat.date')
-            .populate('chat.user', 'username img name')
+            .populate('chat.user', 'username thumb_img name')
+            .populate('users', 'username')
             .exec((err, matchDB) => {
 
                 if (err) {

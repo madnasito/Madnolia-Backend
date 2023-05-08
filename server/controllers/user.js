@@ -32,9 +32,7 @@ const createUser = async(req, res) => {
         }
 
         // Create Token for new User
-        const userPath = path.resolve(__dirname, `../../uploads/users/${userDB._id}`)
         let token = jwt.sign({ user: userDB._id }, process.env.SEED, { expiresIn: process.env.END_TOKEN })
-        fs.mkdirSync(userPath)
 
         res.json({
             ok: true,
@@ -60,6 +58,7 @@ const getUserInfo = async(req, res) => {
         platforms: user.platforms,
         games: user.games,
         img: user.img,
+        thumb_img: user.thumb_img,
         acceptInvitations: user.acceptInvitations,
         uid: user._id,
         token
@@ -292,7 +291,7 @@ const searchUser = async(req, res) => {
 
     let regex = new RegExp(username, 'i');
 
-    User.find({ username: regex, status: true, status: true })
+    User.find({ username: regex, status: true })
         .limit(3)
         .exec((err, userDB) => {
             if (err) {

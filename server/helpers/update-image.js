@@ -9,25 +9,19 @@ const deleteImage = (path) => {
     }
 }
 
-const updateImage = async(type, id, imgName) => {
+const updateImage = async(id, img, thumb) => {
 
     let oldPath = ''
 
-    switch (type) {
-        case 'users':
-            const user = await User.findById(id)
-            if (!user) {
-                return false
-            }
-
-            oldPath = path.resolve(__dirname, `../../uploads/users/${id}/${user.img}`)
-            deleteImage(oldPath)
-
-            user.img = imgName
-            await user.save()
-            return true
-            break
+    const user = await User.findById(id)
+    if (!user) {
+        return false
     }
+
+
+    user.img = img
+    user.thumb_img = thumb
+    user.save()
 }
 
 module.exports = {

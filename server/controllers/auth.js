@@ -55,7 +55,7 @@ const renewToken = async(req, res = response) => {
     const token = await jwt.sign({ user: req.user }, process.env.SEED, { expiresIn: process.env.END_TOKEN })
     const _user = await User.findOne({ _id: req.user })
 
-    const { platforms, games, _id, name, username, email, img, acceptInvitations, notifications } = _user
+    const { platforms, games, _id, name, username, email, img, acceptInvitations, notifications, thumb_img } = _user
     const user = {
         platforms,
         games,
@@ -64,6 +64,7 @@ const renewToken = async(req, res = response) => {
         username,
         email,
         img,
+        thumb_img,
         notifications,
         acceptInvitations
     }
