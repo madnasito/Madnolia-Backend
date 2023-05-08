@@ -44,10 +44,12 @@ const userSchema = new Schema({
         enum: validRoles
     },
     img: {
-        type: String
+        type: String,
+        default: "https://i.ibb.co/myKfdFX/388b32c44b0c.jpg"
     },
     thumb_img: {
-        type: String
+        type: String,
+        default: "https://i.ibb.co/myKfdFX/388b32c44b0c.jpg"
     },
     status: {
         type: Boolean,
