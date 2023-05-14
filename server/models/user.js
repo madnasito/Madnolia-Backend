@@ -45,11 +45,11 @@ const userSchema = new Schema({
     },
     img: {
         type: String,
-        default: "https://i.ibb.co/myKfdFX/388b32c44b0c.jpg"
+        default: "https://i.ibb.co/4d8b4XY/fd0bc6699682.jpg"
     },
     thumb_img: {
         type: String,
-        default: "https://i.ibb.co/myKfdFX/388b32c44b0c.jpg"
+        default: "https://i.ibb.co/YZc5f1y/fd0bc6699682.jpg"
     },
     status: {
         type: Boolean,
