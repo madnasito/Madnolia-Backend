@@ -35,6 +35,8 @@ mongoose.connect(process.env.urlDB, { useNewUrlParser: true, useUnifiedTopology:
         return console.log(err)
     }
 
+    console.log(process.env.urlDB)
+
     console.log('Conectado en la base de datos'.green)
 });
 
