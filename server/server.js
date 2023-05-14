@@ -30,12 +30,12 @@ app.get('*', (req, res) => {
 })
 
 mongoose.connect(process.env.urlDB, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }, (err) => {
+    console.log(process.env.urlDB)
     if (err) {
         console.log('Error en la base de datos'.red)
         return console.log(err)
     }
 
-    console.log(process.env.urlDB)
 
     console.log('Conectado en la base de datos'.green)
 });
