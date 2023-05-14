@@ -25,10 +25,5 @@ process.env.CLIENT_ID = '817997186963-ifufs7fs14r32cggh1q7360g0hnmav0a.apps.goog
 //Base de datos
 let urlDB;
 
-if (process.env.NODE_ENV === 'dev') {
-    urlDB = 'mongodb://127.0.0.1:27017/madnolia';
-} else {
-    urlDB = process.env.MONGO_URI;
-}
+process.env.MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/madnolia'
 
-process.env.urlDB = urlDB;
