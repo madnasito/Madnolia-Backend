@@ -29,8 +29,8 @@ app.get('*', (req, res) => {
     res.sendFile(`${path.dirname(__dirname)}/public/index.html`)
 })
 
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }, (err) => {
-    console.log(process.env.MONGO_URI)
+mongoose.connect(process.env.urlDB, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }, (err) => {
+    console.log(process.env.urlDB)
     if (err) {
         console.log('Error en la base de datos'.red)
         return console.log(err)
