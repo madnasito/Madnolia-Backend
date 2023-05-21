@@ -17,7 +17,7 @@ const login = async(req, res) => {
         if (!userDB) {
             return res.status(400).json({
                 ok: false,
-                message: 'No founded user'
+                message: 'LOGIN.ERRORS.USER'
             })
         }
 
@@ -27,7 +27,7 @@ const login = async(req, res) => {
         if (!validPassword) {
             return res.status(400).json({
                 ok: false,
-                message: 'No valid password'
+                message: 'LOGIN.ERRORS.PASSWORD'
             })
         }
 

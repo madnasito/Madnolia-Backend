@@ -158,7 +158,7 @@ const updateUser = async(req, res) => {
                 email: userUpdated.email,
                 username: userUpdated.username,
                 token,
-                message: 'User Updated',
+                message: 'PROFILE.USER_PAGE.UPDATED',
                 acceptInvitations: userUpdated.acceptInvitations,
                 platforms: userUpdated.platforms,
                 _id: userUpdated._id
@@ -251,7 +251,7 @@ const updatePlatforms = async(req, res) => {
 
             res.json({
                 ok: true,
-                message: "Platforms updated!"
+                message: "PROFILE.PLATFORMS_PAGE.SUCCESS"
             })
         })
 

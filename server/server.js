@@ -30,7 +30,6 @@ app.get('*', (req, res) => {
 })
 
 mongoose.connect(process.env.urlDB, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }, (err) => {
-    console.log(process.env.urlDB)
     if (err) {
         console.log('Error en la base de datos'.red)
         return console.log(err)
@@ -49,6 +48,9 @@ const io = socketIO(server, {
 
 module.exports = { io }
 require('./sockets/index')
+
+// Cronjob for matches time
+require('./cronjob/cronjob')
 
 server.listen(process.env.PORT, () => {
     console.log("Servidor en el puerto:", process.env.PORT.green)
