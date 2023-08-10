@@ -17,7 +17,6 @@ const job = new CronJob('0 */15 * * * *', function() {
 			})
 		}
 		matches.forEach(element => {
-			console.log(element)
 			substractGameMatch(element.game_id, element.platform)
 		});
 	})

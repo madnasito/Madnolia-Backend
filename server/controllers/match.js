@@ -4,6 +4,7 @@ const User = require('../models/user')
 const Chat = require('../models/chat')
 const Game = require('../models/game')
 const { createGame, addGameMatch, getGamesByPlatforms } = require('./game')
+const { substractGameMatch } = require('../controllers/game');
 
 
 // Creating a Match
@@ -163,6 +164,9 @@ const deleteMatch = async(req, res) => {
             })
         }
 
+        substractGameMatch(matchDB.game_id, matchDB.platform)
+
+
         // Match Updated
         res.json({
             ok: true,
@@ -230,7 +234,6 @@ const matchesByPlatform = async(req, res) => {
                             })
                         }
                         topGames[matches[i].game_name] = matchCount
-                        console.log(topGames)
                     })
             }
 
