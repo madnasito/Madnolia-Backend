@@ -18,9 +18,10 @@ const createMatch = async(req, res) => {
         platform: body.platform,
         date: body.date,
         user: req.user,
-        name: body.name,
+        message: body.name,
         img: body.img,
-        users: body.users
+        users: body.users,
+        tournament_match: body.tournament
     })
 
 

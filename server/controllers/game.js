@@ -11,7 +11,7 @@ const createGame = async(req, res) => {
     Game.findOne({ game_id: body.game_id })
         .exec((err, game) => {
             if (err) {
-                addGameMatch(req, res)
+                addGameMatch(req)
             }
             if (!game) {
 

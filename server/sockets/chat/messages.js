@@ -1,7 +1,7 @@
-const { io } = require('../../server')
-const jwt = require('jsonwebtoken')
+// const { io } = require('../../server')
+// const jwt = require('jsonwebtoken')
 const { saveMessage } = require('../../controllers/chat')
-const { Users } = require('../classes/user')
+// const { Users } = require('../classes/user')
     // const users = new Users()
 
 const chatSocket = (socket, users) => {
@@ -41,7 +41,6 @@ const chatSocket = (socket, users) => {
         socket.emit('message', mensaje)
         saveMessage(message, _id, match)
     })
-
 
 
     socket.on('disconnect_chat', () => {

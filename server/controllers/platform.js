@@ -1,5 +1,4 @@
 const express = require("express")
-const mongoose = require('mongoose')
 
 const Platform = require('../models/platform')
 const User = require('../models/user')

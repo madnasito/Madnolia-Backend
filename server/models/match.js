@@ -16,7 +16,7 @@ const matchSchema = new Schema({
     },
     date: {
         type: Number,
-        required: true,
+        required: [true, "The date is required"]
     },
     user: {
         type: Schema.Types.ObjectId,
@@ -38,6 +38,10 @@ const matchSchema = new Schema({
     active: {
         type: Boolean,
         default: true
+    },
+    tournament_match:{
+        type: Boolean,
+        default: false
     },
     img: {
         type: String
