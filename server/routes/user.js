@@ -5,19 +5,6 @@ const { verifyToken, verifyPasswordToken } = require('../middleware/autenticatio
 const { check } = require('express-validator')
 const { validFields } = require('../middleware/valid_fields')
 
-// Post petition for create the user
-app.post('/api/signin', [
-    check('name', 'The name is required').not().isEmpty(),
-    check('username', 'The username is required').not().isEmpty(),
-    check('email', 'The email is required').not().isEmpty(),
-    check('password', 'The password is required').not().isEmpty(),
-    check('platforms', 'Select at least one platform').not().isEmpty(),
-    validFields
-], createUser)
-
-// Post petition for verify user
-app.post('/api/verify_user/:username/:email', verifyUser)
-
 // GET petition for search user by username
 app.get('/api/search_user/:username', searchUser)
 
@@ -39,6 +26,9 @@ app.get('/api/recover_password/:token', [
     validFields,
     verifyPasswordToken
 ], recoverPassword)
+
+// Post petition for verify user
+app.post('/api/verify_user/:username/:email', verifyUser)
 
 // Add a partner for the user
 app.post("/api/add_partner", [

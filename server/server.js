@@ -36,7 +36,7 @@ mongoose.connect(process.env.urlDB, { useNewUrlParser: true, useUnifiedTopology:
     }
 
 
-    console.log('Conectado en la base de datos'.green)
+    console.log('Conectado en la base de datos'.random)
 });
 
 // This is backend's comunication
@@ -53,6 +53,6 @@ require('./sockets/index')
 require('./cronjob/cronjob')
 
 server.listen(process.env.PORT, () => {
-    console.log("Servidor en el puerto:", process.env.PORT.green)
+    console.log("Servidor en el puerto:", process.env.PORT.bgMagenta.white)
 
 })

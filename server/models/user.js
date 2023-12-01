@@ -13,9 +13,9 @@ let invitationOptions = {
 
 let validPlatforms = {
     values: [
-        '15', '16', '17', '18', '19', '187',
-        '1', '80', '14', '186',
-        '7', '8', '10', '11', '2', '4', '21'
+        15, 16, 17, 18, 19, 187,
+        1, 80, 14, 186,
+        7, 8, 10, 11, 2, 4, 21
     ]
 }
 
@@ -70,7 +70,7 @@ const userSchema = new Schema({
         default: 0
     },
     platforms: [{
-        type: String,
+        type: Number,
         enum: validPlatforms
     }],
     games: [{

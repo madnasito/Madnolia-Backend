@@ -48,6 +48,42 @@ const login = async(req, res) => {
     }
 }
 
+const createUser = async(req, res) => {
+
+    const body = req.body;
+
+    let user = new User({
+        name: body.name,
+        username: body.username.toLowerCase(),
+        email: body.email,
+        password: body.password,
+        platforms: body.platforms,
+        img: "https://i.ibb.co/4d8b4XY/fd0bc6699682.jpg",
+        thumb_img: "https://i.ibb.co/YZc5f1y/fd0bc6699682.jpg"
+    })
+
+    user.password = bcrypt.hashSync(user.password, 10)
+
+    user.save((err, userDB) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                err
+            })
+        }
+
+        // Create Token for new User
+        let token = jwt.sign({ user: userDB._id }, process.env.SEED, { expiresIn: process.env.END_TOKEN })
+
+        res.json({
+            ok: true,
+            userDB,
+            token
+        })
+    })
+
+}
+
 const renewToken = async(req, res = response) => {
 
 
@@ -90,6 +126,7 @@ const recoverPasswordToken = (req, res) => {
 
 module.exports = {
     login,
+    createUser,
     renewToken,
     recoverPasswordToken
 }

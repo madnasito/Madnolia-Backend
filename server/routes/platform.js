@@ -6,7 +6,7 @@ const { verifyToken } = require('../middleware/autentication')
 
 const app = express()
 
-app.post('/api/create_platform', createPlatform)
+// app.post('/api/create_platform', createPlatform)
 
 app.get('/api/user_platforms', verifyToken, getUserPlatforms)
 

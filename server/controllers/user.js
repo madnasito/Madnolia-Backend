@@ -7,41 +7,7 @@ const _ = require('underscore')
 const fileUpload = require('express-fileupload')
 const { verifyImage } = require('../middleware/upload_validation')
 
-const createUser = async(req, res) => {
 
-    const body = req.body;
-
-    let user = new User({
-        name: body.name,
-        username: body.username.toLowerCase(),
-        email: body.email,
-        password: body.password,
-        platforms: body.platforms,
-        img: "https://i.ibb.co/4d8b4XY/fd0bc6699682.jpg",
-        thumb_img: "https://i.ibb.co/YZc5f1y/fd0bc6699682.jpg"
-    })
-
-    user.password = bcrypt.hashSync(user.password, 10)
-
-    user.save((err, userDB) => {
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            })
-        }
-
-        // Create Token for new User
-        let token = jwt.sign({ user: userDB._id }, process.env.SEED, { expiresIn: process.env.END_TOKEN })
-
-        res.json({
-            ok: true,
-            userDB,
-            token
-        })
-    })
-
-}
 
 const getUserInfo = async(req, res) => {
 
@@ -92,7 +58,7 @@ const verifyUser = async(req, res) => {
         return res.status(400).json({
             ok: false,
             err: {
-                message: 'Use another username'
+                message: 'This user name is already taked, try another'
             }
         })
     } else if (emailExists) {
@@ -188,7 +154,7 @@ const resetNotifications = (req, res) => {
 
 }
 
-// Control for updating PFP
+// Control to update PFP
 const updateImg = async(req, res) => {
 
     app.use(fileUpload())
@@ -258,7 +224,7 @@ const updatePlatforms = async(req, res) => {
     }
 }
 
-// Get partners of the user
+// Get user's partners
 const getPartners = async(req, res) => {
 
     // Validate Token
@@ -374,7 +340,6 @@ const recoverPassword = (req, res) => {
         })
 }
 module.exports = {
-    createUser,
     getUserInfo,
     getUserInvitations,
     updateUser,
