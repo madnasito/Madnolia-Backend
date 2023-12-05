@@ -25,7 +25,7 @@ const getUserInfo = async(req, res) => {
         games: user.games,
         img: user.img,
         thumb_img: user.thumb_img,
-        acceptInvitations: user.acceptInvitations,
+        accept_invitations: user.accept_invitations,
         uid: user._id,
         token
     })
@@ -99,7 +99,7 @@ const updateUser = async(req, res) => {
             req.body.username = req.body.username.toLowerCase()
         }
         // Updating user
-        let body = _.pick(req.body, ['name', 'email', 'username', 'acceptInvitations'])
+        let body = _.pick(req.body, ['name', 'email', 'username', 'accept_invitations'])
 
         //Modify User
         User.findByIdAndUpdate(uid, body, { new: true }, (err, userUpdated) => {
@@ -123,7 +123,7 @@ const updateUser = async(req, res) => {
                 username: userUpdated.username,
                 token,
                 message: 'PROFILE.USER_PAGE.UPDATED',
-                acceptInvitations: userUpdated.acceptInvitations,
+                accept_invitations: userUpdated.accept_invitations,
                 platforms: userUpdated.platforms,
                 _id: userUpdated._id
             })

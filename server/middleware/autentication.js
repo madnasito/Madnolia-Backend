@@ -23,6 +23,23 @@ const verifyToken = (req, res, next) => {
 
 }
 
+const verifySocketToken = ( token = "" ) => {
+
+    try {
+
+        const user = jwt.verify( token, process.env.SEED );
+        
+        return [true, user.user];
+
+    } catch (error) {
+        return [false, null];
+    }
+
+
+
+
+}
+
 const verifyPasswordToken = (req, res, next) => {
 
     let token = req.params.token
@@ -47,5 +64,6 @@ const verifyPasswordToken = (req, res, next) => {
 
 module.exports = {
     verifyToken,
+    verifySocketToken,
     verifyPasswordToken
 }

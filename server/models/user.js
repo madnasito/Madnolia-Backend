@@ -8,7 +8,7 @@ let validRoles = {
 }
 
 let invitationOptions = {
-    values: ['ALL', 'PARTNERS', 'NOONE']
+    values: ['ALL', 'PARTNERS', 'NOBODY']
 }
 
 let validPlatforms = {
@@ -76,7 +76,7 @@ const userSchema = new Schema({
     games: [{
         type: Number
     }],
-    acceptInvitations: {
+    accept_invitations: {
         type: String,
         default: 'ALL',
         enum: invitationOptions,

@@ -187,7 +187,8 @@ const playerMatches = async(req, res) => {
 
     Match.find({ user })
         .skip(skip)
-        // .limit(6)
+        
+        .limit(30)
         .exec((err, matches) => {
             if (err) {
                 return res.status(404).json({
