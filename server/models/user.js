@@ -71,7 +71,7 @@ const userSchema = new Schema({
     },
     platforms: [{
         type: Number,
-        enum: validPlatforms
+        enum: validPlatforms.values
     }],
     games: [{
         type: Number

@@ -52,15 +52,21 @@ const createUser = async(req, res) => {
 
     const body = req.body;
 
+    // Convert platforms to numbers directly in the map
+    let numberPlatforms = body.platforms.map(str => parseInt(str, 10));
+
     let user = new User({
-        name: body.name,
-        username: body.username.toLowerCase(),
-        email: body.email,
-        password: body.password,
-        platforms: body.platforms,
-        img: "https://i.ibb.co/4d8b4XY/fd0bc6699682.jpg",
-        thumb_img: "https://i.ibb.co/YZc5f1y/fd0bc6699682.jpg"
-    })
+      name: body.name,
+      username: body.username.toLowerCase(),
+      email: body.email,
+      password: body.password,
+      platforms: body.platforms,
+      // img: "https://i.ibb.co/4d8b4XY/fd0bc6699682.jpg",
+      // thumb_img: "https://i.ibb.co/YZc5f1y/fd0bc6699682.jpg"
+    });
+
+    console.log(body);
+    console.log(numberPlatforms)
 
     user.password = bcrypt.hashSync(user.password, 10)
 

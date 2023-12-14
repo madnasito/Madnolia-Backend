@@ -9,6 +9,7 @@ const chatSocket = (socket, users) => {
 
     // Sign up for user
     socket.on('init_match_chat', (data) => {
+        
 
         if (!users.getUser(socket.id)) {
             setTimeout(() => {
@@ -28,10 +29,11 @@ const chatSocket = (socket, users) => {
 
         socket.join(data)
 
+
     })
 
-    socket.on('message', async(message) => {
-        const user = await users.getUser(socket.id)
+    socket.on('message', (message) => {
+        const user = users.getUser(socket.id)
         if (!user) {
             return
         }

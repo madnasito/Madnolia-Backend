@@ -22,6 +22,7 @@ const updateImage = async(id, img, thumb) => {
     user.img = img
     user.thumb_img = thumb
     user.save()
+    return true;
 }
 
 module.exports = {

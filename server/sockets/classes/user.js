@@ -10,6 +10,10 @@ class Users {
 
         const user = await User.findById(user_id)
 
+        if(!user){
+            return;
+        }
+
         const { name, username, thumb_img, _id } = user
 
         this.users.push({ name, username, thumb_img, _id, socket_id, match: '' })

@@ -11,6 +11,10 @@ const { verifySocketToken } = require('../middleware/autentication')
 io.on('connection', async(client) => {
 
 
+    if(!client.handshake.headers["x-token"]){
+        return;
+    }
+
     const [valid, user] = verifySocketToken(client.handshake.headers["x-token"])
 
 

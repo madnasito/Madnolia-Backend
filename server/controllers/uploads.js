@@ -9,7 +9,7 @@ const { updateImage } = require('../helpers/update-image')
 const fileUpload = async(req, res = response) => {
 
     const type = req.params.type
-    const id = req.params.id
+    const uid = req.user
 
 
     // Validation for the archive
@@ -48,14 +48,17 @@ const fileUpload = async(req, res = response) => {
         headers: {
             "Content-Type": "multipart/form-data"
         }
-    }).then(resp => {
+    }).then(async resp => {
 
-        updateImage(id, resp.data.data.url, resp.data.data.thumb.url)
+        const updatedUser = await updateImage(uid, resp.data.data.url, resp.data.data.thumb.url)
+
+        console.log(resp.data.data.url)
+        console.log(resp.data.data.thumb.url)
 
         res.json({
             ok: true,
             img: resp.data.data.url,
-            thumb: resp.data.data.thumb.url
+            thumb_img: resp.data.data.thumb.url
         })
     }).catch((err) => {
         return res.status(400).json({

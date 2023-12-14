@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const { createUser, getUserInfo, updateUser, verifyUser, updatePlatforms, searchUser, getPartners, addPartner, recoverPassword, getUserInvitations, resetNotifications } = require('../controllers/user')
+const { getUserInfo, updateUser, verifyUser, updatePlatforms, searchUser, getPartners, addPartner, recoverPassword, getUserInvitations, resetNotifications } = require('../controllers/user')
 const { verifyToken, verifyPasswordToken } = require('../middleware/autentication')
 const { check } = require('express-validator')
 const { validFields } = require('../middleware/valid_fields')
@@ -40,6 +40,7 @@ app.post("/api/add_partner", [
 // Update user
 app.put('/api/update_user', verifyToken, updateUser)
 
+// Updating platforms
 app.put('/api/update_user_platforms', [check('platforms', 'The platforms are empty').not().isEmpty(), validFields],
     verifyToken,
     updatePlatforms
