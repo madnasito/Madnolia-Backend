@@ -21,7 +21,6 @@ const createMatch = async(req, res) => {
         message: body.name,
         img: body.img,
         users: body.users,
-        tournament_match: body.tournament
     })
 
 
@@ -189,6 +188,7 @@ const playerMatches = async(req, res) => {
         .skip(skip)
         
         .limit(30)
+        .sort({ _id: -1 })
         .exec((err, matches) => {
             if (err) {
                 return res.status(404).json({

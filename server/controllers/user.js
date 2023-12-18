@@ -184,6 +184,10 @@ const updatePlatforms = async(req, res) => {
 
     const uid = req.user
 
+    // let numberPlatforms = req.body.platforms.map(str => parseInt(str, 10));
+    console.log(typeof req.body.platforms[0])
+    
+
     try {
         const userDB = await User.findById(uid)
 
