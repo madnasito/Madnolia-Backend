@@ -65,8 +65,6 @@ const createUser = async(req, res) => {
       // thumb_img: "https://i.ibb.co/YZc5f1y/fd0bc6699682.jpg"
     });
 
-    console.log(body);
-    console.log(numberPlatforms)
 
     user.password = bcrypt.hashSync(user.password, 10)
 

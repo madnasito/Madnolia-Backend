@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../../models/user');
+const Match = require("../../models/match")
 const { Users } = require('../classes/user')
 const { io } = require("../../server")
 
@@ -13,9 +14,11 @@ const notificacionSocket = async(socket, users) => {
 
         let user = await User.findById(match.user)
 
+
         const data = {
             name: user.name,
             match_url,
+            match
         }
 
 
@@ -35,22 +38,31 @@ const notificacionSocket = async(socket, users) => {
 
 }
 
-const invitation_to_match = async(match) => {
-
-    const match_url = `${process.env.URL}/match/${match._id}`
+const matchReadySocket = async(match_id, users) => {
 
     let user = await User.findById(match.user)
 
+    const match = await Match.findOne({_id: match_id});
+
     const data = {
-        name: user.name,
-        match_url,
+        message: `The match ${match.message} will start soon`,
+        id: match._id,
     }
 
-    io.emit('notification', data)
+
+    const { _id } = user
+    match.users.forEach(element => {
+        const invited_user = users.getUserById(element.toString())
+        if (invited_user) {
+            socket.broadcast.to(invited_user.socket_id).emit('match_ready', (data))
+        }
+    });
+        
 
 }
 
 
 module.exports = {
     notificacionSocket,
+    matchReadySocket
 }

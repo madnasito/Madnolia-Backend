@@ -271,7 +271,9 @@ const searchUser = async(req, res) => {
                 })
             }
 
-            res.send(userDB)
+            res.json({
+                ok: true,
+                users: userDB})
 
         })
 }

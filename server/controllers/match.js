@@ -9,6 +9,7 @@ const { substractGameMatch } = require('../controllers/game');
 
 // Creating a Match
 const createMatch = async(req, res) => {
+    console.log(req.body)
 
     const body = req.body
 
@@ -31,8 +32,9 @@ const createMatch = async(req, res) => {
         addGameMatch(req, res)
     }
     if (!game) {
-        game = await createGame(req, res)
+        await createGame(req, res)
     }
+
 
 
     match.save((err, matchDB) => {
@@ -239,11 +241,51 @@ const matchesByPlatform = async(req, res) => {
                     })
             }
 
+            console.log(topGames)
+
             res.send(matches)
         })
 
 }
 
+// Matches of Platform
+const getMatchesByPlatform = async(platform, skip) => {
+    
+
+    let topGames = {}
+
+    Match.find({ platform, active: true })
+        // .sort(-1)
+        .exec((err, matches) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                })
+            }
+
+
+            for (let i = 0; i < matches.length; i++) {
+
+                Match.find({ platform, active: true, game_name: matches[i].game_name })
+                    .count()
+                    .exec((err, matchCount) => {
+                        if (err) {
+                            return res.status(500).json({
+                                ok: false,
+                                err
+                            })
+                        }
+                        topGames[matches[i].game_name] = matchCount
+                    })
+                
+                console.log(topGames)
+            }
+
+            return matches
+        })
+}
 // Matches by game and platform
 const platformGameMatches = (req, res) => {
 
@@ -282,4 +324,4 @@ const platformGameMatches = (req, res) => {
 
 
 // Exporting general Matches
-module.exports = { createMatch, getMatch, editMatch, deleteMatch, playerMatches, matchesByPlatform, platformGameMatches }
+module.exports = { createMatch, getMatch, editMatch, deleteMatch, playerMatches, matchesByPlatform,getMatchesByPlatform,  platformGameMatches }

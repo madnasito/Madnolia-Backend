@@ -32,19 +32,10 @@ const createGame = async(req, res) => {
                             name: game_db.name,
                             game_id: game_db.id,
                             platforms: platforms_db,
-                            img: game_db.background_image
+                            background_image: game_db.background_image
                         })
 
-                        game.save((err, gameDB) => {
-                            if (err) {
-                                return res.status(500).json({
-                                    ok: false,
-                                    err
-                                })
-                            }
-
-                            return gameDB
-                        })
+                        game.save()
                     }).catch(error => {
                         return console.log(error)
 
@@ -121,10 +112,30 @@ const getGamesByPlatforms = async(req, res) => {
 
 }
 
+const gamesByPlatforms = async(platform) => {    
+
+    Game.find({ platforms: { $elemMatch: { platform_id: Number(platform) } } })
+        .limit(9)
+        .sort({ 'platforms.amount': -1 })
+        .exec((err, total) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                })
+            }
+
+            
+        })
+
+
+}
+
 module.exports = {
     createGame,
     addGameMatch,
     getGamesByPlatforms,
     geTotalGameMatchesByPlatform,
-    substractGameMatch
+    substractGameMatch, gamesByPlatforms
 }

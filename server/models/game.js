@@ -32,7 +32,7 @@ const gameSchema = new Schema({
             }
         }
     },
-    img: {
+    background_image: {
         type: String
     },
     screenshots: [{
