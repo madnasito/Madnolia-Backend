@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 const users = new Users()
 
 const { chatSocket } = require('./chat/messages')
-const { notificacionSocket } = require('./notifications/notification')
+const { notificacionSocket, job } = require('./notifications/notification')
 const { verifySocketToken } = require('../middleware/autentication')
 
 io.on('connection', async(client) => {
