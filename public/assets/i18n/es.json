@@ -87,7 +87,8 @@
             "INVITATIONS":{
                 "TITLE": "Aceptar invitaciondes de:",
                 "ALL": "Lo que sea, quiero jugar",
-                "NOONE": "Ya, dejame en paz"
+                "PARTNERS": "Solo colegas",
+                "NOBODY": "Ya, dejame en paz"
             },
 
             "ERRORS":{

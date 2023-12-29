@@ -87,7 +87,8 @@
           "INVITATIONS":{
               "TITLE": "Accept invitations from:",
               "ALL": "Whatever, i want to play",
-              "NOONE": "Please, let me alone"
+              "PARTNERS": "Only my hommies",
+              "NOBODY": "Please, let me alone"
           },
 
           "ERRORS":{
