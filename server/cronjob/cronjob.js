@@ -5,16 +5,13 @@ const { substractGameMatch } = require('../controllers/game');
 
 console.log('Before job instantiation');
 
-const job = new CronJob('0 */15 * * * *', function() {
+const job = new CronJob('0 */2 * * * *', function() {
 	const d = new Date();
 
 
 	Match.find({date: {$lt: d.getTime()}, active: true}, (err, matches) =>{
 		if(err){
-			return res.status(500).json({
-				ok: false,
-				err
-			})
+			return console.log(err)
 		}
 		matches.forEach(element => {
 			substractGameMatch(element.game_id, element.platform)
@@ -23,10 +20,7 @@ const job = new CronJob('0 */15 * * * *', function() {
 
 	Match.updateMany({date: {$lt: d.getTime()}, active: true}, {active: false},(err) =>{
 		if(err){
-			return res.status(500).json({
-				ok: false,
-				err
-			})
+			return console.log(err)
 		}
 	})
 

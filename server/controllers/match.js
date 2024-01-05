@@ -138,7 +138,10 @@ const getMatch = async(req, res) => {
                     })
                 }
 
-                res.send(matchDB)
+                res.json({
+                    ok: true,
+                    match: matchDB
+                })
             })
     } catch (error) {
         console.log(error)

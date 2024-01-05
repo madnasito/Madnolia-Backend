@@ -1,29 +1,29 @@
 const { io } = require('../server')
 const { Users } = require('./classes/user')
-const jwt = require('jsonwebtoken')
 
 const users = new Users()
 
 const { chatSocket } = require('./chat/messages')
-const { notificacionSocket, job } = require('./notifications/notification')
+const { notificacionSocket } = require('./notifications/notification')
 const { verifySocketToken } = require('../middleware/autentication')
 
 io.on('connection', async(client) => {
 
 
+    
     if(!client.handshake.headers["x-token"]){
         return;
     }
 
     const [valid, user] = verifySocketToken(client.handshake.headers["x-token"])
 
+    
+
 
     // // Verificar autenticación
     if(!valid){
         return client.disconnect();
 
-    }else{
-        console.log("Coneto")
     }
 
     // client.on('init_user', (token) => {
@@ -49,7 +49,17 @@ io.on('connection', async(client) => {
         users.deleteUser(client.id)
     })
 
+
     chatSocket(client, users)
     notificacionSocket(client, users)
 
+    
+
 })
+
+const getUsers = () => users;
+
+module.exports = {
+    getUsers
+}
+require('./notifications/cronjob')
