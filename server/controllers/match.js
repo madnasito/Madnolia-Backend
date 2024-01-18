@@ -1,17 +1,19 @@
 const Match = require('../models/match')
 const _ = require('underscore')
 const User = require('../models/user')
-const Chat = require('../models/chat')
 const Game = require('../models/game')
 const { createGame, addGameMatch, getGamesByPlatforms } = require('./game')
 const { substractGameMatch } = require('../controllers/game');
+const { notificacionSocket } = require('../sockets/notifications/notification')
 
 
 // Creating a Match
 const createMatch = async(req, res) => {
-    console.log(req.body)
-
     const body = req.body
+
+    if(body.name == ""){
+        body.name = "Casual Match"
+    }
 
     const match = new Match({
         game_name: body.game_name,
@@ -63,6 +65,7 @@ const createMatch = async(req, res) => {
             }
         })
 
+        notificacionSocket(matchDB)
 
         res.json({
             ok: true,
@@ -203,6 +206,7 @@ const playerMatches = async(req, res) => {
             }
 
             res.json({
+                ok: true,
                 matches
             })
 
