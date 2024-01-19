@@ -8,7 +8,7 @@ const { notificacionSocket } = require('./notifications/notification')
 const { verifySocketToken } = require('../middleware/autentication')
 
 io.on('connection', async(client) => {
-
+    
 
     
     if(!client.handshake.headers["x-token"]){
