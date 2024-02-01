@@ -34,6 +34,7 @@ const matchSchema = new Schema({
     likes: [{
         type: Schema.Types.ObjectId,
         ref: 'User',
+        
     }],
     active: {
         type: Boolean,

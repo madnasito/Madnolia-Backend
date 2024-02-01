@@ -93,7 +93,7 @@ const createMatch = async (req, name) => {
     })
 
 
-    const game = await Game.findOne({ game_id: body.game_id })
+    let game = await Game.findOne({ game_id: body.game_id })
 
 
     if (game) {
@@ -176,7 +176,6 @@ const createTournamentMatches = async(req, res) =>{
             })
         }
     }  
-    console.log(newMatches)
 
     Tournament.updateMany({_id: tournament._id}, {$set: {'matches.match': newMatches}}, {new: true}, (err, tournamentDB) => {
 
@@ -202,7 +201,7 @@ const createTournamentMatches = async(req, res) =>{
 
 }
 
-const addPlayerToNextMatch = async (tournament_id, players) =>{
+const addPlayerToNextMatch = async (tournament_id, players) => {
 
 
     const tournament = await Tournament.findOne({_id: tournament_id})
@@ -245,15 +244,17 @@ const addPlayerToMatch = async (tournament_id, user) =>{
     const player_id = user
 
     if(! tournament){
-        return res.status(404).json({
-            ok: false,
-            message: "Not found tournament"
-        })
+        return console.log("There is no tournament")
     }
 
-    const playerInMatch = tournament.matches.filter(match => match.player_1 == player_id || match.player_2 == player_id)
 
-    if(playerInMatch.length > 0){
+    const player1 =  tournament.matches.filter(match => match.player_1 != null ? (match.player_1.toString() === player_id.toString() ) : null)
+    
+    const player2 =  tournament.matches.filter(match => match.player_2 != null ? (match.player_2.toString() === player_id.toString() ) : null)
+    
+
+
+    if(player1.length > 0 || player2.length > 0){
 
         return console.log("The player is in match")
     }

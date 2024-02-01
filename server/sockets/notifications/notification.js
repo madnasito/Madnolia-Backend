@@ -7,29 +7,72 @@ require('../../config/config');
 
 const notificacionSocket = async(socket, users) => {
 
-    socket.on('match_created', async(match) => {
-
-        const match_url = `${process.env.URL}/match/${match._id}`
-
-        let user = await User.findById(match.user)
+    socket.on('match_created', async(matchId) => {
 
 
-        const data = {
-            name: user.name,
-            match_url,
-            match
+        try {
+            
+            const match = await Match.findOne({_id: matchId});
+    
+            const match_url = `${process.env.URL}/match/${match._id}`
+    
+            let user = await User.findById(match.user)
+    
+    
+            const data = {
+                name: user.name,
+                match_url,
+                match: match._id,
+                img: match.img
+            }
+    
+    
+            
+            match.users.forEach(element => {
+                const invited_user = users.getUserById(element.toString())
+                if (invited_user) {
+                    socket.to(invited_user.socket_id).emit('notification', (data))
+                }
+            });
+
+        } catch (error) {
+            return console.log(error)
         }
 
 
-        const socket_user = users.getUser(socket.id)
+    })
 
-        const { _id } = user
-        match.users.forEach(element => {
-            const invited_user = users.getUserById(element.toString())
-            if (invited_user) {
-                socket.broadcast.to(invited_user.socket_id).emit('notification', (data))
+    socket.on("join_to_match", async(data) => {
+
+        const user = users.getUser(socket.id)
+        try {
+            
+            let matchDB = await Match.findOne({_id: data})
+
+            if(matchDB){
+                
+                
+                Match.findOneAndUpdate({ _id: data }, { $addToSet: { likes: user._id } }, (err) => {
+                    if (err) {
+                        return console.log(err);
+                    }
+                
+                    socket.emit("added_to_match", true);
+                });
+                
+
+                
+
+            }else{
+                socket.emit("added_to_match", false)    
             }
-        });
+            
+
+        } catch (error) {
+            
+            socket.emit("added_to_match", false)
+            return console.log("No founded match")
+        }
 
 
     })

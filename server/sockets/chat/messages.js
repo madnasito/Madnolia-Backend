@@ -10,11 +10,12 @@ const chatSocket = (socket, users) => {
     // Sign up for user
     socket.on('init_match_chat', (data) => {
         
+        console.log(data)
 
         if (!users.getUser(socket.id)) {
             setTimeout(() => {
                 users.getUser(socket.id).match = data
-                socket.join(data.match)
+                socket.join(data)
             }, 100);
         } else {
             users.getUser(socket.id).match = data
@@ -25,13 +26,6 @@ const chatSocket = (socket, users) => {
 
 
 
-    socket.on('enterChat', async(data) => {
-
-        socket.join(data)
-
-
-    })
-
     socket.on('message', (message) => {
         const user = users.getUser(socket.id)
         if (!user) {
@@ -39,7 +33,7 @@ const chatSocket = (socket, users) => {
         }
         const { match, _id } = user
         const mensaje = createMessage(user, message)
-        socket.broadcast.to(match).emit('message', mensaje)
+        socket.to(match).emit('message', mensaje)
         socket.emit('message', mensaje)
         saveMessage(message, _id, match)
     })

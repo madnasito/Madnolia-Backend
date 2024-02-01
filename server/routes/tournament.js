@@ -1,10 +1,12 @@
 const express = require('express')
 const { createTournament, createTournamentMatches, addPlayerToMatch, deletePlayer, addWinner } = require('../controllers/tournament');
 const { verifyToken } = require('../middleware/autentication');
+const { check } = require('express-validator');
+const { validFields } = require('../middleware/valid_fields');
 const app = express()
 
 // Create tournament
-app.post("/api/tournament", verifyToken, createTournament);
+app.post("/api/tournament", [ check("type", "Need players"), validFields, verifyToken], createTournament);
 
 // Create next match for tournament
 app.post("/api/new_tournament_match", verifyToken, createTournamentMatches);

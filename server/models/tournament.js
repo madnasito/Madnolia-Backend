@@ -55,11 +55,13 @@ const tournamentSchema = new Schema({
         },
         player_1: {
             type: Schema.Types.ObjectId,
-            ref: 'User'
+            ref: 'User',
+            default: null
         },
         player_2: {
             type: Schema.Types.ObjectId,
-            ref: 'User'
+            ref: 'User',
+            default: null
         },
         winner: {
             type: Schema.Types.ObjectId,

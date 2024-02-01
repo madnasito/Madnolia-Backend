@@ -65,7 +65,7 @@ const createMatch = async(req, res) => {
             }
         })
 
-        notificacionSocket(matchDB)
+        // notificacionSocket(matchDB)
 
         res.json({
             ok: true,

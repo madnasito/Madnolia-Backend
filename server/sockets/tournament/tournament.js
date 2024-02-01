@@ -8,10 +8,34 @@ const jwt = require('jsonwebtoken');
 const User = require('../../models/user');
 const { Users } = require('../classes/user')
 const { io } = require("../../server")
+const Tournament = require("../../models/tournament");
+const { addPlayerToMatch } = require('../../controllers/tournament');
 
 require('../../config/config');
 
 const tournamentSocket = async(socket, users) =>{
  
-    // Sign up for user in match
+    socket.on("init_tournament", async(tournament_id) =>{
+        
+        const tournament = await Tournament.findOne({_id: tournament_id})
+
+        if(!tournament){
+            return console.log("It Doesn't exist")
+        }
+
+
+    })
+
+    socket.on("add_user", async(tournament_id) => {
+
+        const user = users.getUser(socket.id)
+
+        addPlayerToMatch(tournament_id, user._id)
+    })
+
+
+}
+
+module.exports = {
+    tournamentSocket
 }

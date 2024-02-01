@@ -6,6 +6,7 @@ const users = new Users()
 const { chatSocket } = require('./chat/messages')
 const { notificacionSocket } = require('./notifications/notification')
 const { verifySocketToken } = require('../middleware/autentication')
+const { tournamentSocket } = require('./tournament/tournament')
 
 io.on('connection', async(client) => {
     
@@ -45,7 +46,6 @@ io.on('connection', async(client) => {
 
     // Delete user from Users conexions
     client.on('disconnect', () => {
-        console.log("Desconectado")
         users.deleteUser(client.id)
     })
 
@@ -53,7 +53,7 @@ io.on('connection', async(client) => {
     chatSocket(client, users)
     notificacionSocket(client, users)
 
-    
+    tournamentSocket(client, users)
 
 })
 
