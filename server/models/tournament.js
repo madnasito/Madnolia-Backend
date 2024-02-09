@@ -76,21 +76,6 @@ const tournamentSchema = new Schema({
             default: false
         },
         // _id: false
-    }],
-    chat: [{
-        user: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-        },
-        date: {
-            type: Number,
-        },
-        text: {
-            type: String,
-        },
-        _id: {
-            type: mongoose.Schema.Types.ObjectId
-        }
     }]
 })
 

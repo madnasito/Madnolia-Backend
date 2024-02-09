@@ -52,15 +52,19 @@ const notificacionSocket = async(socket, users) => {
             if(matchDB){
                 
                 
-                Match.findOneAndUpdate({ _id: data }, { $addToSet: { likes: user._id } }, (err) => {
+                await Match.findOneAndUpdate({ _id: data }, { $addToSet: { likes: user._id } }, (err) => {
                     if (err) {
                         return console.log(err);
                     }
                 
                     socket.emit("added_to_match", true);
+                    socket.to(matchDB._id.toString()).emit("new_player_to_match", {
+                        _id: user._id,
+                        name: user.name,
+                        thumb_img: user.thumb_img,
+                        username: user.username
+                    })
                 });
-                
-
                 
 
             }else{

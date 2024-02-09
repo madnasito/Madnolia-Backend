@@ -1,4 +1,8 @@
 // const { io } = require('../../server')
+
+
+const { createMatchMessage } = require("../../controllers/sockets/messages/match_message");
+
 // const jwt = require('jsonwebtoken')
 const { saveMessage } = require('../../controllers/chat')
 // const { Users } = require('../classes/user')
@@ -9,8 +13,6 @@ const chatSocket = (socket, users) => {
 
     // Sign up for user
     socket.on('init_match_chat', (data) => {
-        
-        console.log(data)
 
         if (!users.getUser(socket.id)) {
             setTimeout(() => {
@@ -26,16 +28,24 @@ const chatSocket = (socket, users) => {
 
 
 
-    socket.on('message', (message) => {
-        const user = users.getUser(socket.id)
+    socket.on('message', (data) => {
+
+        const {message, room} = data
+        
+
+        const user = users.getUser(socket.id)   
         if (!user) {
             return
         }
         const { match, _id } = user
-        const mensaje = createMessage(user, message)
-        socket.to(match).emit('message', mensaje)
-        socket.emit('message', mensaje)
-        saveMessage(message, _id, match)
+        const socketMessage = createMessage(user, message, room)
+        
+
+        createMatchMessage(socketMessage);
+
+        
+        socket.to(room).emit('message', socketMessage)
+        socket.emit('message', socketMessage)
     })
 
 
@@ -45,7 +55,7 @@ const chatSocket = (socket, users) => {
 
 }
 
-const createMessage = (user, message) => {
+const createMessage = (user, message, room) => {
 
     return {
         date: new Date().getTime(),
@@ -55,7 +65,8 @@ const createMessage = (user, message) => {
             thumb_img: user.thumb_img,
             name: user.name
         },
-        text: message
+        text: message,
+        room
     }
 }
 

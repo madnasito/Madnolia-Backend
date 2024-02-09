@@ -52,8 +52,8 @@ const fileUpload = async(req, res = response) => {
 
         const updatedUser = await updateImage(uid, resp.data.data.url, resp.data.data.thumb.url)
 
-        console.log(resp.data.data.url)
-        console.log(resp.data.data.thumb.url)
+        // console.log(resp.data.data.url)
+        // console.log(resp.data.data.thumb.url)
 
         res.json({
             ok: true,

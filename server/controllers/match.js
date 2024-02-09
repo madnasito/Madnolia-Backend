@@ -1,7 +1,11 @@
 const Match = require('../models/match')
 const _ = require('underscore')
+
 const User = require('../models/user')
 const Game = require('../models/game')
+const MatchMessage = require('../models/match_message')
+
+
 const { createGame, addGameMatch, getGamesByPlatforms } = require('./game')
 const { substractGameMatch } = require('../controllers/game');
 const { notificacionSocket } = require('../sockets/notifications/notification')
@@ -130,7 +134,8 @@ const getMatch = async(req, res) => {
         Match.findById(id)
             // .select({ chat: { $slice: -10 } })
             // .sort('chat.date')
-            .populate('chat.user', 'username thumb_img name')
+            // .populate('chat.user', 'username thumb_img name')
+            .populate('likes', 'username thumb_img name')
             .populate('users', 'username')
             .exec((err, matchDB) => {
 
@@ -141,10 +146,26 @@ const getMatch = async(req, res) => {
                     })
                 }
 
-                res.json({
-                    ok: true,
-                    match: matchDB
-                })
+                MatchMessage.find({room: id}, {date: 1, user: 1, text: 1, room: 1})
+                            .populate("user", 'username thumb_img name')
+                            .exec((err, messages) => {
+
+                                if (err) {
+                                    return res.status(404).json({
+                                        ok: false,
+                                        err
+                                    })
+                                }
+
+                                res.json({
+                                    ok: true,
+                                    match: matchDB,
+                                    messages
+                                })
+
+                            })
+
+
             })
     } catch (error) {
         console.log(error)
@@ -192,25 +213,25 @@ const playerMatches = async(req, res) => {
 
     let skip = Number(req.query.skip) || 0;
 
-    Match.find({ user })
-        .skip(skip)
-        
-        .limit(30)
-        .sort({ _id: -1 })
-        .exec((err, matches) => {
-            if (err) {
-                return res.status(404).json({
-                    ok: false,
-                    err
-                })
-            }
-
-            res.json({
-                ok: true,
-                matches
+    Match.find({ user }, {img: 1, message: 1, game_name: 1, platform: 1, date: 1})
+    .skip(skip)
+    // .populate("likes", "username thumb_img name _id")  // Commented out for clarity
+    .limit(30)
+    .sort({ _id: -1 })
+    // .select("-users", "-likes")
+    .exec((err, matches) => {
+        if(err){
+            return res.status(500).json({
+                ok: false,
+                err
             })
+        }
 
+        res.json({
+            ok: true,
+            matches
         })
+    });
 }
 
 // Matches of Platform
@@ -248,7 +269,6 @@ const matchesByPlatform = async(req, res) => {
                     })
             }
 
-            console.log(topGames)
 
             res.send(matches)
         })
@@ -286,8 +306,6 @@ const getMatchesByPlatform = async(platform, skip) => {
                         }
                         topGames[matches[i].game_name] = matchCount
                     })
-                
-                console.log(topGames)
             }
 
             return matches
@@ -310,9 +328,10 @@ const platformGameMatches = (req, res) => {
         })
     }
 
-    Match.find({ game_id, platform, active: true })
+    Match.find({ game_id, platform, active: true }, { message: 1, game_name: 1, platform: 1, date: 1})
         .skip(skip)
         .limit(limit)
+        // .populate("likes", "username name thumb_img")
         // .sort({})
         .exec((err, matchesDB) => {
             if (err) {

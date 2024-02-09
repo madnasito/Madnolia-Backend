@@ -28,16 +28,15 @@ const job = new CronJob('0 */1 * * * *', function() {
                 match: match._id
             }
 
-            match.users.forEach(element => {
+            match.likes.forEach(element => {
                 
-                const invited_user = getUsers().getUserById(element.toString())
+                const added_user = getUsers().getUserById(element.toString())
 
-                if(invited_user){
+                if(added_user){
 
-                    console.log(invited_user)
                     
-                    io.to(invited_user.socket_id).emit("match_ready", data)
-                    console.log("Notification a: " + invited_user.name);
+                    io.to(added_user.socket_id).emit("match_ready", data)
+                    console.log("Notification a: " + added_user.name);
                 }
                 
             });

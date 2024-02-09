@@ -37,6 +37,7 @@ const getUserInvitations = async(req, res) => {
 
     User.findById(user)
         .populate('invitations')
+        .populate("invitations.likes", "username thumb_img name _id")
         .exec((err, userDB) => {
             if (err) {
                 return
@@ -184,8 +185,6 @@ const updatePlatforms = async(req, res) => {
 
     const uid = req.user
 
-    // let numberPlatforms = req.body.platforms.map(str => parseInt(str, 10));
-    console.log(typeof req.body.platforms[0])
     
 
     try {

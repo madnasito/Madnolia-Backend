@@ -46,22 +46,7 @@ const matchSchema = new Schema({
     },
     img: {
         type: String
-    },
-    chat: [{
-        user: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-        },
-        date: {
-            type: Number,
-        },
-        text: {
-            type: String,
-        },
-        _id: {
-            type: mongoose.Schema.Types.ObjectId
-        }
-    }]
+    }
 })
 
 module.exports = mongoose.model('Match', matchSchema)
