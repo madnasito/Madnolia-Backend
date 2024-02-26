@@ -86,6 +86,6 @@ const addUserToRooms = async (client, user) =>  {
 }
 
 module.exports = {
-    
+    getUsers
 }
 require('./notifications/cronjob')
