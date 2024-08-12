@@ -10,7 +10,6 @@ const { saveMessage } = require('../../controllers/chat')
 
 const chatSocket = (socket, users) => {
 
-
     // Sign up for user
     socket.on('init_match_chat', (data) => {
 
@@ -26,8 +25,6 @@ const chatSocket = (socket, users) => {
 
     })
 
-
-
     socket.on('message', (data) => {
 
         const {message, room} = data
@@ -40,10 +37,8 @@ const chatSocket = (socket, users) => {
         const { match, _id } = user
         const socketMessage = createMessage(user, message, room)
         
-
         createMatchMessage(socketMessage);
 
-        
         socket.to(room).emit('message', socketMessage)
         socket.emit('message', socketMessage)
     })

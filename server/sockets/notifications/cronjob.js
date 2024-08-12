@@ -11,7 +11,6 @@ const job = new CronJob('0 */1 * * * *', function() {
 
     const d = new Date();
 
-
     Match.find({date: {$lt: d.getTime()}, active: true}, (err, matches) =>{
         if(err){
             return console.log(err)

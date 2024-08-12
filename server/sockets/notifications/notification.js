@@ -9,7 +9,6 @@ const notificacionSocket = async(socket, users) => {
 
     socket.on('match_created', async(matchId) => {
 
-
         try {
             
             const match = await Match.findOne({_id: matchId});
@@ -85,9 +84,6 @@ const notificacionSocket = async(socket, users) => {
 }
 
 
-
-
-
 const matchReadySocket = async(match_id, users) => {
 
     let user = await User.findById(match.user)
@@ -105,6 +101,10 @@ const matchReadySocket = async(match_id, users) => {
         const invited_user = users.getUserById(element.toString())
         if (invited_user) {
             socket.broadcast.to(invited_user.socket_id).emit('match_ready', (data))
+        }
+        const userHost = users.getUserById(_id.toString())
+        if(userHost) {
+            socket.to(userHost.socket_id).emit('match_ready', (data))
         }
     });
         

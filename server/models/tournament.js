@@ -12,9 +12,10 @@ const tournamentSchema = new Schema({
         type: String,
         required: true,
     },
-    game_id: {
+    game: {
         required: [true, 'Hey you forgot your game!'],
-        type: String
+        type: Schema.Types.ObjectId,
+        ref: 'Game'
     },
     platform: {
         type: Number,

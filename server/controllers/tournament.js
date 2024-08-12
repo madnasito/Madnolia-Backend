@@ -14,6 +14,7 @@ const createTournament = async (req, res) =>{
     
     let matches = []
     let body = req.body;
+    body.tournament = true
 
     const validTypes = [4, 8, 16, 32, 64]
     
@@ -30,26 +31,36 @@ const createTournament = async (req, res) =>{
     }
 
 
-    for (let index = 1; index <= type / 2; index++) {
-        const name = `${req.body.name} (${index})`
-        const match = await createMatch(req, name);
-        if(match){
-            matches.push({
-                match: match._id
-        })
-        }else{
-            return res.status(500).json({
-                ok: false,
-                err: {
-                    message: "Error creating the match"
-                }
+    try {
+        
+        for (let index = 1; index <= type / 2; index++) {
+            const name = `${req.body.name} (${index})`
+            const match = await createMatch(req, name);
+            if(match){
+                matches.push({
+                    match: match._id
             })
+            }else{
+                return res.status(500).json({
+                    ok: false,
+                    err: {
+                        message: "Error creating the match"
+                    }
+                })
+            }
         }
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error
+        })
     }
+
+    const game = await Game.findOne({game_id: body.game_id})
 
     const tournament = new Tournament({
         name: body.name,
-        game_id: body.game_id,
+        game: game._id,
         platform: body.platform,
         date: body.date,
         user: req.user,
@@ -73,7 +84,6 @@ const createTournament = async (req, res) =>{
     })
     
 }
-
 
 // Creating a Match
 const createMatch = async (req, name) => {
@@ -125,9 +135,13 @@ const createTournamentMatches = async(req, res) =>{
     */
 
 
-    const tournament = await Tournament.findById(body.tournament_id);
+    const tournament = await Tournament.findById(body.tournament_id).populate("game");
 
-    if(! tournament){
+    const game = tournament.game
+
+
+
+    if(!tournament){
         return res.status(404).json({
             ok: false,
             message: "Error in tournament"
@@ -175,7 +189,7 @@ const createTournamentMatches = async(req, res) =>{
                 }
             })
         }
-    }  
+    }
 
     Tournament.updateMany({_id: tournament._id}, {$set: {'matches.match': newMatches}}, {new: true}, (err, tournamentDB) => {
 

@@ -6,23 +6,23 @@ const { verifyToken } = require('../middleware/autentication')
 const { validFields } = require('../middleware/valid_fields')
 
 app.post('/api/login', [
-    check('username', 'The username is required').not().isEmpty(),
-    check('password', "The password is required").not().isEmpty(),
+    check('username', 'invalid_username').not().isEmpty(),
+    check('password', "invalid_password").not().isEmpty(),
     validFields
 ], login)
 
 // Post petition for create the user
 app.post('/api/signin', [
-    check('name', 'The name is required').not().isEmpty(),
-    check('username', 'The username is required').not().isEmpty(),
-    check('email', 'The email is required').not().isEmpty(),
-    check('password', 'The password is required').not().isEmpty(),
-    check('platforms', 'Select at least one platform').not().isEmpty(),
+    check('name', 'invalid_name').not().isEmpty().isString(),
+    check('username', 'invalid_username').not().isEmpty().isString(),
+    check('email', 'invalid_email').not().isEmpty().isEmail(),
+    check('password', 'invalid_password').not().isEmpty().isString(),
+    check('platforms', 'invalid_platforms').not().isEmpty().isArray(),
     validFields
 ], createUser)
 
 app.post('/api/recover_password', [
-    check('email', 'Need email for recover password').not().isEmpty(),
+    check('email', 'invalid_email').not().isEmpty().isEmail(),
     validFields
 ], recoverPasswordToken)
 

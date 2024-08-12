@@ -4,7 +4,7 @@ const Game = require('../models/game')
 
 const api_key = "8af7cb7fc9d949acac94ab83be57ed1b"
 
-const createGame = async(req, res) => {
+const createGame = async(req) => {
 
     const body = req.body
 

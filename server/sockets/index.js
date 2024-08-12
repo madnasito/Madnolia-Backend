@@ -81,7 +81,6 @@ const addUserToRooms = async (client, user) =>  {
         });
         
     });
-
     
 }
 
