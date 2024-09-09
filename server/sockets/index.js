@@ -13,15 +13,11 @@ const match = require('../models/match')
 io.on('connection', async(client) => {
     
 
-    
     if(!client.handshake.headers["x-token"]){
         return;
     }
 
     const [valid, user] = verifySocketToken(client.handshake.headers["x-token"])
-
-    
-
 
     // // Verificar autenticación
     if(!valid){
@@ -29,26 +25,9 @@ io.on('connection', async(client) => {
 
     }
 
-    // client.on('init_user', (token) => {
-    //     jwt.verify(token, process.env.SEED, (err, decoded) => {
-
-    //         if (err) {
-    //             return
-    //         }
-
-    //         // console.log(decoded)
-
-    //     })
-    // })
-
-
 
     users.addUser(user, client.id)
 
-    
-    // addUserToRooms(user)
-    
-    // users.addUser(user, client.id)
     
     // Delete user from Users conexions
     client.on('disconnect', () => {

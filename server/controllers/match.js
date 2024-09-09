@@ -18,7 +18,10 @@ const createMatch = async(req, res) => {
     if(body.name == ""){
         body.name = "Casual Match"
     }
+    
+    let game = await Game.findOne({ game_id: body.game_id })
 
+    
     const match = new Match({
         game_name: body.game_name,
         game_id: body.game_id,
@@ -26,12 +29,10 @@ const createMatch = async(req, res) => {
         date: body.date,
         user: req.user,
         message: body.name,
-        img: body.img,
         users: body.users,
     })
 
 
-    let game = await Game.findOne({ game_id: body.game_id })
 
 
     if (game) {

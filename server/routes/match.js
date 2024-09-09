@@ -22,8 +22,6 @@ app.get('/api/matches_of_game/:platform/:game', platformGameMatches)
 app.post('/api/match', [
     check('game_id', 'invalid_game_id').not().isEmpty().isInt(),
     check('platform', 'invalid_platform').not().isEmpty().isInt(),
-    check('game_id', 'invalid_game_id').not().isEmpty().isInt(),
-    check('img', 'invalid_img').not().isEmpty().isURL(),
     check('users', 'invalid_users').isArray(),
     validFields,
     verifyToken
