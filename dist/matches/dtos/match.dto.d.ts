@@ -1,8 +1,10 @@
-export declare class CreateMatchDto {
+export declare class MatchDto {
     title: string;
+    user: string;
     platform: number;
-    game: number;
+    game: string;
     date: number;
     inviteds: Array<string>;
     likes: Array<String>;
+    tournament: boolean;
 }

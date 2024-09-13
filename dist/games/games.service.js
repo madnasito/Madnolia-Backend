@@ -25,7 +25,7 @@ let GamesService = class GamesService {
         this.config = config;
         this.httpService = httpService;
         this.getGame = async (id) => {
-            const gameDb = await this.findById(id);
+            const gameDb = await this.findByRawId(id);
             if (gameDb)
                 return gameDb;
             const rawGame = await this.getRawgGame(id);
@@ -41,7 +41,25 @@ let GamesService = class GamesService {
             const createdGame = new this.gameModel(newGame);
             return await createdGame.save();
         };
-        this.findById = async (gameId) => await this.gameModel.findOne({ gameId });
+        this.increaseAmountInPlatform = async (gameId, platform) => {
+            const gameDb = await this.gameModel.findOneAndUpdate({ gameId, platforms: { $elemMatch: { id: Number(platform) } } }, {
+                $inc: {
+                    "platforms.$.amount": 1
+                }
+            }, { new: true });
+            if (gameDb)
+                return gameDb;
+            return await this.gameModel.findOneAndUpdate({ gameId }, {
+                $push: {
+                    platforms: {
+                        id: platform,
+                        amount: 1
+                    }
+                }
+            }, { new: true }).catch((err) => new common_1.BadGatewayException());
+        };
+        this.findByRawId = async (gameId) => await this.gameModel.findOne({ gameId });
+        this.findById = async (gameId) => await this.gameModel.findById(gameId);
         this.getRawgGame = async (id) => {
             const apiKey = this.config.get('RAWG_API_KEY');
             const gameData = (await this.httpService.axiosRef.get(`/${id}?key=${apiKey}`)).data;

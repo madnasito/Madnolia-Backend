@@ -1,7 +1,10 @@
+import { Match } from './schemas/match.schema';
 import { CreateMatchDto } from './dtos/create-match.dto';
-import { GamesService } from 'src/games/games.service';
+import { MatchesService } from './matches.service';
 export declare class MatchesController {
-    private readonly gamesService;
-    constructor(gamesService: GamesService);
-    create(body: CreateMatchDto): Promise<any>;
+    private matchesService;
+    constructor(matchesService: MatchesService);
+    create(req: any, body: CreateMatchDto): Promise<import("mongoose").Document<unknown, {}, Match> & Match & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
 }

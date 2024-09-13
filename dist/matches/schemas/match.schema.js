@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatchSchema = exports.Match = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-const user_schema_1 = require("../../user/schemas/user.schema");
 let Match = class Match {
 };
 exports.Match = Match;
@@ -42,7 +41,7 @@ __decorate([
         ref: 'User',
         required: true
     }),
-    __metadata("design:type", user_schema_1.User)
+    __metadata("design:type", mongoose_2.default.Schema.Types.ObjectId)
 ], Match.prototype, "user", void 0);
 __decorate([
     (0, mongoose_1.Prop)({

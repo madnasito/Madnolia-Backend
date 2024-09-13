@@ -9,33 +9,43 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateMatchDto = void 0;
+exports.MatchDto = void 0;
 const class_validator_1 = require("class-validator");
-class CreateMatchDto {
+class MatchDto {
 }
-exports.CreateMatchDto = CreateMatchDto;
+exports.MatchDto = MatchDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CreateMatchDto.prototype, "title", void 0);
+], MatchDto.prototype, "title", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsDefined)(),
+    (0, class_validator_1.IsMongoId)(),
+    __metadata("design:type", String)
+], MatchDto.prototype, "user", void 0);
 __decorate([
     (0, class_validator_1.IsInt)(),
     __metadata("design:type", Number)
-], CreateMatchDto.prototype, "platform", void 0);
+], MatchDto.prototype, "platform", void 0);
 __decorate([
-    (0, class_validator_1.IsInt)(),
-    __metadata("design:type", Number)
-], CreateMatchDto.prototype, "game", void 0);
+    (0, class_validator_1.IsMongoId)(),
+    __metadata("design:type", String)
+], MatchDto.prototype, "game", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
-], CreateMatchDto.prototype, "date", void 0);
+], MatchDto.prototype, "date", void 0);
 __decorate([
     (0, class_validator_1.IsArray)(),
     __metadata("design:type", Array)
-], CreateMatchDto.prototype, "inviteds", void 0);
+], MatchDto.prototype, "inviteds", void 0);
 __decorate([
     (0, class_validator_1.IsArray)(),
     __metadata("design:type", Array)
-], CreateMatchDto.prototype, "likes", void 0);
-//# sourceMappingURL=create-match.dto.js.map
+], MatchDto.prototype, "likes", void 0);
+__decorate([
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], MatchDto.prototype, "tournament", void 0);
+//# sourceMappingURL=match.dto.js.map

@@ -15,27 +15,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatchesController = void 0;
 const common_1 = require("@nestjs/common");
 const create_match_dto_1 = require("./dtos/create-match.dto");
-const games_service_1 = require("../games/games.service");
+const user_guard_1 = require("../guards/user.guard");
+const matches_service_1 = require("./matches.service");
 let MatchesController = class MatchesController {
-    constructor(gamesService) {
-        this.gamesService = gamesService;
+    constructor(matchesService) {
+        this.matchesService = matchesService;
     }
-    async create(body) {
-        const gameData = await this.gamesService.getGame(body.game);
-        console.log(gameData.name);
-        return gameData;
+    async create(req, body) {
+        console.log(req.user.id);
+        return this.matchesService.create(body, req.user.id);
     }
 };
 exports.MatchesController = MatchesController;
 __decorate([
+    (0, common_1.UseGuards)(user_guard_1.UserGuard),
     (0, common_1.Post)('create'),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_match_dto_1.CreateMatchDto]),
+    __metadata("design:paramtypes", [Object, create_match_dto_1.CreateMatchDto]),
     __metadata("design:returntype", Promise)
 ], MatchesController.prototype, "create", null);
 exports.MatchesController = MatchesController = __decorate([
     (0, common_1.Controller)('match'),
-    __metadata("design:paramtypes", [games_service_1.GamesService])
+    __metadata("design:paramtypes", [matches_service_1.MatchesService])
 ], MatchesController);
 //# sourceMappingURL=matches.controller.js.map

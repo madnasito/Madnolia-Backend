@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -8,6 +8,8 @@ import { MatchesModule } from './matches/matches.module';
 import { TournamentsModule } from './tournaments/tournaments.module';
 import { GamesModule } from './games/games.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -24,12 +26,25 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }
     }),
     UserModule,
+    JwtModule.register({
+      global: true,
+      secret: "hard!to-guess_secret",
+      signOptions: { expiresIn: '10d' },
+    }),
     AuthModule,
     MatchesModule,
     TournamentsModule,
     GamesModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true
+      })
+    }
+  ],
 })
 export class AppModule {}

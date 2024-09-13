@@ -17,6 +17,8 @@ const matches_module_1 = require("./matches/matches.module");
 const tournaments_module_1 = require("./tournaments/tournaments.module");
 const games_module_1 = require("./games/games.module");
 const config_1 = require("@nestjs/config");
+const jwt_1 = require("@nestjs/jwt");
+const core_1 = require("@nestjs/core");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -36,13 +38,26 @@ exports.AppModule = AppModule = __decorate([
                 }
             }),
             user_module_1.UserModule,
+            jwt_1.JwtModule.register({
+                global: true,
+                secret: "hard!to-guess_secret",
+                signOptions: { expiresIn: '10d' },
+            }),
             auth_module_1.AuthModule,
             matches_module_1.MatchesModule,
             tournaments_module_1.TournamentsModule,
             games_module_1.GamesModule
         ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        providers: [
+            app_service_1.AppService,
+            {
+                provide: core_1.APP_PIPE,
+                useValue: new common_1.ValidationPipe({
+                    whitelist: true
+                })
+            }
+        ],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

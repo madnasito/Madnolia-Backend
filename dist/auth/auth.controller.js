@@ -22,6 +22,7 @@ let AuthController = class AuthController {
         this.authService = authService;
     }
     async signUp(body) {
+        console.log(typeof body);
         return await this.authService.signUp(body);
     }
     async signin(body) {

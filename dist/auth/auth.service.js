@@ -40,7 +40,7 @@ let AuthService = class AuthService {
             console.log(salt);
             createdUser.password = hash;
             await createdUser.save();
-            const payload = { id: createdUser._id };
+            const payload = { user: createdUser._id };
             const token = await this.jwtService.signAsync(payload);
             return {
                 createdUser,

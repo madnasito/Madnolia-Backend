@@ -2,12 +2,8 @@ import { IsArray, IsBoolean, IsInt, IsMongoId, IsNumber, IsString } from "class-
 
 
 export class CreateMatchDto {
-
     @IsString()
     title: string;
-
-    // @IsMongoId()
-    // user: string
 
     @IsInt()
     platform: number;
@@ -24,7 +20,5 @@ export class CreateMatchDto {
     @IsArray()
     likes: Array<String>
 
-    @IsBoolean()
-    tournament: boolean
 
 }

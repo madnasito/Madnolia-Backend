@@ -1,3 +1,4 @@
+import { BadGatewayException } from '@nestjs/common';
 import { Game } from './schemas/game.schema';
 import { Model } from 'mongoose';
 import { HttpService } from '@nestjs/axios';
@@ -8,6 +9,10 @@ export declare class GamesService {
     private readonly httpService;
     constructor(gameModel: Model<Game>, config: ConfigService, httpService: HttpService);
     getGame: (id: number) => Promise<any>;
-    findById: (gameId: number) => Promise<any>;
+    increaseAmountInPlatform: (gameId: number, platform: number) => Promise<(import("mongoose").Document<unknown, {}, Game> & Game & {
+        _id: import("mongoose").Types.ObjectId;
+    }) | BadGatewayException>;
+    findByRawId: (gameId: number) => Promise<any>;
+    findById: (gameId: string) => Promise<any>;
     getRawgGame: (id: number) => Promise<any>;
 }

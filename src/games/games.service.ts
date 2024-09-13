@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadGatewayException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Game } from './schemas/game.schema';
 import { Model } from 'mongoose';
@@ -17,7 +17,7 @@ export class GamesService {
 
     getGame = async(id: number) => {
 
-        const gameDb = await this.findById(id);
+        const gameDb = await this.findByRawId(id);
 
         if(gameDb) return gameDb;
 
@@ -39,7 +39,31 @@ export class GamesService {
 
     }
 
-    findById = async(gameId: number):Promise<any> => await this.gameModel.findOne({gameId})
+    increaseAmountInPlatform = async (gameId: number, platform: number) => {
+
+        const gameDb = await this.gameModel.findOneAndUpdate({ gameId, platforms: { $elemMatch: { id: Number(platform) } } }, {
+            $inc: {
+                "platforms.$.amount": 1
+            }
+        }, { new: true })
+
+        if (gameDb) return gameDb
+
+        return await this.gameModel.findOneAndUpdate({ gameId }, {
+            $push: {
+                platforms: {
+                    id: platform,
+                    amount: 1
+                }
+            }
+        }, { new: true }).catch((err) => new BadGatewayException())
+        
+        
+    }
+
+    findByRawId = async(gameId: number):Promise<any> => await this.gameModel.findOne({gameId})
+
+    findById = async(gameId: string):Promise<any> => await this.gameModel.findById(gameId)
 
     getRawgGame = async(id: number) => {
         const apiKey = this.config.get<string>('RAWG_API_KEY')

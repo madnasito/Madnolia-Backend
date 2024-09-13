@@ -28,7 +28,7 @@ export class Match {
         ref: 'User',
         required: true
     })
-    user: User;
+    user: mongoose.Schema.Types.ObjectId;
 
     @Prop({
         required: true,

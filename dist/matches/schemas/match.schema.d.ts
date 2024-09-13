@@ -5,7 +5,7 @@ export declare class Match {
     game: any;
     platform: number;
     date: number;
-    user: User;
+    user: mongoose.Schema.Types.ObjectId;
     inviteds: Array<User>;
     title: string;
     likes: User[];

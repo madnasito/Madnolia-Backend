@@ -17,15 +17,35 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const match_schema_1 = require("./schemas/match.schema");
 const mongoose_2 = require("mongoose");
+const games_service_1 = require("../games/games.service");
 let MatchesService = class MatchesService {
-    constructor(matchModel) {
+    constructor(matchModel, gamesService) {
         this.matchModel = matchModel;
+        this.gamesService = gamesService;
+        this.create = async (createMatchDto, user) => {
+            const gameData = await this.gamesService.getGame(createMatchDto.game);
+            let newMatch = {
+                date: createMatchDto.date,
+                game: gameData._id,
+                inviteds: createMatchDto.inviteds,
+                likes: createMatchDto.likes,
+                platform: createMatchDto.platform,
+                title: createMatchDto.title,
+                tournament: false,
+                user: user
+            };
+            const createdMatch = new this.matchModel(newMatch);
+            const matchDb = await createdMatch.save();
+            await this.gamesService.increaseAmountInPlatform(gameData.gameId, createMatchDto.platform);
+            return matchDb;
+        };
     }
 };
 exports.MatchesService = MatchesService;
 exports.MatchesService = MatchesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(match_schema_1.Match.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        games_service_1.GamesService])
 ], MatchesService);
 //# sourceMappingURL=matches.service.js.map
