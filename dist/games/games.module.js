@@ -6,12 +6,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TournamentModule = void 0;
+exports.GamesModule = void 0;
 const common_1 = require("@nestjs/common");
-let TournamentModule = class TournamentModule {
+const mongoose_1 = require("@nestjs/mongoose");
+const game_schema_1 = require("./schemas/game.schema");
+const games_service_1 = require("./games.service");
+let GamesModule = class GamesModule {
 };
-exports.TournamentModule = TournamentModule;
-exports.TournamentModule = TournamentModule = __decorate([
-    (0, common_1.Module)({})
-], TournamentModule);
-//# sourceMappingURL=tournament.module.js.map
+exports.GamesModule = GamesModule;
+exports.GamesModule = GamesModule = __decorate([
+    (0, common_1.Module)({
+        imports: [
+            mongoose_1.MongooseModule.forFeature([{ name: game_schema_1.Game.name, schema: game_schema_1.GameSchema }])
+        ],
+        providers: [games_service_1.GamesService]
+    })
+], GamesModule);
+//# sourceMappingURL=games.module.js.map

@@ -18,10 +18,12 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const user_schema_1 = require("../user/schemas/user.schema");
 const bcrypt_1 = require("bcrypt");
+const jwt_1 = require("@nestjs/jwt");
 let AuthService = class AuthService {
-    constructor(userModel) {
+    constructor(userModel, jwtService) {
         this.userModel = userModel;
-        this.signup = async (signUpDto) => {
+        this.jwtService = jwtService;
+        this.signUp = async (signUpDto) => {
             const emailDb = await this.findOneByEmail(signUpDto.email);
             if (emailDb) {
                 throw new common_1.BadRequestException('Email in use');
@@ -37,7 +39,27 @@ let AuthService = class AuthService {
             const salt = await (0, bcrypt_1.genSalt)();
             console.log(salt);
             createdUser.password = hash;
-            return createdUser.save();
+            await createdUser.save();
+            const payload = { id: createdUser._id };
+            const token = await this.jwtService.signAsync(payload);
+            return {
+                createdUser,
+                token
+            };
+        };
+        this.signIn = async (signInDto) => {
+            const user = await this.fincOneByUsername(signInDto.username);
+            if (!user)
+                throw new common_1.NotFoundException('Not found user');
+            const isMatch = await (0, bcrypt_1.compare)(signInDto.password, user.password);
+            if (!isMatch)
+                throw new common_1.BadRequestException("Wrong password");
+            const payload = { id: user._id };
+            const token = await this.jwtService.signAsync(payload);
+            return {
+                user,
+                token
+            };
         };
         this.fincOneByUsername = async (username) => {
             const user = await this.userModel.findOne({ username });
@@ -53,6 +75,7 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(user_schema_1.User.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

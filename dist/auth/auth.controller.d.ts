@@ -1,9 +1,19 @@
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dtos/sign-up.dtio';
+import { SignInDto } from './dtos/sign-in.dto';
 export declare class AuthController {
     private authService;
     constructor(authService: AuthService);
-    signUp(body: SignUpDto): Promise<import("mongoose").Document<unknown, {}, import("../user/schemas/user.schema").User> & import("../user/schemas/user.schema").User & {
-        _id: import("mongoose").Types.ObjectId;
+    signUp(body: SignUpDto): Promise<{
+        createdUser: import("mongoose").Document<unknown, {}, import("../user/schemas/user.schema").User> & import("../user/schemas/user.schema").User & {
+            _id: import("mongoose").Types.ObjectId;
+        };
+        token: string;
+    }>;
+    signin(body: SignInDto): Promise<{
+        user: import("mongoose").Document<unknown, {}, import("../user/schemas/user.schema").User> & import("../user/schemas/user.schema").User & {
+            _id: import("mongoose").Types.ObjectId;
+        };
+        token: string;
     }>;
 }

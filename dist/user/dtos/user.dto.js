@@ -33,5 +33,5 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsArray)(),
     __metadata("design:type", Array)
-], UserDto.prototype, "matches", void 0);
+], UserDto.prototype, "platforms", void 0);
 //# sourceMappingURL=user.dto.js.map

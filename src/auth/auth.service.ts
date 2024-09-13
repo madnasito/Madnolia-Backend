@@ -1,14 +1,19 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { User } from "src/user/schemas/user.schema";
 import { SignUpDto } from "./dtos/sign-up.dtio";
-import { hash as bcryptHash, genSalt } from "bcrypt"
+import { hash as bcryptHash, compare, genSalt } from "bcrypt"
+import { JwtService } from "@nestjs/jwt";
+import { SignInDto } from "./dtos/sign-in.dto";
 @Injectable()
 export class AuthService {
-    constructor(@InjectModel(User.name) private userModel: Model<User>){}
+    constructor(
+        @InjectModel(User.name) private userModel: Model<User>,
+        private jwtService: JwtService
+    ){}
 
-    signup = async(signUpDto: SignUpDto) => {
+    signUp = async(signUpDto: SignUpDto) => {
         const emailDb = await this.findOneByEmail(signUpDto.email);
 
         if(emailDb){
@@ -30,9 +35,33 @@ export class AuthService {
 
         createdUser.password = hash
 
-        return createdUser.save()
+        await createdUser.save()
+
+        const payload = {id: createdUser._id}
+        const token = await this.jwtService.signAsync(payload)
+        return {
+            createdUser,
+            token
+        }
     }
 
+    signIn = async(signInDto: SignInDto) => {
+        const user = await this.fincOneByUsername(signInDto.username);
+
+        if(!user) throw new NotFoundException('Not found user');
+
+        const isMatch = await compare(signInDto.password, user.password);
+
+        if(!isMatch) throw new BadRequestException("Wrong password")
+
+        const payload = {id: user._id};
+        const token = await this.jwtService.signAsync(payload)
+
+        return {
+            user,
+            token
+        }
+    }
 
     fincOneByUsername = async(username: string) => {
         const user = await this.userModel.findOne({username})

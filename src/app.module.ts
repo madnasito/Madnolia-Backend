@@ -4,16 +4,32 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { MatchModule } from './match/match.module';
-import { TournamentModule } from './tournament/tournament.module';
+import { MatchesModule } from './matches/matches.module';
+import { TournamentsModule } from './tournaments/tournaments.module';
+import { GamesModule } from './games/games.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/madnolia'),
+    ConfigModule.forRoot({
+      
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV}`
+    }),
+    MongooseModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return {
+          uri: config.get<string>('DB_URI')
+        }
+      }
+    }),
+    // MongooseModule.forRoot('mongodb://localhost/madnolia'),
     UserModule,
     AuthModule,
-    MatchModule,
-    TournamentModule
+    MatchesModule,
+    TournamentsModule,
+    GamesModule
   ],
   controllers: [AppController],
   providers: [AppService],

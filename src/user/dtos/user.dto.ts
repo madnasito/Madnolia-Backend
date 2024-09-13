@@ -13,9 +13,9 @@ export class UserDto {
 
     @IsStrongPassword()
     password: string;
-
+    
     @IsArray()
-    matches: [];
-   
+    platforms: [];
+    
 
 }

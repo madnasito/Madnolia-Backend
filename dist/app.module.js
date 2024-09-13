@@ -13,19 +13,33 @@ const app_service_1 = require("./app.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const user_module_1 = require("./user/user.module");
 const auth_module_1 = require("./auth/auth.module");
-const match_module_1 = require("./match/match.module");
-const tournament_module_1 = require("./tournament/tournament.module");
+const matches_module_1 = require("./matches/matches.module");
+const tournaments_module_1 = require("./tournaments/tournaments.module");
+const games_module_1 = require("./games/games.module");
+const config_1 = require("@nestjs/config");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forRoot('mongodb://localhost/madnolia'),
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+                envFilePath: `.env.${process.env.NODE_ENV}`
+            }),
+            mongoose_1.MongooseModule.forRootAsync({
+                inject: [config_1.ConfigService],
+                useFactory: (config) => {
+                    return {
+                        uri: config.get('DB_URI')
+                    };
+                }
+            }),
             user_module_1.UserModule,
             auth_module_1.AuthModule,
-            match_module_1.MatchModule,
-            tournament_module_1.TournamentModule
+            matches_module_1.MatchesModule,
+            tournaments_module_1.TournamentsModule,
+            games_module_1.GamesModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

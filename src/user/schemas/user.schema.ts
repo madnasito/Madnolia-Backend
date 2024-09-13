@@ -33,12 +33,6 @@ export class User {
     })
     status: boolean;
 
-    // @Prop({
-    //     type: Array<any>,
-    //     default: []
-    // })
-    // matches: Array<any>;
-
     @Prop({
         required: true
     })
