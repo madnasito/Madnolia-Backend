@@ -6,14 +6,14 @@ export class CreateMatchDto {
     @IsString()
     title: string;
 
-    @IsMongoId()
-    user: string
+    // @IsMongoId()
+    // user: string
 
     @IsInt()
     platform: number;
 
-    @IsMongoId()
-    game: string;
+    @IsInt()
+    game: number;
 
     @IsNumber()
     date: number;

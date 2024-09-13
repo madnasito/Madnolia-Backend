@@ -19,16 +19,12 @@ __decorate([
     __metadata("design:type", String)
 ], CreateMatchDto.prototype, "title", void 0);
 __decorate([
-    (0, class_validator_1.IsMongoId)(),
-    __metadata("design:type", String)
-], CreateMatchDto.prototype, "user", void 0);
-__decorate([
     (0, class_validator_1.IsInt)(),
     __metadata("design:type", Number)
 ], CreateMatchDto.prototype, "platform", void 0);
 __decorate([
-    (0, class_validator_1.IsMongoId)(),
-    __metadata("design:type", String)
+    (0, class_validator_1.IsInt)(),
+    __metadata("design:type", Number)
 ], CreateMatchDto.prototype, "game", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),

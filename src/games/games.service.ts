@@ -2,25 +2,48 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Game } from './schemas/game.schema';
 import { Model } from 'mongoose';
-import { CreateGameDto } from './dtos/create-game.dto';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import { RawgGame } from './interfaces/rawg-game.interface';
 
 @Injectable()
 export class GamesService {
 
     constructor(
         @InjectModel(Game.name) private gameModel: Model<Game>,
+        private config: ConfigService,
+        private readonly httpService: HttpService
     ){}
 
-    create = async(createGameDto: CreateGameDto) => {
+    getGame = async(id: number) => {
 
-        const gameDb = await this.findById(createGameDto.gameId);
+        const gameDb = await this.findById(id);
 
         if(gameDb) return gameDb;
 
-        const createdGame = new this.gameModel(createGameDto)
+        const rawGame:RawgGame = await this.getRawgGame(id)
+
+        const newGame = {
+            name: rawGame.name,
+            slug: rawGame.slug,
+            gameId: rawGame.id,
+            platforms: [],
+            background: rawGame.background_image,
+            screenshots: [],
+            description: rawGame.description_raw
+        }
+
+        const createdGame = new this.gameModel(newGame)
 
         return await createdGame.save();
+
     }
 
     findById = async(gameId: number):Promise<any> => await this.gameModel.findOne({gameId})
+
+    getRawgGame = async(id: number) => {
+        const apiKey = this.config.get<string>('RAWG_API_KEY')
+        const gameData = (await this.httpService.axiosRef.get(`/${id}?key=${apiKey}`)).data
+        return gameData
+    }
 }

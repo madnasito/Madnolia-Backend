@@ -1,9 +1,13 @@
 import { Game } from './schemas/game.schema';
 import { Model } from 'mongoose';
-import { CreateGameDto } from './dtos/create-game.dto';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 export declare class GamesService {
     private gameModel;
-    constructor(gameModel: Model<Game>);
-    create: (createGameDto: CreateGameDto) => Promise<any>;
+    private config;
+    private readonly httpService;
+    constructor(gameModel: Model<Game>, config: ConfigService, httpService: HttpService);
+    getGame: (id: number) => Promise<any>;
     findById: (gameId: number) => Promise<any>;
+    getRawgGame: (id: number) => Promise<any>;
 }

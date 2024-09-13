@@ -12,12 +12,16 @@ const mongoose_1 = require("@nestjs/mongoose");
 const match_schema_1 = require("./schemas/match.schema");
 const matches_service_1 = require("./matches.service");
 const matches_controller_1 = require("./matches.controller");
+const games_module_1 = require("../games/games.module");
 let MatchesModule = class MatchesModule {
 };
 exports.MatchesModule = MatchesModule;
 exports.MatchesModule = MatchesModule = __decorate([
     (0, common_1.Module)({
-        imports: [mongoose_1.MongooseModule.forFeature([{ name: match_schema_1.Match.name, schema: match_schema_1.MatchSchema }])],
+        imports: [
+            mongoose_1.MongooseModule.forFeature([{ name: match_schema_1.Match.name, schema: match_schema_1.MatchSchema }]),
+            games_module_1.GamesModule
+        ],
         providers: [matches_service_1.MatchesService],
         controllers: [matches_controller_1.MatchesController]
     })

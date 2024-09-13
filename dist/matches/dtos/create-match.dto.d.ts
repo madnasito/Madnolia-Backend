@@ -1,8 +1,7 @@
 export declare class CreateMatchDto {
     title: string;
-    user: string;
     platform: number;
-    game: string;
+    game: number;
     date: number;
     inviteds: Array<string>;
     likes: Array<String>;
