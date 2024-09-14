@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsInt, IsMongoId, IsNumber, IsString } from "class-validator";
+import { IsArray, IsBoolean, IsInt, IsMongoId, IsNumber, IsOptional, IsString, Min } from "class-validator";
 
 
 export class CreateMatchDto {
@@ -12,6 +12,7 @@ export class CreateMatchDto {
     game: number;
 
     @IsNumber()
+    @Min(new Date().getTime())
     date: number;
 
     @IsArray()
@@ -20,5 +21,8 @@ export class CreateMatchDto {
     @IsArray()
     likes: Array<String>
 
+    @IsOptional()
+    @IsBoolean()
+    private: boolean
 
 }

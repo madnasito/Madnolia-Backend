@@ -17,7 +17,8 @@ export class Game {
     slug: string;
 
     @Prop({ 
-        required: true
+        required: true,
+        unique: true
     })
     gameId: number;
 

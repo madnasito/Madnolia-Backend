@@ -28,7 +28,8 @@ __decorate([
 ], Game.prototype, "slug", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        required: true
+        required: true,
+        unique: true
     }),
     __metadata("design:type", Number)
 ], Game.prototype, "gameId", void 0);

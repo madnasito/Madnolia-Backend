@@ -9,6 +9,7 @@ export declare class Match {
     inviteds: Array<User>;
     title: string;
     likes: User[];
+    private: boolean;
     active: boolean;
     tournament: boolean;
 }

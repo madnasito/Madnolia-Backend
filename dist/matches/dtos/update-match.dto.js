@@ -9,39 +9,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateMatchDto = void 0;
+exports.UpdateMatchDto = void 0;
 const class_validator_1 = require("class-validator");
-class CreateMatchDto {
+class UpdateMatchDto {
 }
-exports.CreateMatchDto = CreateMatchDto;
+exports.UpdateMatchDto = UpdateMatchDto;
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CreateMatchDto.prototype, "title", void 0);
+], UpdateMatchDto.prototype, "title", void 0);
 __decorate([
-    (0, class_validator_1.IsInt)(),
-    __metadata("design:type", Number)
-], CreateMatchDto.prototype, "platform", void 0);
-__decorate([
-    (0, class_validator_1.IsInt)(),
-    __metadata("design:type", Number)
-], CreateMatchDto.prototype, "game", void 0);
-__decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(new Date().getTime()),
     __metadata("design:type", Number)
-], CreateMatchDto.prototype, "date", void 0);
-__decorate([
-    (0, class_validator_1.IsArray)(),
-    __metadata("design:type", Array)
-], CreateMatchDto.prototype, "inviteds", void 0);
-__decorate([
-    (0, class_validator_1.IsArray)(),
-    __metadata("design:type", Array)
-], CreateMatchDto.prototype, "likes", void 0);
+], UpdateMatchDto.prototype, "date", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
-], CreateMatchDto.prototype, "private", void 0);
-//# sourceMappingURL=create-match.dto.js.map
+], UpdateMatchDto.prototype, "private", void 0);
+//# sourceMappingURL=update-match.dto.js.map

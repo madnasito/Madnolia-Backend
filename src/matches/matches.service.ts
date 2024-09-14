@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Match } from './schemas/match.schema';
 import { Model } from 'mongoose';
@@ -37,5 +37,72 @@ export class MatchesService {
         return matchDb;
         
     }
-    
+
+    getMatch = async(id: string) => this.matchModel.findById(id);
+
+    update = async(id: string, user: string, attrs: Partial<Match>) => {
+        const match = await this.matchModel.findById(id, user);
+
+        if(!match) throw new NotFoundException('Match not found')
+
+        Object.assign(match, attrs);
+
+        return match.save();
+    }
+
+    delete = async(id: string, user: string) => {
+
+        const match = await this.matchModel.findOne({_id: id, user})
+
+        if(!match) throw new NotFoundException("Match not found")
+
+        match.active = false;
+
+        return match.save();
+    }
+
+    getPlayerMatches = async(user: string, skip: number = 0) => 
+        this.matchModel.find({user}).sort({ _id: -1 }).skip(0)
+
+    getMatchesByPlatform = async (platform: number, skip: number = 0) => {
+        
+        const results = await this.matchModel.aggregate([
+            {
+              $match: {
+                platform,
+                active: true,
+              },
+            },
+            {
+              $lookup: {
+                from: 'games', // Assuming the collection for games is named 'games'
+                localField: 'game',
+                foreignField: '_id',
+                as: 'gameDetails',
+              },
+            },
+            {
+              $unwind: '$gameDetails',
+            },
+            {
+              $group: {
+                _id: '$gameDetails._id', // Group by game ID
+                count: { $sum: 1 },
+                name: { $first: '$gameDetails.name' }, // Or any other field from Game
+                background: { $first: '$gameDetails.background' }, // Include background property
+                slug: { $first: '$gameDetails.slug' }, // Include slug property
+              },
+            },
+            {
+              $sort: {
+                count: -1,
+              },
+            },
+          ]);
+          return results;
+          
+    }
+
+    getMatchesByGameAndPlatform = async(platform: number, game: string, skip: number = 0) => 
+        this.matchModel.find({platform, game}).skip(skip)
 }

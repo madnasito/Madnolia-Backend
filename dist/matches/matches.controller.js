@@ -17,16 +17,46 @@ const common_1 = require("@nestjs/common");
 const create_match_dto_1 = require("./dtos/create-match.dto");
 const user_guard_1 = require("../guards/user.guard");
 const matches_service_1 = require("./matches.service");
+const update_match_dto_1 = require("./dtos/update-match.dto");
 let MatchesController = class MatchesController {
     constructor(matchesService) {
         this.matchesService = matchesService;
+    }
+    async getMatch(id) {
+        const match = await this.matchesService.getMatch(id);
+        if (!match)
+            throw new common_1.NotFoundException();
+        return match;
+    }
+    async getMatchesByPlatform(platform) {
+        return this.matchesService.getMatchesByPlatform(parseInt(platform));
     }
     async create(req, body) {
         console.log(req.user.id);
         return this.matchesService.create(body, req.user.id);
     }
+    update(req, id, body) {
+        return this.matchesService.update(id, req.user.id, body);
+    }
+    delete(req, id) {
+        return this.matchesService.delete(id, req.user.id);
+    }
 };
 exports.MatchesController = MatchesController;
+__decorate([
+    (0, common_1.Get)('info/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MatchesController.prototype, "getMatch", null);
+__decorate([
+    (0, common_1.Get)('platform/:platform'),
+    __param(0, (0, common_1.Param)('platform')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MatchesController.prototype, "getMatchesByPlatform", null);
 __decorate([
     (0, common_1.UseGuards)(user_guard_1.UserGuard),
     (0, common_1.Post)('create'),
@@ -36,6 +66,25 @@ __decorate([
     __metadata("design:paramtypes", [Object, create_match_dto_1.CreateMatchDto]),
     __metadata("design:returntype", Promise)
 ], MatchesController.prototype, "create", null);
+__decorate([
+    (0, common_1.UseGuards)(user_guard_1.UserGuard),
+    (0, common_1.Put)('update/:id'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, update_match_dto_1.UpdateMatchDto]),
+    __metadata("design:returntype", void 0)
+], MatchesController.prototype, "update", null);
+__decorate([
+    (0, common_1.UseGuards)(user_guard_1.UserGuard),
+    (0, common_1.Delete)('delete/:id'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", void 0)
+], MatchesController.prototype, "delete", null);
 exports.MatchesController = MatchesController = __decorate([
     (0, common_1.Controller)('match'),
     __metadata("design:paramtypes", [matches_service_1.MatchesService])

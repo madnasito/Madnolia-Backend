@@ -64,6 +64,12 @@ __decorate([
 ], Match.prototype, "likes", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
+        default: false
+    }),
+    __metadata("design:type", Boolean)
+], Match.prototype, "private", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
         default: true
     }),
     __metadata("design:type", Boolean)

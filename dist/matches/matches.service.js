@@ -39,6 +39,59 @@ let MatchesService = class MatchesService {
             await this.gamesService.increaseAmountInPlatform(gameData.gameId, createMatchDto.platform);
             return matchDb;
         };
+        this.getMatch = async (id) => this.matchModel.findById(id);
+        this.update = async (id, user, attrs) => {
+            const match = await this.matchModel.findById(id, user);
+            if (!match)
+                throw new common_1.NotFoundException('Match not found');
+            Object.assign(match, attrs);
+            return match.save();
+        };
+        this.delete = async (id, user) => {
+            const match = await this.matchModel.findOne({ _id: id, user });
+            if (!match)
+                throw new common_1.NotFoundException("Match not found");
+            match.active = false;
+            return match.save();
+        };
+        this.getPlayerMatches = async (user, skip = 0) => this.matchModel.find({ user }).sort({ _id: -1 }).skip(0);
+        this.getMatchesByPlatform = async (platform, skip = 0) => {
+            const results = await this.matchModel.aggregate([
+                {
+                    $match: {
+                        platform,
+                        active: true,
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'games',
+                        localField: 'game',
+                        foreignField: '_id',
+                        as: 'gameDetails',
+                    },
+                },
+                {
+                    $unwind: '$gameDetails',
+                },
+                {
+                    $group: {
+                        _id: '$gameDetails._id',
+                        count: { $sum: 1 },
+                        name: { $first: '$gameDetails.name' },
+                        background: { $first: '$gameDetails.background' },
+                        slug: { $first: '$gameDetails.slug' },
+                    },
+                },
+                {
+                    $sort: {
+                        count: -1,
+                    },
+                },
+            ]);
+            return results;
+        };
+        this.getMatchesByGameAndPlatform = async (platform, game, skip = 0) => this.matchModel.find({ platform, game }).skip(skip);
     }
 };
 exports.MatchesService = MatchesService;

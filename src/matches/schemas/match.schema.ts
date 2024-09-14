@@ -47,6 +47,11 @@ export class Match {
     likes: User[];
 
     @Prop({
+        default: false
+    })
+    private: boolean;
+
+    @Prop({
         default: true
     })
     active: boolean;
