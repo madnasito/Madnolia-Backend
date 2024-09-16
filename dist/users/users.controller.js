@@ -17,6 +17,8 @@ const common_1 = require("@nestjs/common");
 const users_service_1 = require("./users.service");
 const user_guard_1 = require("../guards/user.guard");
 const update_user_dto_1 = require("./dtos/update-user.dto");
+const serialize_interceptor_1 = require("../interceptors/serialize.interceptor");
+const user_dto_1 = require("./dtos/user.dto");
 let UserController = class UserController {
     constructor(usersService) {
         this.usersService = usersService;
@@ -54,7 +56,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getInfo", null);
 __decorate([
-    (0, common_1.Get)('reser-notifications'),
+    (0, common_1.Get)('reset-notifications'),
     (0, common_1.UseGuards)(user_guard_1.UserGuard),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
@@ -80,6 +82,7 @@ __decorate([
 ], UserController.prototype, "update", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('user'),
+    (0, serialize_interceptor_1.Serialize)(user_dto_1.UserDto),
     __metadata("design:paramtypes", [users_service_1.UsersService])
 ], UserController);
 //# sourceMappingURL=users.controller.js.map

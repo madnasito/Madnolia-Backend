@@ -32,13 +32,20 @@ let UsersService = class UsersService {
         this.upadte = async (user, attrs) => this.userModel.findOneAndUpdate({ _id: user }, attrs, { new: true });
         this.searchUser = async (username) => {
             let regex = new RegExp(username, 'i');
-            return await this.userModel.find({ username: regex, status: true })
-                .limit(5);
+            return await this.userModel.find({ username: regex, status: true }, { name: 1, username: 1, _id: 1, imgThumb: 1 }, { limit: 5 });
         };
         this.resetNotifications = async (user) => this.userModel.findOneAndUpdate({ _id: user }, { notification: 0 }, { new: true });
-        this.getUserPartners = async (user) => this.userModel
-            .findOne({ _id: user }, {}, { populate: { path: 'partners', match: { status: true }, select: 'name username img' }
-        });
+        this.getUserPartners = async (user) => {
+            return this.userModel
+                .findOne({ _id: user }, { partners: 1 }, {
+                populate: {
+                    path: 'partners',
+                    match: { status: true },
+                    select: 'name username img',
+                },
+            })
+                .select('partners');
+        };
         this.addPartner = async (user, partner) => {
             const verifiedUser = await this.getInfo(partner);
             if (!verifiedUser)

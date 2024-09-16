@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Match } from './schemas/match.schema';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { GamesService } from 'src/games/games.service';
 import { GameInterface } from './interfaces/game.interface';
 import { CreateMatchDto } from './dtos/create-match.dto';
@@ -38,10 +38,13 @@ export class MatchesService {
         
     }
 
-    getMatch = async(id: string) => this.matchModel.findById(id);
+    getMatch = async(id: string) => {
+      if(!mongoose.Types.ObjectId.isValid(id)) throw new NotFoundException()
+      return this.matchModel.findById(id)
+    }
 
     update = async(id: string, user: string, attrs: Partial<Match>) => {
-        const match = await this.matchModel.findById(id, user);
+        const match = await this.matchModel.findOne({_id: id, user, active: true});
 
         if(!match) throw new NotFoundException('Match not found')
 
@@ -52,13 +55,13 @@ export class MatchesService {
 
     delete = async(id: string, user: string) => {
 
-        const match = await this.matchModel.findOne({_id: id, user})
+        if(!mongoose.Types.ObjectId.isValid(id)) throw new NotFoundException()
 
-        if(!match) throw new NotFoundException("Match not found")
+        const matchDeleted = await  this.matchModel.findOneAndUpdate({_id: id, active: true, user}, {active: false}, {new: true})
 
-        match.active = false;
+        if (!matchDeleted) throw new NotFoundException()
 
-        return match.save();
+        return matchDeleted;
     }
 
     getPlayerMatches = async(user: string, skip: number = 0) => 

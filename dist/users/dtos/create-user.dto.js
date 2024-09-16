@@ -9,50 +9,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserDto = void 0;
-const class_transformer_1 = require("class-transformer");
+exports.CreateUserDto = void 0;
 const class_validator_1 = require("class-validator");
-class UserDto {
+class CreateUserDto {
 }
-exports.UserDto = UserDto;
+exports.CreateUserDto = CreateUserDto;
+__decorate([
+    (0, class_validator_1.IsAlphanumeric)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_transformer_1.Expose)(),
     __metadata("design:type", String)
-], UserDto.prototype, "name", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_transformer_1.Expose)(),
-    __metadata("design:type", String)
-], UserDto.prototype, "username", void 0);
+], CreateUserDto.prototype, "username", void 0);
 __decorate([
     (0, class_validator_1.IsEmail)(),
-    (0, class_transformer_1.Expose)(),
     __metadata("design:type", String)
-], UserDto.prototype, "email", void 0);
+], CreateUserDto.prototype, "email", void 0);
+__decorate([
+    (0, class_validator_1.IsStrongPassword)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "password", void 0);
 __decorate([
     (0, class_validator_1.IsArray)(),
-    (0, class_transformer_1.Expose)(),
     __metadata("design:type", Array)
-], UserDto.prototype, "platforms", void 0);
-__decorate([
-    (0, class_validator_1.IsUrl)(),
-    (0, class_transformer_1.Expose)(),
-    __metadata("design:type", String)
-], UserDto.prototype, "img", void 0);
-__decorate([
-    (0, class_validator_1.IsUrl)(),
-    (0, class_transformer_1.Expose)(),
-    __metadata("design:type", String)
-], UserDto.prototype, "imgThumb", void 0);
-__decorate([
-    (0, class_validator_1.IsArray)(),
-    (0, class_transformer_1.Expose)(),
-    __metadata("design:type", Array)
-], UserDto.prototype, "users", void 0);
-__decorate([
-    (0, class_validator_1.IsInt)(),
-    (0, class_transformer_1.Expose)(),
-    __metadata("design:type", Number)
-], UserDto.prototype, "notifications", void 0);
-//# sourceMappingURL=user.dto.js.map
+], CreateUserDto.prototype, "platforms", void 0);
+//# sourceMappingURL=create-user.dto.js.map

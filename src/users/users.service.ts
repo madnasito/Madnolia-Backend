@@ -26,19 +26,27 @@ export class UsersService {
     searchUser = async (username: string) => {
         let regex = new RegExp(username, 'i')
 
-        return await this.userModel.find({username: regex, status: true})
-            .limit(5)
+        return await this.userModel.find({username: regex, status: true},
+            {name: 1, username: 1, _id: 1, imgThumb: 1}, {limit: 5})
     }
 
     resetNotifications = async (user: string) => this.userModel.findOneAndUpdate({_id: user}, {notification: 0}, {new: true})
     
-    getUserPartners = async (user: string) => 
-        this.userModel
-        .findOne(
-            {_id: user},
-            {},
-            {populate: {path: 'partners',match: { status: true},  select: 'name username img'}
-        })
+    getUserPartners = async (user: string) => {
+        return this.userModel
+          .findOne(
+            { _id: user },
+            { partners: 1 }, // Select only the 'partners' field
+            {
+              populate: {
+                path: 'partners',
+                match: { status: true },
+                select: 'name username img',
+              },
+            }
+          )
+          .select('partners'); // Ensure only 'partners' is returned
+      };
     
     addPartner = async (user: string, partner: string) => {
         const verifiedUser = await this.getInfo(partner);

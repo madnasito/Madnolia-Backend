@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
 import { Match } from './schemas/match.schema';
 import { CreateMatchDto } from './dtos/create-match.dto';
 import { UserGuard } from 'src/guards/user.guard';
@@ -11,9 +11,7 @@ export class MatchesController {
 
     @Get('info/:id')
     async getMatch(@Param('id') id: string){
-        const match = await this.matchesService.getMatch(id);
-        if(!match) throw new NotFoundException();
-        return match;
+        return this.matchesService.getMatch(id);
     }
 
     @Get('platform/:platform')
@@ -24,13 +22,8 @@ export class MatchesController {
     @UseGuards(UserGuard)
     @Post('create')
     async create (@Request() req:any, @Body() body:CreateMatchDto) {
-        
-        console.log(req.user.id);
-
         return this.matchesService.create(body, req.user.id);
     }
-
-    
 
     @UseGuards(UserGuard)
     @Put('update/:id')
@@ -42,6 +35,6 @@ export class MatchesController {
     @Delete('delete/:id')
     delete(@Request() req:any, @Param('id') id: string){
         return this.matchesService.delete(id, req.user.id)
-    }    
+    }
 
 }

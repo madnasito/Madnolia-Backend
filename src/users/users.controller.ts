@@ -2,8 +2,11 @@ import { Controller, Get, UseGuards, Request, Param, Put, Body } from '@nestjs/c
 import { UsersService } from './users.service';
 import { UserGuard } from 'src/guards/user.guard';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { UserDto } from './dtos/user.dto';
 
 @Controller('user')
+@Serialize(UserDto)
 export class UserController {
 
     constructor(private usersService: UsersService){}
@@ -20,7 +23,7 @@ export class UserController {
     }
 
 
-    @Get('reser-notifications')
+    @Get('reset-notifications')
     @UseGuards(UserGuard)
     async resetNotifications(@Request() req:any) {
         return this.usersService.resetNotifications(req.user.id)

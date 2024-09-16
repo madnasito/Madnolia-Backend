@@ -23,16 +23,12 @@ let MatchesController = class MatchesController {
         this.matchesService = matchesService;
     }
     async getMatch(id) {
-        const match = await this.matchesService.getMatch(id);
-        if (!match)
-            throw new common_1.NotFoundException();
-        return match;
+        return this.matchesService.getMatch(id);
     }
     async getMatchesByPlatform(platform) {
         return this.matchesService.getMatchesByPlatform(parseInt(platform));
     }
     async create(req, body) {
-        console.log(req.user.id);
         return this.matchesService.create(body, req.user.id);
     }
     update(req, id, body) {

@@ -39,20 +39,25 @@ let MatchesService = class MatchesService {
             await this.gamesService.increaseAmountInPlatform(gameData.gameId, createMatchDto.platform);
             return matchDb;
         };
-        this.getMatch = async (id) => this.matchModel.findById(id);
+        this.getMatch = async (id) => {
+            if (!mongoose_2.default.Types.ObjectId.isValid(id))
+                throw new common_1.NotFoundException();
+            return this.matchModel.findById(id);
+        };
         this.update = async (id, user, attrs) => {
-            const match = await this.matchModel.findById(id, user);
+            const match = await this.matchModel.findOne({ _id: id, user, active: true });
             if (!match)
                 throw new common_1.NotFoundException('Match not found');
             Object.assign(match, attrs);
             return match.save();
         };
         this.delete = async (id, user) => {
-            const match = await this.matchModel.findOne({ _id: id, user });
-            if (!match)
-                throw new common_1.NotFoundException("Match not found");
-            match.active = false;
-            return match.save();
+            if (!mongoose_2.default.Types.ObjectId.isValid(id))
+                throw new common_1.NotFoundException();
+            const matchDeleted = await this.matchModel.findOneAndUpdate({ _id: id, active: true, user }, { active: false }, { new: true });
+            if (!matchDeleted)
+                throw new common_1.NotFoundException();
+            return matchDeleted;
         };
         this.getPlayerMatches = async (user, skip = 0) => this.matchModel.find({ user }).sort({ _id: -1 }).skip(0);
         this.getMatchesByPlatform = async (platform, skip = 0) => {
