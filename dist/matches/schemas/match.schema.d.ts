@@ -1,5 +1,5 @@
 import mongoose, { HydratedDocument } from 'mongoose';
-import { User } from 'src/user/schemas/user.schema';
+import { User } from 'src/users/schemas/user.schema';
 export type MatchDocument = HydratedDocument<Match>;
 export declare class Match {
     game: any;

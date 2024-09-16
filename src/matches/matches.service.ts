@@ -104,5 +104,5 @@ export class MatchesService {
     }
 
     getMatchesByGameAndPlatform = async(platform: number, game: string, skip: number = 0) => 
-        this.matchModel.find({platform, game}).skip(skip)
+        this.matchModel.find({platform, game, active: true}).skip(skip)
 }

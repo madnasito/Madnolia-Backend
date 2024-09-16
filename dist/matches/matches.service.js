@@ -91,7 +91,7 @@ let MatchesService = class MatchesService {
             ]);
             return results;
         };
-        this.getMatchesByGameAndPlatform = async (platform, game, skip = 0) => this.matchModel.find({ platform, game }).skip(skip);
+        this.getMatchesByGameAndPlatform = async (platform, game, skip = 0) => this.matchModel.find({ platform, game, active: true }).skip(skip);
     }
 };
 exports.MatchesService = MatchesService;

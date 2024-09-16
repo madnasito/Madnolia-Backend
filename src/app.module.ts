@@ -2,7 +2,7 @@ import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserModule } from './user/user.module';
+import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { MatchesModule } from './matches/matches.module';
 import { TournamentsModule } from './tournaments/tournaments.module';
@@ -10,6 +10,8 @@ import { GamesModule } from './games/games.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_PIPE } from '@nestjs/core';
+import { UsersService } from './users/users.service';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -25,7 +27,7 @@ import { APP_PIPE } from '@nestjs/core';
         }
       }
     }),
-    UserModule,
+    UsersModule,
     JwtModule.register({
       global: true,
       secret: "hard!to-guess_secret",
@@ -34,7 +36,8 @@ import { APP_PIPE } from '@nestjs/core';
     AuthModule,
     MatchesModule,
     TournamentsModule,
-    GamesModule
+    GamesModule,
+    MessagesModule
   ],
   controllers: [AppController],
   providers: [

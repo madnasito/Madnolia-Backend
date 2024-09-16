@@ -6,24 +6,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthModule = void 0;
+exports.UsersModule = void 0;
 const common_1 = require("@nestjs/common");
-const auth_controller_1 = require("./auth.controller");
+const users_controller_1 = require("./users.controller");
 const mongoose_1 = require("@nestjs/mongoose");
-const user_schema_1 = require("../users/schemas/user.schema");
-const auth_service_1 = require("./auth.service");
-const jwt_1 = require("@nestjs/jwt");
-let AuthModule = class AuthModule {
+const user_schema_1 = require("./schemas/user.schema");
+const users_service_1 = require("./users.service");
+const user_guard_1 = require("../guards/user.guard");
+let UsersModule = class UsersModule {
 };
-exports.AuthModule = AuthModule;
-exports.AuthModule = AuthModule = __decorate([
+exports.UsersModule = UsersModule;
+exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: user_schema_1.User.name, schema: user_schema_1.UserSchema }]),
-            jwt_1.JwtModule.register({ secret: 'hard!to-guess_secret', signOptions: { expiresIn: "10d" } })
-        ],
-        controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService]
+        imports: [mongoose_1.MongooseModule.forFeature([{ name: user_schema_1.User.name, schema: user_schema_1.UserSchema }])],
+        controllers: [users_controller_1.UserController],
+        providers: [users_service_1.UsersService, user_guard_1.UserGuard],
+        exports: [user_guard_1.UserGuard]
     })
-], AuthModule);
-//# sourceMappingURL=auth.module.js.map
+], UsersModule);
+//# sourceMappingURL=users.module.js.map
