@@ -4,13 +4,16 @@ import { Match, MatchSchema } from './schemas/match.schema';
 import { MatchesService } from './matches.service';
 import { MatchesController } from './matches.controller';
 import { GamesModule } from 'src/games/games.module';
+import { MatchesGateway } from './matches.gateway';
+import { MessagesModule } from 'src/messages/messages.module';
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: Match.name, schema: MatchSchema }]),
-        GamesModule
+        GamesModule,
+        MessagesModule
     ],
-    providers: [MatchesService],
+    providers: [MatchesService, MatchesGateway],
     controllers: [MatchesController]
 })
 export class MatchesModule {}

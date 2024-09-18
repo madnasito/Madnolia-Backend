@@ -18,6 +18,11 @@ export declare class MatchesService {
     delete: (id: string, user: string) => Promise<mongoose.Document<unknown, {}, Match> & Match & {
         _id: mongoose.Types.ObjectId;
     }>;
+    addUserToMatch: (id: string, user: string) => mongoose.Query<mongoose.Document<unknown, {}, Match> & Match & {
+        _id: mongoose.Types.ObjectId;
+    }, mongoose.Document<unknown, {}, Match> & Match & {
+        _id: mongoose.Types.ObjectId;
+    }, {}, Match, "findOneAndUpdate", {}>;
     getPlayerMatches: (user: string, skip?: number) => Promise<(mongoose.Document<unknown, {}, Match> & Match & {
         _id: mongoose.Types.ObjectId;
     })[]>;

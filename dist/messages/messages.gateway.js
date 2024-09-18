@@ -152,9 +152,7 @@ __decorate([
 ], MessagesGateway.prototype, "handleDisconnectChat", null);
 exports.MessagesGateway = MessagesGateway = MessagesGateway_1 = __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe()),
-    (0, websockets_1.WebSocketGateway)({
-        namespace: 'messages'
-    }),
+    (0, websockets_1.WebSocketGateway)({}),
     __metadata("design:paramtypes", [messages_service_1.MessagesService,
         jwt_1.JwtService,
         user_1.Users])

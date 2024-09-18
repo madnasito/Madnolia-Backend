@@ -12,6 +12,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { APP_PIPE } from '@nestjs/core';
 import { UsersService } from './users/users.service';
 import { MessagesModule } from './messages/messages.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { MessagesModule } from './messages/messages.module';
     MatchesModule,
     TournamentsModule,
     GamesModule,
-    MessagesModule
+    MessagesModule,
+    NotificationsModule
   ],
   controllers: [AppController],
   providers: [

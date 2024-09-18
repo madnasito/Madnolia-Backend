@@ -14,7 +14,7 @@ import { JwtService } from '@nestjs/jwt';
 
   @UsePipes(new ValidationPipe())
 @WebSocketGateway({
-  namespace: 'messages'
+  // namespace: 'messages'
 })
 export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 

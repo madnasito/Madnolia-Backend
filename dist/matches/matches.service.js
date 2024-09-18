@@ -59,6 +59,11 @@ let MatchesService = class MatchesService {
                 throw new common_1.NotFoundException();
             return matchDeleted;
         };
+        this.addUserToMatch = (id, user) => {
+            if (!mongoose_2.default.Types.ObjectId.isValid(id) || !mongoose_2.default.Types.ObjectId.isValid(user))
+                throw new common_1.NotFoundException();
+            return this.matchModel.findByIdAndUpdate(id, { $addToSet: { likes: user } }, { new: true });
+        };
         this.getPlayerMatches = async (user, skip = 0) => this.matchModel.find({ user }).sort({ _id: -1 }).skip(0);
         this.getMatchesByPlatform = async (platform, skip = 0) => {
             const results = await this.matchModel.aggregate([

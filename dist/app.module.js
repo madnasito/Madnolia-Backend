@@ -20,6 +20,7 @@ const config_1 = require("@nestjs/config");
 const jwt_1 = require("@nestjs/jwt");
 const core_1 = require("@nestjs/core");
 const messages_module_1 = require("./messages/messages.module");
+const notifications_module_1 = require("./notifications/notifications.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -48,7 +49,8 @@ exports.AppModule = AppModule = __decorate([
             matches_module_1.MatchesModule,
             tournaments_module_1.TournamentsModule,
             games_module_1.GamesModule,
-            messages_module_1.MessagesModule
+            messages_module_1.MessagesModule,
+            notifications_module_1.NotificationsModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [

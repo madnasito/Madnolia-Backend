@@ -13,6 +13,8 @@ const match_schema_1 = require("./schemas/match.schema");
 const matches_service_1 = require("./matches.service");
 const matches_controller_1 = require("./matches.controller");
 const games_module_1 = require("../games/games.module");
+const matches_gateway_1 = require("./matches.gateway");
+const messages_module_1 = require("../messages/messages.module");
 let MatchesModule = class MatchesModule {
 };
 exports.MatchesModule = MatchesModule;
@@ -20,9 +22,10 @@ exports.MatchesModule = MatchesModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: match_schema_1.Match.name, schema: match_schema_1.MatchSchema }]),
-            games_module_1.GamesModule
+            games_module_1.GamesModule,
+            messages_module_1.MessagesModule
         ],
-        providers: [matches_service_1.MatchesService],
+        providers: [matches_service_1.MatchesService, matches_gateway_1.MatchesGateway],
         controllers: [matches_controller_1.MatchesController]
     })
 ], MatchesModule);

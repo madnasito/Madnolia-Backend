@@ -64,6 +64,12 @@ export class MatchesService {
         return matchDeleted;
     }
 
+    addUserToMatch = (id: string, user: string) => {
+      if(!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(user)) throw new NotFoundException()
+      
+      return this.matchModel.findByIdAndUpdate(id, {$addToSet: { likes: user }}, {new: true})
+    }
+
     getPlayerMatches = async(user: string, skip: number = 0) => 
         this.matchModel.find({user}).sort({ _id: -1 }).skip(0)
 
