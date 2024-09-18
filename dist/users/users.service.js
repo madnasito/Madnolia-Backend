@@ -28,6 +28,14 @@ let UsersService = class UsersService {
             const user = await this.userModel.findOne({ email });
             return user;
         };
+        this.fincOneById = async (id) => {
+            if (!mongoose_1.default.Types.ObjectId.isValid(id))
+                throw new common_1.NotFoundException();
+            const user = await this.userModel.findById(id);
+            if (!user)
+                throw new common_1.NotFoundException();
+            return user;
+        };
         this.getInfo = async (user) => await this.userModel.findOne({ _id: user, status: true });
         this.upadte = async (user, attrs) => this.userModel.findOneAndUpdate({ _id: user }, attrs, { new: true });
         this.searchUser = async (username) => {

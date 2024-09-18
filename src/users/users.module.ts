@@ -9,6 +9,6 @@ import { UserGuard } from '../guards/user.guard';
   imports: [MongooseModule.forFeature([{name: User.name, schema: UserSchema}])],
   controllers: [UserController],
   providers: [UsersService, UserGuard],
-  exports: [UserGuard]
+  exports: [UserGuard, UsersService]
 })
 export class UsersModule {}

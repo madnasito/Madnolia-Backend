@@ -8,15 +8,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessagesModule = void 0;
 const common_1 = require("@nestjs/common");
-const messages_controller_1 = require("./messages.controller");
 const messages_service_1 = require("./messages.service");
+const messages_gateway_1 = require("./messages.gateway");
+const mongoose_1 = require("@nestjs/mongoose");
+const messages_schema_1 = require("./schema/messages.schema");
+const users_module_1 = require("../users/users.module");
+const jwt_1 = require("@nestjs/jwt");
+const user_1 = require("./classes/user");
 let MessagesModule = class MessagesModule {
 };
 exports.MessagesModule = MessagesModule;
 exports.MessagesModule = MessagesModule = __decorate([
     (0, common_1.Module)({
-        controllers: [messages_controller_1.MessagesController],
-        providers: [messages_service_1.MessagesService]
+        imports: [
+            mongoose_1.MongooseModule.forFeature([{ name: messages_schema_1.Message.name, schema: messages_schema_1.MessageSchema }]),
+            users_module_1.UsersModule,
+            jwt_1.JwtModule.register({ secret: 'hard!to-guess_secret', signOptions: { expiresIn: "10d" } })
+        ],
+        providers: [messages_service_1.MessagesService, messages_gateway_1.MessagesGateway, user_1.Users]
     })
 ], MessagesModule);
 //# sourceMappingURL=messages.module.js.map

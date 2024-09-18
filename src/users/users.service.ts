@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
@@ -15,6 +15,16 @@ export class UsersService {
     findOneByEmail = async(email: string) => {
         const user = await this.userModel.findOne({email})
         return user;
+    }
+
+    fincOneById = async(id: string) => {
+      if(!mongoose.Types.ObjectId.isValid(id)) throw new NotFoundException()
+
+      const user = await this.userModel.findById(id)
+
+      if(!user) throw new NotFoundException()
+
+      return user;
     }
 
     getInfo = async(user: string) => await this.userModel.findOne({_id: user, status: true})
