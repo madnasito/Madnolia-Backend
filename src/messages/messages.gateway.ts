@@ -126,5 +126,6 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       throw new WsException(error)
     }
   }
+  
 }
 

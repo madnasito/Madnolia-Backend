@@ -13,6 +13,7 @@ import { APP_PIPE } from '@nestjs/core';
 import { UsersService } from './users/users.service';
 import { MessagesModule } from './messages/messages.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { NotificationsModule } from './notifications/notifications.module';
         }
       }
     }),
+    ScheduleModule.forRoot(),
     UsersModule,
     JwtModule.register({
       global: true,

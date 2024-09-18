@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var MatchesGateway_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatchesGateway = void 0;
 const common_1 = require("@nestjs/common");
@@ -16,10 +17,12 @@ const socket_io_1 = require("socket.io");
 const user_sockets_guard_1 = require("../guards/user-sockets.guard");
 const matches_service_1 = require("./matches.service");
 const user_1 = require("../messages/classes/user");
-let MatchesGateway = class MatchesGateway {
+const schedule_1 = require("@nestjs/schedule");
+let MatchesGateway = MatchesGateway_1 = class MatchesGateway {
     constructor(matchesService, users) {
         this.matchesService = matchesService;
         this.users = users;
+        this.logger = new common_1.Logger(MatchesGateway_1.name);
     }
     handleDisconnect(client) {
         console.log("Connection");
@@ -68,8 +71,38 @@ let MatchesGateway = class MatchesGateway {
             throw new websockets_1.WsException(error);
         }
     }
+    async handleCron() {
+        try {
+            this.logger.debug('Called every minute');
+            const matches = await this.matchesService.updatePastTimeMatches();
+            matches.forEach((match) => {
+                const payload = {
+                    title: match.title,
+                    match: match._id,
+                };
+                const hoster = this.users.getUserById(match.user.toString());
+                if (hoster)
+                    this.io.to(hoster.socketId).emit('match_ready', payload);
+                match.likes.forEach((user) => {
+                    const socketUser = this.users.getUserById(user.toString());
+                    if (socketUser) {
+                        this.io.to(socketUser.socketId).emit('match_ready', payload);
+                        this.logger.debug(`Notification to ${socketUser.username}`);
+                    }
+                });
+            });
+        }
+        catch (error) {
+            this.logger.debug(error);
+            throw new websockets_1.WsException(error);
+        }
+    }
 };
 exports.MatchesGateway = MatchesGateway;
+__decorate([
+    (0, websockets_1.WebSocketServer)(),
+    __metadata("design:type", socket_io_1.Namespace)
+], MatchesGateway.prototype, "io", void 0);
 __decorate([
     (0, common_1.UseGuards)(user_sockets_guard_1.UserSocketGuard),
     (0, websockets_1.SubscribeMessage)('match_created'),
@@ -84,7 +117,13 @@ __decorate([
     __metadata("design:paramtypes", [socket_io_1.Socket, String]),
     __metadata("design:returntype", Promise)
 ], MatchesGateway.prototype, "handleJoinToMatch", null);
-exports.MatchesGateway = MatchesGateway = __decorate([
+__decorate([
+    (0, schedule_1.Cron)(schedule_1.CronExpression.EVERY_MINUTE),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], MatchesGateway.prototype, "handleCron", null);
+exports.MatchesGateway = MatchesGateway = MatchesGateway_1 = __decorate([
     (0, websockets_1.WebSocketGateway)(),
     __metadata("design:paramtypes", [matches_service_1.MatchesService,
         user_1.Users])

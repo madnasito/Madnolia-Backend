@@ -21,6 +21,7 @@ const jwt_1 = require("@nestjs/jwt");
 const core_1 = require("@nestjs/core");
 const messages_module_1 = require("./messages/messages.module");
 const notifications_module_1 = require("./notifications/notifications.module");
+const schedule_1 = require("@nestjs/schedule");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -39,6 +40,7 @@ exports.AppModule = AppModule = __decorate([
                     };
                 }
             }),
+            schedule_1.ScheduleModule.forRoot(),
             users_module_1.UsersModule,
             jwt_1.JwtModule.register({
                 global: true,

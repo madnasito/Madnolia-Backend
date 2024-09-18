@@ -7,6 +7,10 @@ export type MatchDocument = HydratedDocument<Match>;
 @Schema()
 export class Match {
     @Prop({
+        type: mongoose.Schema.Types.ObjectId
+    })
+    _id: mongoose.Schema.Types.ObjectId;
+    @Prop({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Game',
         required: true

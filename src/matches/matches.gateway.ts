@@ -1,17 +1,24 @@
-import { NotFoundException, UseGuards } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WsException } from '@nestjs/websockets';
-import { Socket } from "socket.io"
+import { Logger, NotFoundException, UseGuards } from '@nestjs/common';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
+import { Namespace, Socket } from "socket.io"
 import { UserSocketGuard } from 'src/guards/user-sockets.guard';
 import { MatchesService } from './matches.service';
 import { Users } from 'src/messages/classes/user';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @WebSocketGateway()
 export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+
+  private readonly logger = new Logger(MatchesGateway.name);
 
   constructor(
     private matchesService:MatchesService,
     private users:Users
   ){}
+
+  
+  @WebSocketServer() io: Namespace
+
   handleDisconnect(client: any) {
     console.log("Connection");
   }
@@ -84,9 +91,40 @@ export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGat
       throw new WsException(error)
     }
 
-
-        
-    
   }
   
+  @Cron(CronExpression.EVERY_MINUTE)
+  async handleCron() {
+
+    try {
+      this.logger.debug('Called every minute');
+    const matches = await this.matchesService.updatePastTimeMatches()
+    
+    matches.forEach((match) => {
+      const payload = {
+        title: match.title,
+        match: match._id,
+      }
+      
+      // Event to hoster
+      const hoster = this.users.getUserById(match.user.toString())
+      if(hoster) this.io.to(hoster.socketId).emit('match_ready', payload)
+
+      // Event to joined users
+      match.likes.forEach((user) => {
+        
+        const socketUser = this.users.getUserById(user.toString())
+        if(socketUser){
+          this.io.to(socketUser.socketId).emit('match_ready', payload)
+          this.logger.debug(`Notification to ${socketUser.username}`)
+        }
+      })
+
+    })
+    } catch (error) {
+      this.logger.debug(error)
+      throw new WsException(error)
+    }
+    
+  }
 }

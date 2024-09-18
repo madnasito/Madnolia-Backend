@@ -102,6 +102,11 @@ let MatchesService = class MatchesService {
             return results;
         };
         this.getMatchesByGameAndPlatform = async (platform, game, skip = 0) => this.matchModel.find({ platform, game, active: true }).skip(skip);
+        this.updatePastTimeMatches = async () => {
+            const matchesToUpdate = await this.matchModel.find({ active: true, date: { $lt: new Date().getTime() } });
+            await this.matchModel.updateMany({ date: { $lt: new Date().getTime() }, active: true }, { active: false });
+            return matchesToUpdate;
+        };
     }
 };
 exports.MatchesService = MatchesService;
