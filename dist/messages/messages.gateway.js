@@ -31,7 +31,6 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
         this.logger = new common_1.Logger(MessagesGateway_1.name);
     }
     afterInit(socket) {
-        console.log(socket.id);
         this.logger.log("Initialized");
     }
     async handleConnection(client, ...args) {
@@ -44,11 +43,11 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
             }
             const tokenPayload = await this.jwtService.verifyAsync(token);
             await this.users.addUser(tokenPayload.id, client.id);
-            console.log(this.users.getUsers());
             this.logger.debug(`Client id: ${client.id} connected`);
             this.logger.debug(`Number of connected clients: ${size}`);
         }
         catch (error) {
+            console.log(error);
             throw new websockets_1.WsException(error);
         }
     }
@@ -90,7 +89,6 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
                 }
             };
             client.emit('message', payloadEvent);
-            console.log(3);
         }
         catch (error) {
             console.log(error);

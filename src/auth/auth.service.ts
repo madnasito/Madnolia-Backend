@@ -31,7 +31,6 @@ export class AuthService {
         const password = signUpDto.password;
         const hash = await bcryptHash(password, saltOrRounds);
         const salt = await genSalt();
-        console.log(salt);
 
         createdUser.password = hash
 

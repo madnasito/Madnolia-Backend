@@ -64,7 +64,7 @@ let MatchesService = class MatchesService {
                 throw new common_1.NotFoundException();
             return this.matchModel.findByIdAndUpdate(id, { $addToSet: { likes: user } }, { new: true });
         };
-        this.getPlayerMatches = async (user, skip = 0) => this.matchModel.find({ user }).sort({ _id: -1 }).skip(0);
+        this.getPlayerMatches = async (user, skip = 0) => this.matchModel.find({ user }, {}, { populate: { path: 'game' } }).sort({ _id: -1 }).skip(0);
         this.getMatchesByPlatform = async (platform, skip = 0) => {
             const results = await this.matchModel.aggregate([
                 {

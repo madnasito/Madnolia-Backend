@@ -20,7 +20,6 @@ export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGat
   @WebSocketServer() io: Namespace
 
   handleDisconnect(client: any) {
-    console.log("Connection");
   }
   afterInit(server: any) {
 
@@ -37,11 +36,9 @@ export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGat
 
     if(!match) throw new WsException('Not found match')
 
-    console.log(match.game.background);
 
     const matchUrl = `${process.env.URL}/match/info/${match._id}`
 
-    console.log(process.env);
     // const user = this.users.getUser(client.id)
 
     const eventPayload = {

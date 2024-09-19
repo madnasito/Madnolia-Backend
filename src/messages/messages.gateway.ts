@@ -30,7 +30,6 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
   
   afterInit(@ConnectedSocket() socket: Socket) {
-    console.log(socket.id);
     this.logger.log("Initialized");
   }
 
@@ -48,12 +47,12 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
       const tokenPayload = await this.jwtService.verifyAsync(token as string)
       await this.users.addUser(tokenPayload.id, client.id)
-      console.log(this.users.getUsers());
       
       this.logger.debug(`Client id: ${client.id} connected`);
       this.logger.debug(`Number of connected clients: ${size}`);
 
     } catch (error) {
+      console.log(error);
       throw new WsException(error);
     }
     
@@ -109,7 +108,6 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       }
       client.emit('message', payloadEvent)
   
-      console.log(3);
     } catch (error) {
       console.log(error);
       throw new WsException(error)

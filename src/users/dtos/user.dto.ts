@@ -1,7 +1,12 @@
 import { Expose } from "class-transformer";
-import { IsArray, IsEmail, IsInt, IsString, IsUrl } from "class-validator";
+import { IsArray, IsEmail, IsInt, IsMongoId, IsOptional, IsString, IsUrl } from "class-validator";
 
 export class UserDto {
+
+    @IsMongoId()
+    @IsOptional()
+    @Expose()
+    _id: string;
 
     @IsString()
     @Expose()
@@ -29,7 +34,11 @@ export class UserDto {
 
     @IsArray()
     @Expose()
-    users: Array<string>
+    partners: Array<string>
+
+    @IsInt()
+    @Expose()
+    invitationsStatus: number
 
     @IsInt()
     @Expose()

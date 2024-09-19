@@ -37,7 +37,6 @@ let AuthService = class AuthService {
             const password = signUpDto.password;
             const hash = await (0, bcrypt_1.hash)(password, saltOrRounds);
             const salt = await (0, bcrypt_1.genSalt)();
-            console.log(salt);
             createdUser.password = hash;
             await createdUser.save();
             const payload = { user: createdUser._id };

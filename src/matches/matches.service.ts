@@ -71,45 +71,44 @@ export class MatchesService {
     }
 
     getPlayerMatches = async(user: string, skip: number = 0) => 
-        this.matchModel.find({user}).sort({ _id: -1 }).skip(0)
+        this.matchModel.find({user}, {} , {populate: {path:'game'}}).sort({ _id: -1 }).skip(0)
 
     getMatchesByPlatform = async (platform: number, skip: number = 0) => {
         
-        const results = await this.matchModel.aggregate([
-            {
-              $match: {
-                platform,
-                active: true,
-              },
+      const results = await this.matchModel.aggregate([
+          {
+            $match: {
+              platform,
+              active: true,
             },
-            {
-              $lookup: {
-                from: 'games', // Assuming the collection for games is named 'games'
-                localField: 'game',
-                foreignField: '_id',
-                as: 'gameDetails',
-              },
+          },
+          {
+            $lookup: {
+              from: 'games', // Assuming the collection for games is named 'games'
+              localField: 'game',
+              foreignField: '_id',
+              as: 'gameDetails',
             },
-            {
-              $unwind: '$gameDetails',
+          },
+          {
+            $unwind: '$gameDetails',
+          },
+          {
+            $group: {
+              _id: '$gameDetails._id', // Group by game ID
+              count: { $sum: 1 },
+              name: { $first: '$gameDetails.name' }, // Or any other field from Game
+              background: { $first: '$gameDetails.background' }, // Include background property
+              slug: { $first: '$gameDetails.slug' }, // Include slug property
             },
-            {
-              $group: {
-                _id: '$gameDetails._id', // Group by game ID
-                count: { $sum: 1 },
-                name: { $first: '$gameDetails.name' }, // Or any other field from Game
-                background: { $first: '$gameDetails.background' }, // Include background property
-                slug: { $first: '$gameDetails.slug' }, // Include slug property
-              },
+          },
+          {
+            $sort: {
+              count: -1,
             },
-            {
-              $sort: {
-                count: -1,
-              },
-            },
-          ]);
-          return results;
-          
+          },
+        ]);
+        return results;
     }
 
     getMatchesByGameAndPlatform = async(platform: number, game: string, skip: number = 0) => 

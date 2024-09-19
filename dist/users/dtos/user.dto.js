@@ -16,6 +16,12 @@ class UserDto {
 }
 exports.UserDto = UserDto;
 __decorate([
+    (0, class_validator_1.IsMongoId)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Expose)(),
+    __metadata("design:type", String)
+], UserDto.prototype, "_id", void 0);
+__decorate([
     (0, class_validator_1.IsString)(),
     (0, class_transformer_1.Expose)(),
     __metadata("design:type", String)
@@ -49,7 +55,12 @@ __decorate([
     (0, class_validator_1.IsArray)(),
     (0, class_transformer_1.Expose)(),
     __metadata("design:type", Array)
-], UserDto.prototype, "users", void 0);
+], UserDto.prototype, "partners", void 0);
+__decorate([
+    (0, class_validator_1.IsInt)(),
+    (0, class_transformer_1.Expose)(),
+    __metadata("design:type", Number)
+], UserDto.prototype, "invitationsStatus", void 0);
 __decorate([
     (0, class_validator_1.IsInt)(),
     (0, class_transformer_1.Expose)(),

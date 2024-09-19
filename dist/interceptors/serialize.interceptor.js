@@ -14,7 +14,6 @@ class SerializeInterceptor {
     }
     intercept(context, next) {
         return next.handle().pipe((0, rxjs_1.map)((data) => {
-            console.log(data);
             return (0, class_transformer_1.plainToClass)(this.dto, data, {
                 excludeExtraneousValues: true
             });

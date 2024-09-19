@@ -25,7 +25,6 @@ let MatchesGateway = MatchesGateway_1 = class MatchesGateway {
         this.logger = new common_1.Logger(MatchesGateway_1.name);
     }
     handleDisconnect(client) {
-        console.log("Connection");
     }
     afterInit(server) {
     }
@@ -35,9 +34,7 @@ let MatchesGateway = MatchesGateway_1 = class MatchesGateway {
         const match = await (await this.matchesService.getMatch(payload)).populate({ path: 'game' });
         if (!match)
             throw new websockets_1.WsException('Not found match');
-        console.log(match.game.background);
         const matchUrl = `${process.env.URL}/match/info/${match._id}`;
-        console.log(process.env);
         const eventPayload = {
             match: match._id,
             img: match.game.background,
