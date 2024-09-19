@@ -17,6 +17,8 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const sign_up_dtio_1 = require("./dtos/sign-up.dtio");
 const sign_in_dto_1 = require("./dtos/sign-in.dto");
+const response_dto_1 = require("./dtos/response.dto");
+const auth_interceptor_1 = require("../interceptors/auth.interceptor");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -46,6 +48,7 @@ __decorate([
 ], AuthController.prototype, "signin", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
+    (0, auth_interceptor_1.AuthSerialize)(response_dto_1.AuthResponseDto),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map
