@@ -43,8 +43,8 @@ export class MatchesService {
       return this.matchModel.findById(id)
     }
 
-    update = async(id: string, user: string, attrs: Partial<Match>) => {
-        const match = await this.matchModel.findOne({_id: id, user, active: true});
+    update = async( user: string, attrs: Partial<Match>) => {
+        const match = await this.matchModel.findOne({_id: attrs._id, user, active: true});
 
         if(!match) throw new NotFoundException('Match not found')
 

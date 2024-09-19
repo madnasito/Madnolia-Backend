@@ -36,26 +36,27 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
   @UseGuards(UserGuard)
   async handleConnection(client: Socket, ...args: any[]) {
-    const { size } = this.io.sockets;
-
-    const { token } = client.handshake.headers
-
-    if (!token) {
-      // throw new WsException('Missing authentication token');
-      client.disconnect(true)
-    }
-
     try {
+      const { size } = this.io.sockets;
+
+      const { token } = client.handshake.headers
+
+      if (token === undefined || token === null) {
+        client.disconnect(true)
+        throw new WsException('Missing authentication token');
+      }
+
       const tokenPayload = await this.jwtService.verifyAsync(token as string)
       await this.users.addUser(tokenPayload.id, client.id)
       console.log(this.users.getUsers());
+      
+      this.logger.debug(`Client id: ${client.id} connected`);
+      this.logger.debug(`Number of connected clients: ${size}`);
+
     } catch (error) {
       throw new WsException(error);
     }
     
-
-    this.logger.debug(`Client id: ${client.id} connected`);
-    this.logger.debug(`Number of connected clients: ${size}`);
   }
 
   handleDisconnect(client: any) {

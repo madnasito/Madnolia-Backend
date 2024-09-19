@@ -8,21 +8,21 @@ export declare class AuthService {
     private jwtService;
     constructor(userModel: Model<User>, jwtService: JwtService);
     signUp: (signUpDto: SignUpDto) => Promise<{
-        createdUser: import("mongoose").Document<unknown, {}, User> & User & Required<{
-            _id: import("mongoose").Schema.Types.ObjectId;
-        }>;
+        user: import("mongoose").Document<unknown, {}, User> & User & {
+            _id: import("mongoose").Types.ObjectId;
+        };
         token: string;
     }>;
     signIn: (signInDto: SignInDto) => Promise<{
-        user: import("mongoose").Document<unknown, {}, User> & User & Required<{
-            _id: import("mongoose").Schema.Types.ObjectId;
-        }>;
+        user: import("mongoose").Document<unknown, {}, User> & User & {
+            _id: import("mongoose").Types.ObjectId;
+        };
         token: string;
     }>;
-    fincOneByUsername: (username: string) => Promise<import("mongoose").Document<unknown, {}, User> & User & Required<{
-        _id: import("mongoose").Schema.Types.ObjectId;
-    }>>;
-    findOneByEmail: (email: string) => Promise<import("mongoose").Document<unknown, {}, User> & User & Required<{
-        _id: import("mongoose").Schema.Types.ObjectId;
-    }>>;
+    fincOneByUsername: (username: string) => Promise<import("mongoose").Document<unknown, {}, User> & User & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
+    findOneByEmail: (email: string) => Promise<import("mongoose").Document<unknown, {}, User> & User & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
 }

@@ -44,8 +44,8 @@ let MatchesService = class MatchesService {
                 throw new common_1.NotFoundException();
             return this.matchModel.findById(id);
         };
-        this.update = async (id, user, attrs) => {
-            const match = await this.matchModel.findOne({ _id: id, user, active: true });
+        this.update = async (user, attrs) => {
+            const match = await this.matchModel.findOne({ _id: attrs._id, user, active: true });
             if (!match)
                 throw new common_1.NotFoundException('Match not found');
             Object.assign(match, attrs);

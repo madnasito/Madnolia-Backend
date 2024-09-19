@@ -6,8 +6,7 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema()
 export class User {
-    @Prop({ type: mongoose.Schema.Types.ObjectId })
-    _id: mongoose.Schema.Types.ObjectId;
+    
     @Prop({
         required: true
     })
@@ -57,6 +56,8 @@ export class User {
     @Prop({type: Number, default: 0})
     notifications: number;
 
+    @Prop({type: Number, default: 1})
+    invitationsStatus: number
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

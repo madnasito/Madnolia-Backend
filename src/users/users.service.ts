@@ -1,5 +1,5 @@
 import mongoose, { Model } from 'mongoose';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 
@@ -32,6 +32,14 @@ export class UsersService {
     // getInvitations = async (user: string) => this.userModel.populate('')
 
     upadte = async (user: string, attrs: Partial<User>) => this.userModel.findOneAndUpdate({_id: user}, attrs, {new: true});
+
+    userExists = async(username: string, email: string) => {
+      const usernameDb = await this.userModel.findOne({username})
+      if (usernameDb) throw new ConflictException("Username taked")
+      const emailDb = await this.userModel.findOne({email})
+      if (emailDb) throw new ConflictException("Email taked")
+      return {}
+    }
 
     searchUser = async (username: string) => {
         let regex = new RegExp(username, 'i')

@@ -38,6 +38,15 @@ let UsersService = class UsersService {
         };
         this.getInfo = async (user) => await this.userModel.findOne({ _id: user, status: true });
         this.upadte = async (user, attrs) => this.userModel.findOneAndUpdate({ _id: user }, attrs, { new: true });
+        this.userExists = async (username, email) => {
+            const usernameDb = await this.userModel.findOne({ username });
+            if (usernameDb)
+                throw new common_1.ConflictException("Username taked");
+            const emailDb = await this.userModel.findOne({ email });
+            if (emailDb)
+                throw new common_1.ConflictException("Email taked");
+            return {};
+        };
         this.searchUser = async (username) => {
             let regex = new RegExp(username, 'i');
             return await this.userModel.find({ username: regex, status: true }, { name: 1, username: 1, _id: 1, imgThumb: 1 }, { limit: 5 });

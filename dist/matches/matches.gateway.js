@@ -30,7 +30,6 @@ let MatchesGateway = MatchesGateway_1 = class MatchesGateway {
     afterInit(server) {
     }
     handleConnection(client, ...args) {
-        console.log("ANDIFAD ");
     }
     async handleMatchCreated(client, payload) {
         const match = await (await this.matchesService.getMatch(payload)).populate({ path: 'game' });

@@ -5,15 +5,15 @@ export declare class AuthController {
     private authService;
     constructor(authService: AuthService);
     signUp(body: SignUpDto): Promise<{
-        createdUser: import("mongoose").Document<unknown, {}, import("../users/schemas/user.schema").User> & import("../users/schemas/user.schema").User & Required<{
-            _id: import("mongoose").Schema.Types.ObjectId;
-        }>;
+        user: import("mongoose").Document<unknown, {}, import("../users/schemas/user.schema").User> & import("../users/schemas/user.schema").User & {
+            _id: import("mongoose").Types.ObjectId;
+        };
         token: string;
     }>;
     signin(body: SignInDto): Promise<{
-        user: import("mongoose").Document<unknown, {}, import("../users/schemas/user.schema").User> & import("../users/schemas/user.schema").User & Required<{
-            _id: import("mongoose").Schema.Types.ObjectId;
-        }>;
+        user: import("mongoose").Document<unknown, {}, import("../users/schemas/user.schema").User> & import("../users/schemas/user.schema").User & {
+            _id: import("mongoose").Types.ObjectId;
+        };
         token: string;
     }>;
 }

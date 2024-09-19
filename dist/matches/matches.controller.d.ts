@@ -8,11 +8,14 @@ export declare class MatchesController {
     getMatch(id: string): Promise<import("mongoose").Document<unknown, {}, Match> & Match & Required<{
         _id: import("mongoose").Schema.Types.ObjectId;
     }>>;
+    getPlayerMatches(request: any): Promise<(import("mongoose").Document<unknown, {}, Match> & Match & Required<{
+        _id: import("mongoose").Schema.Types.ObjectId;
+    }>)[]>;
     getMatchesByPlatform(platform: string): Promise<any[]>;
     create(req: any, body: CreateMatchDto): Promise<import("mongoose").Document<unknown, {}, Match> & Match & Required<{
         _id: import("mongoose").Schema.Types.ObjectId;
     }>>;
-    update(req: any, id: string, body: UpdateMatchDto): Promise<import("mongoose").Document<unknown, {}, Match> & Match & Required<{
+    update(req: any, body: UpdateMatchDto): Promise<import("mongoose").Document<unknown, {}, Match> & Match & Required<{
         _id: import("mongoose").Schema.Types.ObjectId;
     }>>;
     delete(req: any, id: string): Promise<import("mongoose").Document<unknown, {}, Match> & Match & Required<{

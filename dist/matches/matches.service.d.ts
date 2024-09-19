@@ -12,7 +12,7 @@ export declare class MatchesService {
     getMatch: (id: string) => Promise<mongoose.Document<unknown, {}, Match> & Match & Required<{
         _id: mongoose.Schema.Types.ObjectId;
     }>>;
-    update: (id: string, user: string, attrs: Partial<Match>) => Promise<mongoose.Document<unknown, {}, Match> & Match & Required<{
+    update: (user: string, attrs: Partial<Match>) => Promise<mongoose.Document<unknown, {}, Match> & Match & Required<{
         _id: mongoose.Schema.Types.ObjectId;
     }>>;
     delete: (id: string, user: string) => Promise<mongoose.Document<unknown, {}, Match> & Match & Required<{

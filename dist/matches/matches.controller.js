@@ -25,14 +25,17 @@ let MatchesController = class MatchesController {
     async getMatch(id) {
         return this.matchesService.getMatch(id);
     }
+    async getPlayerMatches(request) {
+        return this.matchesService.getPlayerMatches(request.user.id);
+    }
     async getMatchesByPlatform(platform) {
         return this.matchesService.getMatchesByPlatform(parseInt(platform));
     }
     async create(req, body) {
         return this.matchesService.create(body, req.user.id);
     }
-    update(req, id, body) {
-        return this.matchesService.update(id, req.user.id, body);
+    update(req, body) {
+        return this.matchesService.update(req.user.id, body);
     }
     delete(req, id) {
         return this.matchesService.delete(id, req.user.id);
@@ -46,6 +49,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], MatchesController.prototype, "getMatch", null);
+__decorate([
+    (0, common_1.UseGuards)(user_guard_1.UserGuard),
+    (0, common_1.Get)('player-matches'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], MatchesController.prototype, "getPlayerMatches", null);
 __decorate([
     (0, common_1.Get)('platform/:platform'),
     __param(0, (0, common_1.Param)('platform')),
@@ -64,12 +75,11 @@ __decorate([
 ], MatchesController.prototype, "create", null);
 __decorate([
     (0, common_1.UseGuards)(user_guard_1.UserGuard),
-    (0, common_1.Put)('update/:id'),
+    (0, common_1.Put)('update'),
     __param(0, (0, common_1.Request)()),
-    __param(1, (0, common_1.Param)('id')),
-    __param(2, (0, common_1.Body)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String, update_match_dto_1.UpdateMatchDto]),
+    __metadata("design:paramtypes", [Object, update_match_dto_1.UpdateMatchDto]),
     __metadata("design:returntype", void 0)
 ], MatchesController.prototype, "update", null);
 __decorate([

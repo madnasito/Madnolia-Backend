@@ -14,6 +14,12 @@ export class MatchesController {
         return this.matchesService.getMatch(id);
     }
 
+    @UseGuards(UserGuard)
+    @Get('player-matches')
+    async getPlayerMatches(@Request() request:any){
+        return this.matchesService.getPlayerMatches(request.user.id)
+    }
+
     @Get('platform/:platform')
     async getMatchesByPlatform(@Param('platform') platform: string){
         return this.matchesService.getMatchesByPlatform(parseInt(platform))
@@ -26,9 +32,9 @@ export class MatchesController {
     }
 
     @UseGuards(UserGuard)
-    @Put('update/:id')
-    update(@Request() req:any, @Param('id') id: string, @Body() body: UpdateMatchDto) {
-        return this.matchesService.update(id, req.user.id, body);
+    @Put('update')
+    update(@Request() req:any, @Body() body: UpdateMatchDto) {
+        return this.matchesService.update(req.user.id, body);
     }
 
     @UseGuards(UserGuard)

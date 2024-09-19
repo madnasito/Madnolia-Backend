@@ -16,6 +16,11 @@ export class UserController {
         return this.usersService.searchUser(username);
     }
 
+    @Get('user-exists/:username/:email')
+    async userExists(@Param('username') username:string, @Param('email') email: string){
+        return this.usersService.userExists(username, email);
+    }
+
     @Get('info')
     @UseGuards(UserGuard)
     async getInfo(@Request() req:any) {

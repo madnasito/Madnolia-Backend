@@ -43,7 +43,7 @@ let AuthService = class AuthService {
             const payload = { user: createdUser._id };
             const token = await this.jwtService.signAsync(payload);
             return {
-                createdUser,
+                user: createdUser,
                 token
             };
         };

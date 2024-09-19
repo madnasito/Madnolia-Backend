@@ -16,10 +16,6 @@ let User = class User {
 };
 exports.User = User;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.default.Schema.Types.ObjectId }),
-    __metadata("design:type", mongoose_2.default.Schema.Types.ObjectId)
-], User.prototype, "_id", void 0);
-__decorate([
     (0, mongoose_1.Prop)({
         required: true
     }),
@@ -77,6 +73,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: Number, default: 0 }),
     __metadata("design:type", Number)
 ], User.prototype, "notifications", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Number, default: 1 }),
+    __metadata("design:type", Number)
+], User.prototype, "invitationsStatus", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)()
 ], User);

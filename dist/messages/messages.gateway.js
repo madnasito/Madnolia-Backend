@@ -35,21 +35,22 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
         this.logger.log("Initialized");
     }
     async handleConnection(client, ...args) {
-        const { size } = this.io.sockets;
-        const { token } = client.handshake.headers;
-        if (!token) {
-            client.disconnect(true);
-        }
         try {
+            const { size } = this.io.sockets;
+            const { token } = client.handshake.headers;
+            if (token === undefined || token === null) {
+                client.disconnect(true);
+                throw new websockets_1.WsException('Missing authentication token');
+            }
             const tokenPayload = await this.jwtService.verifyAsync(token);
             await this.users.addUser(tokenPayload.id, client.id);
             console.log(this.users.getUsers());
+            this.logger.debug(`Client id: ${client.id} connected`);
+            this.logger.debug(`Number of connected clients: ${size}`);
         }
         catch (error) {
             throw new websockets_1.WsException(error);
         }
-        this.logger.debug(`Client id: ${client.id} connected`);
-        this.logger.debug(`Number of connected clients: ${size}`);
     }
     handleDisconnect(client) {
         this.logger.log(`Cliend id:${client.id} disconnected`);

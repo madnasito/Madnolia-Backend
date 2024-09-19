@@ -26,6 +26,9 @@ let UserController = class UserController {
     async search(username) {
         return this.usersService.searchUser(username);
     }
+    async userExists(username, email) {
+        return this.usersService.userExists(username, email);
+    }
     async getInfo(req) {
         return this.usersService.getInfo(req.user.id);
     }
@@ -47,6 +50,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "search", null);
+__decorate([
+    (0, common_1.Get)('user-exists/:username/:email'),
+    __param(0, (0, common_1.Param)('username')),
+    __param(1, (0, common_1.Param)('email')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "userExists", null);
 __decorate([
     (0, common_1.Get)('info'),
     (0, common_1.UseGuards)(user_guard_1.UserGuard),

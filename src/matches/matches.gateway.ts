@@ -26,7 +26,6 @@ export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGat
 
   }
   handleConnection(client: any, ...args: any[]) {
-    console.log("ANDIFAD ");
   }
 
   @UseGuards(UserSocketGuard)
