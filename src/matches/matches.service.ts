@@ -6,6 +6,7 @@ import { GamesService } from 'src/games/games.service';
 import { GameInterface } from './interfaces/game.interface';
 import { CreateMatchDto } from './dtos/create-match.dto';
 import { MatchDto } from './dtos/match.dto';
+import { NewMatchDto } from './dtos/new-match.dto';
 
 @Injectable()
 export class MatchesService {
@@ -17,11 +18,10 @@ export class MatchesService {
     create = async(createMatchDto:CreateMatchDto, user: string) => {
         const gameData:GameInterface = await this.gamesService.getGame(createMatchDto.game);
 
-        let newMatch:MatchDto = {
+        let newMatch:NewMatchDto = {
             date: createMatchDto.date,
             game: gameData._id,
             inviteds: createMatchDto.inviteds,
-            likes: createMatchDto.likes,
             platform: createMatchDto.platform,
             title: createMatchDto.title,
             tournament: false,
@@ -32,7 +32,7 @@ export class MatchesService {
         
         const matchDb = await createdMatch.save();
 
-        await this.gamesService.increaseAmountInPlatform(gameData.gameId, createMatchDto.platform)
+        // await this.gamesService.increaseAmountInPlatform(gameData.gameId, createMatchDto.platform)
 
         return matchDb;
         
@@ -43,7 +43,7 @@ export class MatchesService {
       return this.matchModel.findById(id)
     }
 
-    update = async( user: string, attrs: Partial<Match>) => {
+    update = async( user: string, attrs: Partial<MatchDto>) => {
         const match = await this.matchModel.findOne({_id: attrs._id, user, active: true});
 
         if(!match) throw new NotFoundException('Match not found')
@@ -117,6 +117,7 @@ export class MatchesService {
     updatePastTimeMatches = async(): Promise<Array<Match>> => {
       const matchesToUpdate = await this.matchModel.find({active: true, date: {$lt: new Date().getTime()}})
       await this.matchModel.updateMany({date: {$lt: new Date().getTime()}, active: true}, {active: false});
+      
       return matchesToUpdate;
     }
   }

@@ -49,7 +49,7 @@ let UsersService = class UsersService {
         };
         this.searchUser = async (username) => {
             let regex = new RegExp(username, 'i');
-            return await this.userModel.find({ username: regex, status: true }, { name: 1, username: 1, _id: 1, imgThumb: 1 }, { limit: 5 });
+            return await this.userModel.find({ username: regex, status: true }, { name: 1, username: 1, _id: 1, thumb: 1 }, { limit: 5 });
         };
         this.resetNotifications = async (user) => this.userModel.findOneAndUpdate({ _id: user }, { notification: 0 }, { new: true });
         this.getUserPartners = async (user) => {

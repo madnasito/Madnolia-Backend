@@ -6,10 +6,8 @@ export type MatchDocument = HydratedDocument<Match>;
 
 @Schema()
 export class Match {
-    @Prop({
-        type: mongoose.Schema.Types.ObjectId
-    })
-    _id: mongoose.Schema.Types.ObjectId;
+    
+
     @Prop({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Game',
@@ -46,7 +44,7 @@ export class Match {
     title: string;
 
     @Prop({
-        required: true
+        default: []
     })
     likes: User[];
 

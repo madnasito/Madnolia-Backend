@@ -5,6 +5,7 @@ import { UserSocketGuard } from 'src/guards/user-sockets.guard';
 import { MatchesService } from './matches.service';
 import { Users } from 'src/messages/classes/user';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { MatchDto } from './dtos/match.dto';
 
 @WebSocketGateway()
 export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -32,10 +33,12 @@ export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGat
   async handleMatchCreated(client: Socket, payload: string) {
 
 
+    console.log(payload);
     const match = await (await this.matchesService.getMatch(payload)).populate({path: 'game'})
 
     if(!match) throw new WsException('Not found match')
 
+    console.log(match);
 
     const matchUrl = `${process.env.URL}/match/info/${match._id}`
 
@@ -47,10 +50,13 @@ export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGat
       name: match.title,
       url: matchUrl
     }
+    console.log(this.users.getUsers());
 
     match.inviteds.forEach(element => {
+      console.log(`User: ${element}`);
       const invitedUser = this.users.getUserById(element.toString())
       if(invitedUser){
+        console.log(invitedUser);
         client.to(invitedUser.socketId).emit('invitation', eventPayload)
       }
     })
@@ -76,10 +82,10 @@ export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGat
   
       client.emit('added_to_match', true)
   
-      const {_id, name, imgThumb, username} = user
+      const {_id, name, thumb, username} = user
   
       client.to(payload).emit('new_player_to_match', {
-        _id, name, imgThumb, username
+        _id, name, thumb, username
       })
 
     } catch (error) {
@@ -94,9 +100,9 @@ export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGat
 
     try {
       this.logger.debug('Called every minute');
-    const matches = await this.matchesService.updatePastTimeMatches()
+    const matches:any = await this.matchesService.updatePastTimeMatches() 
     
-    matches.forEach((match) => {
+    matches.forEach((match:MatchDto) => {
       const payload = {
         title: match.title,
         match: match._id,

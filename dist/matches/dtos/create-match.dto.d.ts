@@ -4,6 +4,5 @@ export declare class CreateMatchDto {
     game: number;
     date: number;
     inviteds: Array<string>;
-    likes: Array<String>;
     private: boolean;
 }

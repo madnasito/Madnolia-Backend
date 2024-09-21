@@ -8,10 +8,10 @@ export declare class User {
     status: boolean;
     platforms: Array<number>;
     img: string;
-    imgThumb: string;
+    thumb: string;
     partners: User[];
     notifications: number;
-    invitationsStatus: number;
+    availability: number;
 }
 export declare const UserSchema: mongoose.Schema<User, mongoose.Model<User, any, any, any, mongoose.Document<unknown, any, User> & User & {
     _id: mongoose.Types.ObjectId;

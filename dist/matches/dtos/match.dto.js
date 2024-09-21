@@ -15,6 +15,11 @@ class MatchDto {
 }
 exports.MatchDto = MatchDto;
 __decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsMongoId)(),
+    __metadata("design:type", Object)
+], MatchDto.prototype, "_id", void 0);
+__decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], MatchDto.prototype, "title", void 0);

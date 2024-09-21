@@ -47,12 +47,12 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
             this.logger.debug(`Number of connected clients: ${size}`);
         }
         catch (error) {
-            console.log(error);
-            throw new websockets_1.WsException(error);
+            return new websockets_1.WsException(error);
         }
     }
     handleDisconnect(client) {
-        this.logger.log(`Cliend id:${client.id} disconnected`);
+        this.users.deleteUser(client.id);
+        this.logger.debug(`Cliend id:${client.id} disconnected`);
     }
     handleEvent(data, client) {
         try {
@@ -77,7 +77,7 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
             if (!messageSaved)
                 throw new websockets_1.WsException("No message");
             const { text, _id, date } = messageSaved;
-            const { name, username, imgThumb } = this.users.getUserById(request.user);
+            const { name, username, thumb } = this.users.getUserById(request.user);
             const payloadEvent = {
                 _id,
                 text,
@@ -85,7 +85,7 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
                 user: {
                     name,
                     username,
-                    imgThumb
+                    thumb
                 }
             };
             client.emit('message', payloadEvent);

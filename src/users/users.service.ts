@@ -45,7 +45,7 @@ export class UsersService {
         let regex = new RegExp(username, 'i')
 
         return await this.userModel.find({username: regex, status: true},
-            {name: 1, username: 1, _id: 1, imgThumb: 1}, {limit: 5})
+            {name: 1, username: 1, _id: 1, thumb: 1}, {limit: 5})
     }
 
     resetNotifications = async (user: string) => this.userModel.findOneAndUpdate({_id: user}, {notification: 0}, {new: true})

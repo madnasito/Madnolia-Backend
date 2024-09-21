@@ -21,9 +21,9 @@ export class Users {
             return;
         }
 
-        const { name, username, imgThumb, _id } = user
+        const { name, username, thumb, _id } = user
 
-        this.users.push({ name, username, imgThumb, _id, socketId, room: '' })
+        this.users.push({ name, username, thumb, _id, socketId, room: '' })
 
         return this.users
     }
@@ -51,7 +51,7 @@ export class Users {
 interface User {
     name: string,
     username: string,
-    imgThumb: string,
+    thumb: string,
     _id: any,
     socketId: string,
     room: string

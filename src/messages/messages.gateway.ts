@@ -40,6 +40,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
       const { token } = client.handshake.headers
 
+
       if (token === undefined || token === null) {
         client.disconnect(true)
         throw new WsException('Missing authentication token');
@@ -47,19 +48,19 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
       const tokenPayload = await this.jwtService.verifyAsync(token as string)
       await this.users.addUser(tokenPayload.id, client.id)
-      
+
       this.logger.debug(`Client id: ${client.id} connected`);
       this.logger.debug(`Number of connected clients: ${size}`);
 
     } catch (error) {
-      console.log(error);
-      throw new WsException(error);
+      return new WsException(error)
     }
     
   }
 
   handleDisconnect(client: any) {
-    this.logger.log(`Cliend id:${client.id} disconnected`);
+    this.users.deleteUser(client.id)
+    this.logger.debug(`Cliend id:${client.id} disconnected`);
   }
 
 
@@ -94,7 +95,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       if(!messageSaved) throw new WsException("No message")
   
       const { text, _id, date} = messageSaved
-      const {name, username, imgThumb} = this.users.getUserById(request.user)
+      const {name, username, thumb} = this.users.getUserById(request.user)
 
       const payloadEvent = {
         _id,
@@ -103,7 +104,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
         user: {
           name,
           username,
-          imgThumb
+          thumb
         }
       }
       client.emit('message', payloadEvent)

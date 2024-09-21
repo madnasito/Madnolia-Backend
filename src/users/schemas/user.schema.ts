@@ -47,8 +47,7 @@ export class User {
     @Prop({
         default: "https://i.ibb.co/YZc5f1y/fd0bc6699682.jpg"
     })
-    imgThumb: string;
-
+    thumb: string;
     
     @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], default: [] })
     partners: User[];
@@ -57,7 +56,7 @@ export class User {
     notifications: number;
 
     @Prop({type: Number, default: 1})
-    invitationsStatus: number
+    availability: number
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

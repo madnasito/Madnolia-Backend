@@ -5,8 +5,8 @@ export declare class UserDto {
     email: string;
     platforms: Array<Number>;
     img: string;
-    imgThumb: string;
+    thumb: string;
     partners: Array<string>;
-    invitationsStatus: number;
+    availability: number;
     notifications: number;
 }

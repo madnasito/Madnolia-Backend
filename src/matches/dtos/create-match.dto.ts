@@ -18,9 +18,6 @@ export class CreateMatchDto {
     @IsArray()
     inviteds: Array<string>
 
-    @IsArray()
-    likes: Array<String>
-
     @IsOptional()
     @IsBoolean()
     private: boolean

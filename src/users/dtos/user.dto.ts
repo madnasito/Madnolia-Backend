@@ -30,7 +30,7 @@ export class UserDto {
 
     @IsUrl()
     @Expose()
-    imgThumb: string;
+    thumb: string;
 
     @IsArray()
     @Expose()
@@ -38,7 +38,7 @@ export class UserDto {
 
     @IsInt()
     @Expose()
-    invitationsStatus: number
+    availability: number
 
     @IsInt()
     @Expose()

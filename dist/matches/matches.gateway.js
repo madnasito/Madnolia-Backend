@@ -31,9 +31,11 @@ let MatchesGateway = MatchesGateway_1 = class MatchesGateway {
     handleConnection(client, ...args) {
     }
     async handleMatchCreated(client, payload) {
+        console.log(payload);
         const match = await (await this.matchesService.getMatch(payload)).populate({ path: 'game' });
         if (!match)
             throw new websockets_1.WsException('Not found match');
+        console.log(match);
         const matchUrl = `${process.env.URL}/match/info/${match._id}`;
         const eventPayload = {
             match: match._id,
@@ -41,9 +43,12 @@ let MatchesGateway = MatchesGateway_1 = class MatchesGateway {
             name: match.title,
             url: matchUrl
         };
+        console.log(this.users.getUsers());
         match.inviteds.forEach(element => {
+            console.log(`User: ${element}`);
             const invitedUser = this.users.getUserById(element.toString());
             if (invitedUser) {
+                console.log(invitedUser);
                 client.to(invitedUser.socketId).emit('invitation', eventPayload);
             }
         });
@@ -57,9 +62,9 @@ let MatchesGateway = MatchesGateway_1 = class MatchesGateway {
                 throw new websockets_1.WsException(common_1.NotFoundException);
             }
             client.emit('added_to_match', true);
-            const { _id, name, imgThumb, username } = user;
+            const { _id, name, thumb, username } = user;
             client.to(payload).emit('new_player_to_match', {
-                _id, name, imgThumb, username
+                _id, name, thumb, username
             });
         }
         catch (error) {

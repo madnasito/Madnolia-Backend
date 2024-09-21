@@ -1,11 +1,7 @@
-import { IsArray, IsBoolean, IsDefined, IsInt, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
-import { ObjectId } from "mongoose";
+import { IsArray, IsBoolean, IsDefined, IsInt, IsMongoId, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
-export class MatchDto {
+export class NewMatchDto {
 
-    @IsOptional()
-    @IsMongoId()
-    _id: ObjectId;
     
     @IsString()
     title: string;
@@ -26,9 +22,6 @@ export class MatchDto {
 
     @IsArray()
     inviteds: Array<string>
-
-    @IsArray()
-    likes: Array<String>
 
     @IsBoolean()
     tournament: boolean

@@ -1,4 +1,4 @@
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, WsException } from '@nestjs/websockets';
 import { Namespace, Socket } from "socket.io";
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dtos/create-message.dto';
@@ -12,7 +12,7 @@ export declare class MessagesGateway implements OnGatewayInit, OnGatewayConnecti
     constructor(messagesService: MessagesService, jwtService: JwtService, users: Users);
     io: Namespace;
     afterInit(socket: Socket): void;
-    handleConnection(client: Socket, ...args: any[]): Promise<void>;
+    handleConnection(client: Socket, ...args: any[]): Promise<WsException>;
     handleDisconnect(client: any): void;
     handleEvent(data: string, client: Socket): string;
     handleMessage(request: any, payload: CreateMessageDto, client: Socket): Promise<void>;

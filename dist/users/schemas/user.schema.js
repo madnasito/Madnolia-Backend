@@ -64,7 +64,7 @@ __decorate([
         default: "https://i.ibb.co/YZc5f1y/fd0bc6699682.jpg"
     }),
     __metadata("design:type", String)
-], User.prototype, "imgThumb", void 0);
+], User.prototype, "thumb", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.default.Schema.Types.ObjectId, ref: 'User' }], default: [] }),
     __metadata("design:type", Array)
@@ -76,7 +76,7 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({ type: Number, default: 1 }),
     __metadata("design:type", Number)
-], User.prototype, "invitationsStatus", void 0);
+], User.prototype, "availability", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)()
 ], User);

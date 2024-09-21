@@ -20,8 +20,8 @@ let Users = class Users {
             if (!user) {
                 return;
             }
-            const { name, username, imgThumb, _id } = user;
-            this.users.push({ name, username, imgThumb, _id, socketId, room: '' });
+            const { name, username, thumb, _id } = user;
+            this.users.push({ name, username, thumb, _id, socketId, room: '' });
             return this.users;
         };
         this.getUser = (id) => this.users.filter(user => user.socketId === id)[0];

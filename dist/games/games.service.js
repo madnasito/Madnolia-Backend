@@ -41,23 +41,6 @@ let GamesService = class GamesService {
             const createdGame = new this.gameModel(newGame);
             return await createdGame.save();
         };
-        this.increaseAmountInPlatform = async (gameId, platform) => {
-            const gameDb = await this.gameModel.findOneAndUpdate({ gameId, platforms: { $elemMatch: { id: Number(platform) } } }, {
-                $inc: {
-                    "platforms.$.amount": 1
-                }
-            }, { new: true });
-            if (gameDb)
-                return gameDb;
-            return await this.gameModel.findOneAndUpdate({ gameId }, {
-                $push: {
-                    platforms: {
-                        id: platform,
-                        amount: 1
-                    }
-                }
-            }, { new: true }).catch((err) => new common_1.BadGatewayException());
-        };
         this.findByRawId = async (gameId) => await this.gameModel.findOne({ gameId });
         this.findById = async (gameId) => await this.gameModel.findById(gameId);
         this.getRawgGame = async (id) => {

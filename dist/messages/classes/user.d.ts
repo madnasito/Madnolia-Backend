@@ -13,7 +13,7 @@ export declare class Users {
 interface User {
     name: string;
     username: string;
-    imgThumb: string;
+    thumb: string;
     _id: any;
     socketId: string;
     room: string;

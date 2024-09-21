@@ -50,7 +50,7 @@ __decorate([
     (0, class_validator_1.IsUrl)(),
     (0, class_transformer_1.Expose)(),
     __metadata("design:type", String)
-], UserDto.prototype, "imgThumb", void 0);
+], UserDto.prototype, "thumb", void 0);
 __decorate([
     (0, class_validator_1.IsArray)(),
     (0, class_transformer_1.Expose)(),
@@ -60,7 +60,7 @@ __decorate([
     (0, class_validator_1.IsInt)(),
     (0, class_transformer_1.Expose)(),
     __metadata("design:type", Number)
-], UserDto.prototype, "invitationsStatus", void 0);
+], UserDto.prototype, "availability", void 0);
 __decorate([
     (0, class_validator_1.IsInt)(),
     (0, class_transformer_1.Expose)(),

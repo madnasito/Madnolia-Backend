@@ -17,12 +17,6 @@ let Match = class Match {
 exports.Match = Match;
 __decorate([
     (0, mongoose_1.Prop)({
-        type: mongoose_2.default.Schema.Types.ObjectId
-    }),
-    __metadata("design:type", mongoose_2.default.Schema.Types.ObjectId)
-], Match.prototype, "_id", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({
         type: mongoose_2.default.Schema.Types.ObjectId,
         ref: 'Game',
         required: true
@@ -64,7 +58,7 @@ __decorate([
 ], Match.prototype, "title", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        required: true
+        default: []
     }),
     __metadata("design:type", Array)
 ], Match.prototype, "likes", void 0);

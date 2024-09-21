@@ -2,33 +2,34 @@ import { Match } from './schemas/match.schema';
 import mongoose, { Model } from 'mongoose';
 import { GamesService } from 'src/games/games.service';
 import { CreateMatchDto } from './dtos/create-match.dto';
+import { MatchDto } from './dtos/match.dto';
 export declare class MatchesService {
     private matchModel;
     private readonly gamesService;
     constructor(matchModel: Model<Match>, gamesService: GamesService);
-    create: (createMatchDto: CreateMatchDto, user: string) => Promise<mongoose.Document<unknown, {}, Match> & Match & Required<{
-        _id: mongoose.Schema.Types.ObjectId;
-    }>>;
-    getMatch: (id: string) => Promise<mongoose.Document<unknown, {}, Match> & Match & Required<{
-        _id: mongoose.Schema.Types.ObjectId;
-    }>>;
-    update: (user: string, attrs: Partial<Match>) => Promise<mongoose.Document<unknown, {}, Match> & Match & Required<{
-        _id: mongoose.Schema.Types.ObjectId;
-    }>>;
-    delete: (id: string, user: string) => Promise<mongoose.Document<unknown, {}, Match> & Match & Required<{
-        _id: mongoose.Schema.Types.ObjectId;
-    }>>;
-    addUserToMatch: (id: string, user: string) => mongoose.Query<mongoose.Document<unknown, {}, Match> & Match & Required<{
-        _id: mongoose.Schema.Types.ObjectId;
-    }>, mongoose.Document<unknown, {}, Match> & Match & Required<{
-        _id: mongoose.Schema.Types.ObjectId;
-    }>, {}, Match, "findOneAndUpdate", {}>;
-    getPlayerMatches: (user: string, skip?: number) => Promise<(mongoose.Document<unknown, {}, Match> & Match & Required<{
-        _id: mongoose.Schema.Types.ObjectId;
-    }>)[]>;
+    create: (createMatchDto: CreateMatchDto, user: string) => Promise<mongoose.Document<unknown, {}, Match> & Match & {
+        _id: mongoose.Types.ObjectId;
+    }>;
+    getMatch: (id: string) => Promise<mongoose.Document<unknown, {}, Match> & Match & {
+        _id: mongoose.Types.ObjectId;
+    }>;
+    update: (user: string, attrs: Partial<MatchDto>) => Promise<mongoose.Document<unknown, {}, Match> & Match & {
+        _id: mongoose.Types.ObjectId;
+    }>;
+    delete: (id: string, user: string) => Promise<mongoose.Document<unknown, {}, Match> & Match & {
+        _id: mongoose.Types.ObjectId;
+    }>;
+    addUserToMatch: (id: string, user: string) => mongoose.Query<mongoose.Document<unknown, {}, Match> & Match & {
+        _id: mongoose.Types.ObjectId;
+    }, mongoose.Document<unknown, {}, Match> & Match & {
+        _id: mongoose.Types.ObjectId;
+    }, {}, Match, "findOneAndUpdate", {}>;
+    getPlayerMatches: (user: string, skip?: number) => Promise<(mongoose.Document<unknown, {}, Match> & Match & {
+        _id: mongoose.Types.ObjectId;
+    })[]>;
     getMatchesByPlatform: (platform: number, skip?: number) => Promise<any[]>;
-    getMatchesByGameAndPlatform: (platform: number, game: string, skip?: number) => Promise<(mongoose.Document<unknown, {}, Match> & Match & Required<{
-        _id: mongoose.Schema.Types.ObjectId;
-    }>)[]>;
+    getMatchesByGameAndPlatform: (platform: number, game: string, skip?: number) => Promise<(mongoose.Document<unknown, {}, Match> & Match & {
+        _id: mongoose.Types.ObjectId;
+    })[]>;
     updatePastTimeMatches: () => Promise<Array<Match>>;
 }

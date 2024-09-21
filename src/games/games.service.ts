@@ -39,27 +39,27 @@ export class GamesService {
 
     }
 
-    increaseAmountInPlatform = async (gameId: number, platform: number) => {
+    // increaseAmountInPlatform = async (gameId: number, platform: number) => {
 
-        const gameDb = await this.gameModel.findOneAndUpdate({ gameId, platforms: { $elemMatch: { id: Number(platform) } } }, {
-            $inc: {
-                "platforms.$.amount": 1
-            }
-        }, { new: true })
+    //     const gameDb = await this.gameModel.findOneAndUpdate({ gameId, platforms: { $elemMatch: { id: Number(platform) } } }, {
+    //         $inc: {
+    //             "platforms.$.amount": 1
+    //         }
+    //     }, { new: true })
 
-        if (gameDb) return gameDb
+    //     if (gameDb) return gameDb
 
-        return await this.gameModel.findOneAndUpdate({ gameId }, {
-            $push: {
-                platforms: {
-                    id: platform,
-                    amount: 1
-                }
-            }
-        }, { new: true }).catch((err) => new BadGatewayException())
+    //     return await this.gameModel.findOneAndUpdate({ gameId }, {
+    //         $push: {
+    //             platforms: {
+    //                 id: platform,
+    //                 amount: 1
+    //             }
+    //         }
+    //     }, { new: true }).catch((err) => new BadGatewayException())
         
         
-    }
+    // }
 
     findByRawId = async(gameId: number):Promise<any> => await this.gameModel.findOne({gameId})
 

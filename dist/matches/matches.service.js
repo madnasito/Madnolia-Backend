@@ -28,7 +28,6 @@ let MatchesService = class MatchesService {
                 date: createMatchDto.date,
                 game: gameData._id,
                 inviteds: createMatchDto.inviteds,
-                likes: createMatchDto.likes,
                 platform: createMatchDto.platform,
                 title: createMatchDto.title,
                 tournament: false,
@@ -36,7 +35,6 @@ let MatchesService = class MatchesService {
             };
             const createdMatch = new this.matchModel(newMatch);
             const matchDb = await createdMatch.save();
-            await this.gamesService.increaseAmountInPlatform(gameData.gameId, createMatchDto.platform);
             return matchDb;
         };
         this.getMatch = async (id) => {
