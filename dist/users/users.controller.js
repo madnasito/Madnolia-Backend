@@ -19,9 +19,13 @@ const user_guard_1 = require("../guards/user.guard");
 const update_user_dto_1 = require("./dtos/update-user.dto");
 const serialize_interceptor_1 = require("../interceptors/serialize.interceptor");
 const user_dto_1 = require("./dtos/user.dto");
+const platform_express_1 = require("@nestjs/platform-express");
+const config_1 = require("@nestjs/config");
+const axios_1 = require("axios");
 let UserController = class UserController {
-    constructor(usersService) {
+    constructor(usersService, config) {
         this.usersService = usersService;
+        this.config = config;
     }
     async search(username) {
         return this.usersService.searchUser(username);
@@ -40,6 +44,29 @@ let UserController = class UserController {
     }
     async update(req, body) {
         return this.usersService.upadte(req.user.id, body);
+    }
+    async uploadFile(req, img) {
+        const validExtension = ['jpg', 'jpeg', 'png'];
+        const extension = img.mimetype.split('/')[1];
+        if (!validExtension.includes(extension)) {
+            throw new common_1.HttpException('Not valid extension', common_1.HttpStatus.BAD_REQUEST);
+        }
+        const base64Img = Buffer.from(img.buffer).toString('base64');
+        const formData = new FormData();
+        formData.append('image', base64Img);
+        const imgBbKey = this.config.get('IMGBB_KEY');
+        await axios_1.default.post(`https://api.imgbb.com/1/upload?key=${imgBbKey}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        }).then(async (resp) => {
+            console.log(resp);
+            await this.usersService.upadte(req.user.id, {
+                img: resp.data.data.url,
+                thumb: resp.data.data.thumb.url
+            });
+            return resp;
+        }).catch((error) => new common_1.HttpException(error, common_1.HttpStatus.BAD_REQUEST));
     }
 };
 exports.UserController = UserController;
@@ -91,9 +118,24 @@ __decorate([
     __metadata("design:paramtypes", [Object, update_user_dto_1.UpdateUserDto]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "update", null);
+__decorate([
+    (0, common_1.Post)('upload'),
+    (0, common_1.UseGuards)(user_guard_1.UserGuard),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('img')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.UploadedFile)(new common_1.ParseFilePipe({
+        validators: [
+            new common_1.MaxFileSizeValidator({ maxSize: 2000 * 1024 }),
+        ],
+    }))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "uploadFile", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('user'),
     (0, serialize_interceptor_1.Serialize)(user_dto_1.UserDto),
-    __metadata("design:paramtypes", [users_service_1.UsersService])
+    __metadata("design:paramtypes", [users_service_1.UsersService,
+        config_1.ConfigService])
 ], UserController);
 //# sourceMappingURL=users.controller.js.map
