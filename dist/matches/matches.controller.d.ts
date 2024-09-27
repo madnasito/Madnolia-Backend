@@ -8,7 +8,21 @@ export declare class MatchesController {
     getMatch(id: string): Promise<import("mongoose").Document<unknown, {}, Match> & Match & {
         _id: import("mongoose").Types.ObjectId;
     }>;
+    getMatchWithGame(id: string): Promise<import("mongoose").Document<unknown, {}, Match> & Match & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
+    getFullMatch(id: string): Promise<{
+        match: import("mongoose").Document<unknown, {}, Match> & Match & {
+            _id: import("mongoose").Types.ObjectId;
+        };
+        messages: (import("mongoose").Document<unknown, {}, import("../messages/schema/messages.schema").Message> & import("../messages/schema/messages.schema").Message & {
+            _id: import("mongoose").Types.ObjectId;
+        })[];
+    }>;
     getPlayerMatches(request: any): Promise<(import("mongoose").Document<unknown, {}, Match> & Match & {
+        _id: import("mongoose").Types.ObjectId;
+    })[]>;
+    getPlayerInvitations(request: any): Promise<(import("mongoose").Document<unknown, {}, Match> & Match & {
         _id: import("mongoose").Types.ObjectId;
     })[]>;
     getMatchesByPlatform(platform: string): Promise<any[]>;

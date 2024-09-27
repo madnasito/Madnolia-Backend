@@ -26,7 +26,7 @@ exports.MessagesModule = MessagesModule = __decorate([
             jwt_1.JwtModule.register({ secret: 'hard!to-guess_secret', signOptions: { expiresIn: "10d" } })
         ],
         providers: [messages_service_1.MessagesService, messages_gateway_1.MessagesGateway, user_1.Users],
-        exports: [user_1.Users]
+        exports: [user_1.Users, messages_service_1.MessagesService]
     })
 ], MessagesModule);
 //# sourceMappingURL=messages.module.js.map

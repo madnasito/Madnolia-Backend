@@ -43,6 +43,7 @@ let UserController = class UserController {
         return this.usersService.getUserPartners(req.user.id);
     }
     async update(req, body) {
+        console.log(body);
         return this.usersService.upadte(req.user.id, body);
     }
     async uploadFile(req, img) {
@@ -51,22 +52,21 @@ let UserController = class UserController {
         if (!validExtension.includes(extension)) {
             throw new common_1.HttpException('Not valid extension', common_1.HttpStatus.BAD_REQUEST);
         }
+        console.log(img);
         const base64Img = Buffer.from(img.buffer).toString('base64');
-        const formData = new FormData();
-        formData.append('image', base64Img);
-        const imgBbKey = this.config.get('IMGBB_KEY');
-        await axios_1.default.post(`https://api.imgbb.com/1/upload?key=${imgBbKey}`, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data"
+        const form = new FormData();
+        form.append('file', img.destination);
+        form.append("apikey", "a639124c1b9448e386cdf89e3fa4597f");
+        axios_1.default.post('https://beeimg.com/api/upload/file/json/', form, { headers: {
+                "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
             }
-        }).then(async (resp) => {
-            console.log(resp);
-            await this.usersService.upadte(req.user.id, {
-                img: resp.data.data.url,
-                thumb: resp.data.data.thumb.url
-            });
-            return resp;
-        }).catch((error) => new common_1.HttpException(error, common_1.HttpStatus.BAD_REQUEST));
+        })
+            .then(response => {
+            console.log(response.data);
+        })
+            .catch(error => {
+            console.error(error);
+        });
     }
 };
 exports.UserController = UserController;

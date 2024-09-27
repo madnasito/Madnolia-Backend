@@ -26,7 +26,8 @@ exports.MatchesModule = MatchesModule = __decorate([
             messages_module_1.MessagesModule
         ],
         providers: [matches_service_1.MatchesService, matches_gateway_1.MatchesGateway],
-        controllers: [matches_controller_1.MatchesController]
+        controllers: [matches_controller_1.MatchesController],
+        exports: []
     })
 ], MatchesModule);
 //# sourceMappingURL=matches.module.js.map

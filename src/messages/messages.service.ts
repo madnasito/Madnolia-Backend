@@ -15,7 +15,7 @@ export class MessagesService {
     }
 
     getRoomMessages(room: string, skip: number = 0) {
-        return this.messageModel.find({room}, {}, {skip});
+        return this.messageModel.find({room}, {}, {skip, populate: {path: 'user', select: '_id name username thumb'}});
     }
 
     update(id: string, text: string){

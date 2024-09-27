@@ -21,5 +21,5 @@ export declare class UserController {
     update(req: any, body: UpdateUserDto): Promise<import("mongoose").Document<unknown, {}, import("./schemas/user.schema").User> & import("./schemas/user.schema").User & {
         _id: import("mongoose").Types.ObjectId;
     }>;
-    uploadFile(req: any, img: Express.Multer.File): Promise<any>;
+    uploadFile(req: any, img: Express.Multer.File): Promise<void>;
 }

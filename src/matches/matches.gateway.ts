@@ -32,13 +32,10 @@ export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGat
   @SubscribeMessage('match_created')
   async handleMatchCreated(client: Socket, payload: string) {
 
+    const match = await this.matchesService.getMatchWithGame(payload);
 
-    console.log(payload);
-    const match = await (await this.matchesService.getMatch(payload)).populate({path: 'game'})
 
     if(!match) throw new WsException('Not found match')
-
-    console.log(match);
 
     const matchUrl = `${process.env.URL}/match/info/${match._id}`
 
@@ -50,13 +47,11 @@ export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGat
       name: match.title,
       url: matchUrl
     }
-    console.log(this.users.getUsers());
+    
 
     match.inviteds.forEach(element => {
-      console.log(`User: ${element}`);
       const invitedUser = this.users.getUserById(element.toString())
       if(invitedUser){
-        console.log(invitedUser);
         client.to(invitedUser.socketId).emit('invitation', eventPayload)
       }
     })

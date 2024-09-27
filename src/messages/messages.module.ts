@@ -14,6 +14,6 @@ import { Users } from './classes/user';
     JwtModule.register({ secret: 'hard!to-guess_secret', signOptions: {expiresIn: "10d"} })
   ],
   providers: [MessagesService, MessagesGateway, Users],
-  exports: [Users]
+  exports: [Users, MessagesService]
 })
 export class MessagesModule {}

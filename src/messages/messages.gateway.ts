@@ -9,9 +9,6 @@ import { MessageDto } from './dtos/message.dto';
 import { Users } from './classes/user';
 import { JwtService } from '@nestjs/jwt';
 
-
-
-
   @UsePipes(new ValidationPipe())
 @WebSocketGateway({
   // namespace: 'messages'
@@ -66,12 +63,12 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
   @UseGuards(UserSocketGuard)
   @SubscribeMessage('init_chat')
-  handleEvent(@MessageBody() data: string, @ConnectedSocket() client:Socket): string {
+  handleEvent(@MessageBody() data: string, @ConnectedSocket() client:Socket) {
 
     try {
       this.users.getUser(client.id).room = data
       client.join(data)
-      return data;
+      return true;
     } catch (error) {
       throw new WsException(error)
     }
@@ -95,19 +92,23 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       if(!messageSaved) throw new WsException("No message")
   
       const { text, _id, date} = messageSaved
-      const {name, username, thumb} = this.users.getUserById(request.user)
+      const user = this.users.getUserById(request.user)
 
       const payloadEvent = {
         _id,
         text,
         date,
+        room: payload.room,
         user: {
-          name,
-          username,
-          thumb
+          _id: user._id,
+          name: user.name,
+          username: user.username,
+          thumb: user.thumb
         }
       }
+
       client.emit('message', payloadEvent)
+      client.to(payload.room).emit('message', payloadEvent)
   
     } catch (error) {
       console.log(error);

@@ -18,10 +18,12 @@ const mongoose_1 = require("@nestjs/mongoose");
 const match_schema_1 = require("./schemas/match.schema");
 const mongoose_2 = require("mongoose");
 const games_service_1 = require("../games/games.service");
+const messages_service_1 = require("../messages/messages.service");
 let MatchesService = class MatchesService {
-    constructor(matchModel, gamesService) {
+    constructor(matchModel, gamesService, messagesService) {
         this.matchModel = matchModel;
         this.gamesService = gamesService;
+        this.messagesService = messagesService;
         this.create = async (createMatchDto, user) => {
             const gameData = await this.gamesService.getGame(createMatchDto.game);
             let newMatch = {
@@ -41,6 +43,25 @@ let MatchesService = class MatchesService {
             if (!mongoose_2.default.Types.ObjectId.isValid(id))
                 throw new common_1.NotFoundException();
             return this.matchModel.findById(id);
+        };
+        this.getMatchWithGame = async (id) => {
+            if (!mongoose_2.default.Types.ObjectId.isValid(id))
+                throw new common_1.NotFoundException();
+            return this.matchModel.findOne({ _id: id }, {}, { populate: { path: 'game' } });
+        };
+        this.getFullMatch = async (id) => {
+            if (!mongoose_2.default.Types.ObjectId.isValid(id))
+                throw new common_1.NotFoundException();
+            const match = await this.matchModel.findOne({ _id: id }, {}, {
+                populate: [
+                    { path: 'game' },
+                    { path: 'likes', select: '_id name thumb username' }
+                ],
+            });
+            if (!match)
+                throw new common_1.NotFoundException();
+            const messages = await this.messagesService.getRoomMessages(id);
+            return { match, messages };
         };
         this.update = async (user, attrs) => {
             const match = await this.matchModel.findOne({ _id: attrs._id, user, active: true });
@@ -63,6 +84,9 @@ let MatchesService = class MatchesService {
             return this.matchModel.findByIdAndUpdate(id, { $addToSet: { likes: user } }, { new: true });
         };
         this.getPlayerMatches = async (user, skip = 0) => this.matchModel.find({ user }, {}, { populate: { path: 'game' } }).sort({ _id: -1 }).skip(0);
+        this.getPlayerInvitations = async (user, skip = 0) => {
+            return this.matchModel.find({ inviteds: user }, {}, { populate: { path: 'game' } });
+        };
         this.getMatchesByPlatform = async (platform, skip = 0) => {
             const results = await this.matchModel.aggregate([
                 {
@@ -112,6 +136,7 @@ exports.MatchesService = MatchesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(match_schema_1.Match.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
-        games_service_1.GamesService])
+        games_service_1.GamesService,
+        messages_service_1.MessagesService])
 ], MatchesService);
 //# sourceMappingURL=matches.service.js.map

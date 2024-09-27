@@ -8,7 +8,7 @@ export declare class Match {
     user: mongoose.Schema.Types.ObjectId;
     inviteds: Array<User>;
     title: string;
-    likes: User[];
+    likes: Array<mongoose.Schema.Types.ObjectId>;
     private: boolean;
     active: boolean;
     tournament: boolean;

@@ -6,6 +6,8 @@ import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
+
+
 import axios from 'axios';
 
 @Controller('user')
@@ -49,6 +51,7 @@ export class UserController {
     @Put('update')
     @UseGuards(UserGuard)
     async update(@Request() req:any, @Body() body:UpdateUserDto) {
+        console.log(body);
         return this.usersService.upadte(req.user.id, body)
     }
 
@@ -64,33 +67,39 @@ export class UserController {
                 ],
             })
         ) img: Express.Multer.File,
-     ):Promise<any> {
+     ) {
         const validExtension = [ 'jpg', 'jpeg', 'png'];
         const extension = img.mimetype.split('/')[1]
         if(!validExtension.includes(extension)){
             throw new HttpException('Not valid extension', HttpStatus.BAD_REQUEST);
         }
 
+        console.log(img);
+
         const base64Img = Buffer.from(img.buffer).toString('base64');
 
-        const formData = new FormData()
-        formData.append('image', base64Img)
+        // const formData = new FormData()
+        // formData.append('image', base64Img)
 
-        const imgBbKey = this.config.get<string>('IMGBB_KEY')
+
         
-        await axios.post(`https://api.imgbb.com/1/upload?key=${imgBbKey}`, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data"
+        const form = new FormData();
+        form.append('file', img.destination);
+        form.append("apikey", "a639124c1b9448e386cdf89e3fa4597f");
+
+        axios.post('https://beeimg.com/api/upload/file/json/',
+            form
+            , {headers:
+            {
+                "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
             }
-        }).then(async(resp) => {
-            console.log(resp);
-            await this.usersService.upadte(req.user.id, {
-                
-                img: resp.data.data.url,
-                thumb: resp.data.data.thumb.url
-            });
-            return resp;
-        }).catch((error) => new HttpException(error, HttpStatus.BAD_REQUEST))
+        } )
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
         
     }
 

@@ -40,12 +40,12 @@ export class User {
     platforms: Array<number>;
     
     @Prop({
-        default: "https://i.ibb.co/4d8b4XY/fd0bc6699682.jpg"
+        default: "https://beeimg.com/images/w13588287183.jpg"
     })
     img: string;
 
     @Prop({
-        default: "https://i.ibb.co/YZc5f1y/fd0bc6699682.jpg"
+        default: "https://i.beeimg.com/images/thumb/w13588287183-xs.jpg"
     })
     thumb: string;
     

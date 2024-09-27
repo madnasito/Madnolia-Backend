@@ -53,6 +53,7 @@ let AuthService = class AuthService {
             const isMatch = await (0, bcrypt_1.compare)(signInDto.password, user.password);
             if (!isMatch)
                 throw new common_1.BadRequestException("Wrong password");
+            console.log(user);
             const payload = { id: user._id };
             const token = await this.jwtService.signAsync(payload);
             return {

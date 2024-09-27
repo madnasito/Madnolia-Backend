@@ -14,6 +14,7 @@ import { MessagesModule } from 'src/messages/messages.module';
         MessagesModule
     ],
     providers: [MatchesService, MatchesGateway],
-    controllers: [MatchesController]
+    controllers: [MatchesController],
+    exports: []
 })
 export class MatchesModule {}

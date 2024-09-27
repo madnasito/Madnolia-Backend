@@ -26,7 +26,7 @@ let MessagesService = class MessagesService {
         return createdMessage.save();
     }
     getRoomMessages(room, skip = 0) {
-        return this.messageModel.find({ room }, {}, { skip });
+        return this.messageModel.find({ room }, {}, { skip, populate: { path: 'user', select: '_id name username thumb' } });
     }
     update(id, text) {
         if (!mongoose_2.default.Types.ObjectId.isValid(id))

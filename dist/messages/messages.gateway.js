@@ -58,7 +58,7 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
         try {
             this.users.getUser(client.id).room = data;
             client.join(data);
-            return data;
+            return true;
         }
         catch (error) {
             throw new websockets_1.WsException(error);
@@ -77,18 +77,21 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
             if (!messageSaved)
                 throw new websockets_1.WsException("No message");
             const { text, _id, date } = messageSaved;
-            const { name, username, thumb } = this.users.getUserById(request.user);
+            const user = this.users.getUserById(request.user);
             const payloadEvent = {
                 _id,
                 text,
                 date,
+                room: payload.room,
                 user: {
-                    name,
-                    username,
-                    thumb
+                    _id: user._id,
+                    name: user.name,
+                    username: user.username,
+                    thumb: user.thumb
                 }
             };
             client.emit('message', payloadEvent);
+            client.to(payload.room).emit('message', payloadEvent);
         }
         catch (error) {
             console.log(error);
@@ -129,7 +132,7 @@ __decorate([
     __param(1, (0, websockets_1.ConnectedSocket)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, socket_io_1.Socket]),
-    __metadata("design:returntype", String)
+    __metadata("design:returntype", void 0)
 ], MessagesGateway.prototype, "handleEvent", null);
 __decorate([
     (0, common_1.UseGuards)(user_sockets_guard_1.UserSocketGuard),

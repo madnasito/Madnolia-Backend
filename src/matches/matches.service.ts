@@ -7,12 +7,14 @@ import { GameInterface } from './interfaces/game.interface';
 import { CreateMatchDto } from './dtos/create-match.dto';
 import { MatchDto } from './dtos/match.dto';
 import { NewMatchDto } from './dtos/new-match.dto';
+import { MessagesService } from 'src/messages/messages.service';
 
 @Injectable()
 export class MatchesService {
     constructor(
         @InjectModel(Match.name) private matchModel: Model<Match>,
-        private readonly gamesService:GamesService
+        private readonly gamesService:GamesService,
+        private readonly messagesService:MessagesService
     ){}
 
     create = async(createMatchDto:CreateMatchDto, user: string) => {
@@ -43,6 +45,32 @@ export class MatchesService {
       return this.matchModel.findById(id)
     }
 
+    getMatchWithGame = async(id: string) => {
+      if(!mongoose.Types.ObjectId.isValid(id)) throw new NotFoundException()
+      return this.matchModel.findOne({_id: id}, {}, {populate: {path: 'game'}})
+    }
+
+    getFullMatch = async (id: string) => {
+      if (!mongoose.Types.ObjectId.isValid(id)) throw new NotFoundException();
+    
+      const match = await this.matchModel.findOne(
+        { _id: id },
+        {},
+        {
+          populate: [
+            { path: 'game' },
+            { path: 'likes', select: '_id name thumb username'}
+          ],
+        }
+      );
+    
+      if (!match) throw new NotFoundException();
+    
+      const messages = await this.messagesService.getRoomMessages(id);
+    
+      return { match, messages };
+    };
+
     update = async( user: string, attrs: Partial<MatchDto>) => {
         const match = await this.matchModel.findOne({_id: attrs._id, user, active: true});
 
@@ -71,7 +99,11 @@ export class MatchesService {
     }
 
     getPlayerMatches = async(user: string, skip: number = 0) => 
-        this.matchModel.find({user}, {} , {populate: {path:'game'}}).sort({ _id: -1 }).skip(0)
+        this.matchModel.find({user}, {} , {populate: {path:'game'}}).sort({ _id: -1 }).skip(0);
+
+    getPlayerInvitations = async(user: string, skip: number = 0) => {
+      return this.matchModel.find({inviteds: user}, {}, {populate: {path: 'game'}});
+    }
 
     getMatchesByPlatform = async (platform: number, skip: number = 0) => {
         
@@ -120,4 +152,6 @@ export class MatchesService {
       
       return matchesToUpdate;
     }
+
+    
   }

@@ -44,9 +44,11 @@ export class Match {
     title: string;
 
     @Prop({
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'User',
         default: []
     })
-    likes: User[];
+    likes: Array<mongoose.Schema.Types.ObjectId>;
 
     @Prop({
         default: false

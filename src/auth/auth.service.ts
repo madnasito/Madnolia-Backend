@@ -53,6 +53,7 @@ export class AuthService {
 
         if(!isMatch) throw new BadRequestException("Wrong password")
 
+        console.log(user)
         const payload = {id: user._id};
         const token = await this.jwtService.signAsync(payload)
 

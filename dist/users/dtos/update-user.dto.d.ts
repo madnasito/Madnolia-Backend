@@ -3,4 +3,6 @@ export declare class UpdateUserDto {
     username: string;
     email: string;
     platforms: Array<number>;
+    img: string;
+    thumb: string;
 }

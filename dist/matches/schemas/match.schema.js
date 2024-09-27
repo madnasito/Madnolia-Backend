@@ -58,6 +58,8 @@ __decorate([
 ], Match.prototype, "title", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
+        type: [mongoose_2.default.Schema.Types.ObjectId],
+        ref: 'User',
         default: []
     }),
     __metadata("design:type", Array)

@@ -25,8 +25,17 @@ let MatchesController = class MatchesController {
     async getMatch(id) {
         return this.matchesService.getMatch(id);
     }
+    async getMatchWithGame(id) {
+        return this.matchesService.getMatchWithGame(id);
+    }
+    async getFullMatch(id) {
+        return this.matchesService.getFullMatch(id);
+    }
     async getPlayerMatches(request) {
         return this.matchesService.getPlayerMatches(request.user.id);
+    }
+    async getPlayerInvitations(request) {
+        return this.matchesService.getPlayerInvitations(request.user.id);
     }
     async getMatchesByPlatform(platform) {
         return this.matchesService.getMatchesByPlatform(parseInt(platform));
@@ -50,6 +59,20 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MatchesController.prototype, "getMatch", null);
 __decorate([
+    (0, common_1.Get)('with-game/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MatchesController.prototype, "getMatchWithGame", null);
+__decorate([
+    (0, common_1.Get)('full/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MatchesController.prototype, "getFullMatch", null);
+__decorate([
     (0, common_1.UseGuards)(user_guard_1.UserGuard),
     (0, common_1.Get)('player-matches'),
     __param(0, (0, common_1.Request)()),
@@ -57,6 +80,14 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], MatchesController.prototype, "getPlayerMatches", null);
+__decorate([
+    (0, common_1.UseGuards)(user_guard_1.UserGuard),
+    (0, common_1.Get)('invitations'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], MatchesController.prototype, "getPlayerInvitations", null);
 __decorate([
     (0, common_1.Get)('platform/:platform'),
     __param(0, (0, common_1.Param)('platform')),

@@ -55,13 +55,13 @@ __decorate([
 ], User.prototype, "platforms", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        default: "https://i.ibb.co/4d8b4XY/fd0bc6699682.jpg"
+        default: "https://beeimg.com/images/w13588287183.jpg"
     }),
     __metadata("design:type", String)
 ], User.prototype, "img", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        default: "https://i.ibb.co/YZc5f1y/fd0bc6699682.jpg"
+        default: "https://i.beeimg.com/images/thumb/w13588287183-xs.jpg"
     }),
     __metadata("design:type", String)
 ], User.prototype, "thumb", void 0);

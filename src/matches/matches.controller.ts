@@ -14,10 +14,26 @@ export class MatchesController {
         return this.matchesService.getMatch(id);
     }
 
+    @Get('with-game/:id')
+    async getMatchWithGame(@Param('id') id: string){
+        return this.matchesService.getMatchWithGame(id);
+    }
+
+    @Get('full/:id')
+    async getFullMatch(@Param('id') id: string){
+        return this.matchesService.getFullMatch(id);
+    }
+
     @UseGuards(UserGuard)
     @Get('player-matches')
     async getPlayerMatches(@Request() request:any){
         return this.matchesService.getPlayerMatches(request.user.id)
+    }
+
+    @UseGuards(UserGuard)
+    @Get('invitations')
+    async getPlayerInvitations(@Request() request:any){
+        return this.matchesService.getPlayerInvitations(request.user.id)
     }
 
     @Get('platform/:platform')

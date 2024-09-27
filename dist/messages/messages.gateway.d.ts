@@ -14,7 +14,7 @@ export declare class MessagesGateway implements OnGatewayInit, OnGatewayConnecti
     afterInit(socket: Socket): void;
     handleConnection(client: Socket, ...args: any[]): Promise<WsException>;
     handleDisconnect(client: any): void;
-    handleEvent(data: string, client: Socket): string;
+    handleEvent(data: string, client: Socket): boolean;
     handleMessage(request: any, payload: CreateMessageDto, client: Socket): Promise<void>;
     handleDisconnectChat(client: Socket): boolean;
 }

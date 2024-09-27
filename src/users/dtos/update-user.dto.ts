@@ -16,4 +16,12 @@ export class UpdateUserDto {
     @IsArray()
     @IsOptional()
     platforms: Array<number>
+
+    @IsString()
+    @IsOptional()
+    img: string
+
+    @IsString()
+    @IsOptional()
+    thumb: string
 }
