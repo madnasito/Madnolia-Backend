@@ -1,6 +1,4 @@
-.env.development
-.env.test
-.env.production
+.env.*
 
 /node_modules
 /uploads/users
