@@ -17,6 +17,7 @@ const mongoose_1 = require("mongoose");
 const common_1 = require("@nestjs/common");
 const mongoose_2 = require("@nestjs/mongoose");
 const user_schema_1 = require("./schemas/user.schema");
+const axios_1 = require("axios");
 let UsersService = class UsersService {
     constructor(userModel) {
         this.userModel = userModel;
@@ -68,6 +69,14 @@ let UsersService = class UsersService {
             if (!verifiedUser)
                 throw new common_1.NotFoundException();
             return this.userModel.findOneAndUpdate({ _id: user }, { $push: { partners: partner } }, { new: true });
+        };
+        this.uploadImage = async (form) => {
+            return new Promise((resolve, reject) => {
+                axios_1.default.post('https://beeimg.com/api/upload/file/json/', form, {
+                    headers: {}
+                }).then((resp) => resolve(resp))
+                    .catch((err) => reject(err));
+            });
         };
     }
 };

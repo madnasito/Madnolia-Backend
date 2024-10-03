@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Request, Param, Put, Body, UseInterceptors, Post, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request, Param, Put, Body, UseInterceptors, Post, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, HttpException, HttpStatus, BadRequestException, BadGatewayException, Logger } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserGuard } from 'src/guards/user.guard';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 
 
 import axios from 'axios';
+import { HttpService } from '@nestjs/axios';
 
 @Controller('user')
 @Serialize(UserDto)
@@ -16,7 +17,7 @@ export class UserController {
 
     constructor(
         private usersService: UsersService,
-        private readonly config: ConfigService,
+        private readonly config: ConfigService
     ){}
 
     @Get('search/:username')
@@ -51,11 +52,10 @@ export class UserController {
     @Put('update')
     @UseGuards(UserGuard)
     async update(@Request() req:any, @Body() body:UpdateUserDto) {
-        console.log(body);
         return this.usersService.upadte(req.user.id, body)
     }
 
-    @Post('upload')
+    @Post('update-img')
     @UseGuards(UserGuard)
     @UseInterceptors(FileInterceptor('img'))
     async uploadFile(
@@ -63,7 +63,7 @@ export class UserController {
         @UploadedFile(
             new ParseFilePipe({
                 validators: [
-                    new MaxFileSizeValidator({ maxSize: 2000 * 1024 }), // 2MB max size
+                    new MaxFileSizeValidator({ maxSize: 1000 * 1024 }), // 2MB max size
                 ],
             })
         ) img: Express.Multer.File,
@@ -74,32 +74,32 @@ export class UserController {
             throw new HttpException('Not valid extension', HttpStatus.BAD_REQUEST);
         }
 
-        console.log(img);
-
-        const base64Img = Buffer.from(img.buffer).toString('base64');
-
-        // const formData = new FormData()
-        // formData.append('image', base64Img)
-
-
         
         const form = new FormData();
-        form.append('file', img.destination);
+        form.append('file', new Blob([img.buffer], {type: img.mimetype}));
         form.append("apikey", "a639124c1b9448e386cdf89e3fa4597f");
 
-        axios.post('https://beeimg.com/api/upload/file/json/',
-            form
-            , {headers:
+        return axios.post('https://beeimg.com/api/upload/file/json/',
+            form,
             {
-                "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
-            }
-        } )
-        .then(response => {
-            console.log(response.data);
-        })
-        .catch(error => {
-            console.error(error);
-        });
+                headers:
+                    {
+                        "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
+                    }
+            })
+            .then((resp) => {
+                if(resp.data.files.status == "Success" || resp.data.files.status == "Duplicate") {
+                    return this.usersService.upadte(
+                        req.user.id,
+                        {thumb: resp.data.files.thumbnail_url, img: resp.data.files.url}
+                    )
+                }
+                throw new BadRequestException()
+            })
+            .catch((err) => {
+                new BadGatewayException(err)
+            })
+        
         
     }
 

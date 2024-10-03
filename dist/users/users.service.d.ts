@@ -31,4 +31,5 @@ export declare class UsersService {
     addPartner: (user: string, partner: string) => Promise<mongoose.Document<unknown, {}, User> & User & {
         _id: mongoose.Types.ObjectId;
     }>;
+    uploadImage: (form: FormData) => Promise<any>;
 }

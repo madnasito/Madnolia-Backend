@@ -43,7 +43,6 @@ let UserController = class UserController {
         return this.usersService.getUserPartners(req.user.id);
     }
     async update(req, body) {
-        console.log(body);
         return this.usersService.upadte(req.user.id, body);
     }
     async uploadFile(req, img) {
@@ -52,20 +51,22 @@ let UserController = class UserController {
         if (!validExtension.includes(extension)) {
             throw new common_1.HttpException('Not valid extension', common_1.HttpStatus.BAD_REQUEST);
         }
-        console.log(img);
-        const base64Img = Buffer.from(img.buffer).toString('base64');
         const form = new FormData();
-        form.append('file', img.destination);
+        form.append('file', new Blob([img.buffer], { type: img.mimetype }));
         form.append("apikey", "a639124c1b9448e386cdf89e3fa4597f");
-        axios_1.default.post('https://beeimg.com/api/upload/file/json/', form, { headers: {
+        return axios_1.default.post('https://beeimg.com/api/upload/file/json/', form, {
+            headers: {
                 "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
             }
         })
-            .then(response => {
-            console.log(response.data);
+            .then((resp) => {
+            if (resp.data.files.status == "Success" || resp.data.files.status == "Duplicate") {
+                return this.usersService.upadte(req.user.id, { thumb: resp.data.files.thumbnail_url, img: resp.data.files.url });
+            }
+            throw new common_1.BadRequestException();
         })
-            .catch(error => {
-            console.error(error);
+            .catch((err) => {
+            new common_1.BadGatewayException(err);
         });
     }
 };
@@ -119,13 +120,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "update", null);
 __decorate([
-    (0, common_1.Post)('upload'),
+    (0, common_1.Post)('update-img'),
     (0, common_1.UseGuards)(user_guard_1.UserGuard),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('img')),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.UploadedFile)(new common_1.ParseFilePipe({
         validators: [
-            new common_1.MaxFileSizeValidator({ maxSize: 2000 * 1024 }),
+            new common_1.MaxFileSizeValidator({ maxSize: 1000 * 1024 }),
         ],
     }))),
     __metadata("design:type", Function),

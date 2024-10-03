@@ -1,7 +1,8 @@
 import mongoose, { Model } from 'mongoose';
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadGatewayException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
+import axios from 'axios';
 
 @Injectable()
 export class UsersService {
@@ -74,5 +75,17 @@ export class UsersService {
         return this.userModel.findOneAndUpdate({_id: user}, {$push: {partners: partner}}, {new: true})
     }
 
-    
+    uploadImage = async(form:FormData):Promise<any> => {
+      return new Promise((resolve, reject ) =>{
+        axios.post('https://beeimg.com/api/upload/file/json/',
+          form
+          , {
+              headers:
+                  {
+                      
+                  }
+          }).then((resp) => resolve(resp))
+            .catch((err) => reject(err))
+      })
+    }
 }
