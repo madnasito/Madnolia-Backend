@@ -14,7 +14,8 @@ import { UsersService } from './users/users.service';
 import { MessagesModule } from './messages/messages.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ScheduleModule } from '@nestjs/schedule';
-
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,6 +32,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     }),
     ScheduleModule.forRoot(),
     UsersModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', "public")
+    }),
     JwtModule.register({
       global: true,
       secret: "hard!to-guess_secret",

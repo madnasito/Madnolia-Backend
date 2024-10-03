@@ -22,6 +22,8 @@ const core_1 = require("@nestjs/core");
 const messages_module_1 = require("./messages/messages.module");
 const notifications_module_1 = require("./notifications/notifications.module");
 const schedule_1 = require("@nestjs/schedule");
+const path_1 = require("path");
+const serve_static_1 = require("@nestjs/serve-static");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -42,6 +44,9 @@ exports.AppModule = AppModule = __decorate([
             }),
             schedule_1.ScheduleModule.forRoot(),
             users_module_1.UsersModule,
+            serve_static_1.ServeStaticModule.forRoot({
+                rootPath: (0, path_1.join)(__dirname, '..', "public")
+            }),
             jwt_1.JwtModule.register({
                 global: true,
                 secret: "hard!to-guess_secret",
