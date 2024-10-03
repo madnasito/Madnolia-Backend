@@ -144,7 +144,7 @@ export class MatchesService {
     }
 
     getMatchesByGameAndPlatform = async(platform: number, game: string, skip: number = 0) => 
-        this.matchModel.find({platform, game, active: true}).skip(skip)
+        this.matchModel.find({platform, game, active: true},{}, {skip})
 
     updatePastTimeMatches = async(): Promise<Array<Match>> => {
       const matchesToUpdate = await this.matchModel.find({active: true, date: {$lt: new Date().getTime()}})

@@ -40,6 +40,9 @@ let MatchesController = class MatchesController {
     async getMatchesByPlatform(platform) {
         return this.matchesService.getMatchesByPlatform(parseInt(platform));
     }
+    async getMatchesByGameAndPlatform(platform, game) {
+        return this.matchesService.getMatchesByGameAndPlatform(parseInt(platform), game);
+    }
     async create(req, body) {
         return this.matchesService.create(body, req.user.id);
     }
@@ -95,6 +98,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], MatchesController.prototype, "getMatchesByPlatform", null);
+__decorate([
+    (0, common_1.Get)('by-platform-and-game/:platform/:game'),
+    __param(0, (0, common_1.Param)('platform')),
+    __param(1, (0, common_1.Param)('game')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], MatchesController.prototype, "getMatchesByGameAndPlatform", null);
 __decorate([
     (0, common_1.UseGuards)(user_guard_1.UserGuard),
     (0, common_1.Post)('create'),

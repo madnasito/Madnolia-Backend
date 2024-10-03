@@ -49,7 +49,7 @@ __decorate([
 ], Game.prototype, "screenshots", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        required: true
+        default: ""
     }),
     __metadata("design:type", String)
 ], Game.prototype, "description", void 0);

@@ -40,7 +40,7 @@ export class Game {
     screenshots: String[];
 
     @Prop({
-        required: true
+        default: ""
     })
     description: string;
 
