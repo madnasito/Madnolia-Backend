@@ -123,8 +123,9 @@ export class MatchesService {
             },
           },
           {
-            $unwind: '$gameDetails',
+            $unwind: '$gameDetails'
           },
+
           {
             $group: {
               _id: '$gameDetails._id', // Group by game ID
@@ -137,7 +138,7 @@ export class MatchesService {
           {
             $sort: {
               count: -1,
-            },
+            }
           },
         ]);
         return results;

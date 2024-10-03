@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Game, GameSchema } from './schemas/game.schema';
 import { GamesService } from './games.service';
 import { HttpModule } from '@nestjs/axios';
+import { GamesController } from './games.controller';
 
 @Module({
     imports: [
@@ -12,7 +13,8 @@ import { HttpModule } from '@nestjs/axios';
         })
     ],
     providers: [GamesService],
-    exports: [GamesService]
+    exports: [GamesService],
+    controllers: [GamesController]
     
 })
 export class GamesModule {}

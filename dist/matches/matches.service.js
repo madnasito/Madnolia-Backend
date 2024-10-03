@@ -104,7 +104,7 @@ let MatchesService = class MatchesService {
                     },
                 },
                 {
-                    $unwind: '$gameDetails',
+                    $unwind: '$gameDetails'
                 },
                 {
                     $group: {
@@ -118,7 +118,7 @@ let MatchesService = class MatchesService {
                 {
                     $sort: {
                         count: -1,
-                    },
+                    }
                 },
             ]);
             return results;

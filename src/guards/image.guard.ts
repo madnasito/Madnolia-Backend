@@ -3,9 +3,6 @@ import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface 
 @ValidatorConstraint({ async: false, name: 'img' })
 export class IsImageFile implements ValidatorConstraintInterface {
   validate(mimeType: string, args: ValidationArguments) {
-    console.log("IMG INTERCEPTOR");
-    // nothing is written on the console
-    console.log(mimeType);
 
     const acceptMimeTypes = ['image/png', 'image/jpeg'];
 

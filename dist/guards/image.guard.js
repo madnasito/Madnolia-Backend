@@ -10,8 +10,6 @@ exports.IsImageFile = void 0;
 const class_validator_1 = require("class-validator");
 let IsImageFile = class IsImageFile {
     validate(mimeType, args) {
-        console.log("IMG INTERCEPTOR");
-        console.log(mimeType);
         const acceptMimeTypes = ['image/png', 'image/jpeg'];
         const fileType = acceptMimeTypes.find((type) => type === mimeType);
         if (!fileType)
