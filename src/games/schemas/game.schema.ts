@@ -31,6 +31,7 @@ export class Game {
 
     @Prop({
         // required: true
+        default: ""
     })
     background: string;
 

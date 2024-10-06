@@ -55,6 +55,10 @@ export class User {
     @Prop({type: Number, default: 0})
     notifications: number;
 
+    // Availability 0 = Noone
+    // Availability 1 = AnyOne
+    // Availability 2 = Just partners
+    
     @Prop({type: Number, default: 1})
     availability: number
 }

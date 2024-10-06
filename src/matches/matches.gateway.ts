@@ -32,8 +32,12 @@ export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGat
   @SubscribeMessage('match_created')
   async handleMatchCreated(client: Socket, payload: string) {
 
+    this.logger.debug(client)
+    this.logger.debug(payload)
+
     const match = await this.matchesService.getMatchWithGame(payload);
 
+    this.logger.debug(match)
 
     if(!match) throw new WsException('Not found match')
 
@@ -53,6 +57,7 @@ export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGat
       const invitedUser = this.users.getUserById(element.toString())
       if(invitedUser){
         client.to(invitedUser.socketId).emit('invitation', eventPayload)
+        this.logger.debug(invitedUser)
       }
     })
 
@@ -65,23 +70,28 @@ export class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGat
   async handleJoinToMatch(client: Socket, payload: string) {
 
     try {
-      
+
+      this.logger.debug(`Client id: ${client.id} tries to join`);
+
       const user = this.users.getUser(client.id)
+      this.logger.debug(user);
       const matchUpdated = await this.matchesService.addUserToMatch(payload, user._id)
-  
-  
+      
+      this.logger.debug(matchUpdated);
+      
       if(!matchUpdated) {
         client.emit('added_to_match', false)
         throw new WsException(NotFoundException)
       }
-  
+      
       client.emit('added_to_match', true)
-  
+      
       const {_id, name, thumb, username} = user
-  
+      
       client.to(payload).emit('new_player_to_match', {
         _id, name, thumb, username
       })
+      this.logger.debug(`Client id: ${client.id} joined to match`);
 
     } catch (error) {
       client.emit('added_to_match', false)

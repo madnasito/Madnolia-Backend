@@ -9,6 +9,6 @@ export declare class GamesService {
     constructor(gameModel: Model<Game>, config: ConfigService, httpService: HttpService);
     getGame: (id: number) => Promise<any>;
     findByRawId: (gameId: number) => Promise<any>;
-    findById: (gameId: string) => Promise<any>;
+    findById(gameId: string): Promise<any>;
     getRawgGame: (id: number) => Promise<any>;
 }

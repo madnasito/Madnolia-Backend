@@ -31,7 +31,10 @@ let MatchesGateway = MatchesGateway_1 = class MatchesGateway {
     handleConnection(client, ...args) {
     }
     async handleMatchCreated(client, payload) {
+        this.logger.debug(client);
+        this.logger.debug(payload);
         const match = await this.matchesService.getMatchWithGame(payload);
+        this.logger.debug(match);
         if (!match)
             throw new websockets_1.WsException('Not found match');
         const matchUrl = `${process.env.URL}/match/info/${match._id}`;
@@ -45,13 +48,17 @@ let MatchesGateway = MatchesGateway_1 = class MatchesGateway {
             const invitedUser = this.users.getUserById(element.toString());
             if (invitedUser) {
                 client.to(invitedUser.socketId).emit('invitation', eventPayload);
+                this.logger.debug(invitedUser);
             }
         });
     }
     async handleJoinToMatch(client, payload) {
         try {
+            this.logger.debug(`Client id: ${client.id} tries to join`);
             const user = this.users.getUser(client.id);
+            this.logger.debug(user);
             const matchUpdated = await this.matchesService.addUserToMatch(payload, user._id);
+            this.logger.debug(matchUpdated);
             if (!matchUpdated) {
                 client.emit('added_to_match', false);
                 throw new websockets_1.WsException(common_1.NotFoundException);
@@ -61,6 +68,7 @@ let MatchesGateway = MatchesGateway_1 = class MatchesGateway {
             client.to(payload).emit('new_player_to_match', {
                 _id, name, thumb, username
             });
+            this.logger.debug(`Client id: ${client.id} joined to match`);
         }
         catch (error) {
             client.emit('added_to_match', false);

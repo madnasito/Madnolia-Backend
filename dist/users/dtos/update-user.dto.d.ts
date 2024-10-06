@@ -5,4 +5,5 @@ export declare class UpdateUserDto {
     platforms: Array<number>;
     img: string;
     thumb: string;
+    availability: number;
 }

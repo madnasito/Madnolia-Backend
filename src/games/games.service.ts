@@ -63,7 +63,13 @@ export class GamesService {
 
     findByRawId = async(gameId: number):Promise<any> => await this.gameModel.findOne({gameId})
 
-    findById = async(gameId: string):Promise<any> => await this.gameModel.findById(gameId)
+    async findById (gameId: string):Promise<any> {
+        const gameDb = await this.gameModel.findById(gameId)
+
+        if(!gameDb) throw new NotFoundException()
+
+        return gameDb;
+    } 
 
     getRawgGame = async(id: number) => {
         const apiKey = this.config.get<string>('RAWG_API_KEY')

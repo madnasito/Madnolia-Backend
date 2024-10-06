@@ -107,9 +107,11 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
         }
       }
 
-      client.emit('message', payloadEvent)
+      
+      this.logger.debug(`${this.users.getUser(client.id).room}`)
+
       client.to(payload.room).emit('message', payloadEvent)
-  
+      client.emit('message', payloadEvent)
     } catch (error) {
       console.log(error);
       throw new WsException(error)
@@ -121,9 +123,11 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   handleDisconnectChat( @ConnectedSocket() client:Socket) {
 
     try {
+      this.logger.debug(`Leaved the room: ${client.id}`);
       this.users.getUser(client.id).room = ""
       return true;
     } catch (error) {
+      console.log(error);
       throw new WsException(error)
     }
   }

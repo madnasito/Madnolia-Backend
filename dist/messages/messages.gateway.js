@@ -90,8 +90,9 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
                     thumb: user.thumb
                 }
             };
-            client.emit('message', payloadEvent);
+            this.logger.debug(`${this.users.getUser(client.id).room}`);
             client.to(payload.room).emit('message', payloadEvent);
+            client.emit('message', payloadEvent);
         }
         catch (error) {
             console.log(error);
@@ -100,10 +101,12 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
     }
     handleDisconnectChat(client) {
         try {
+            this.logger.debug(`Leaved the room: ${client.id}`);
             this.users.getUser(client.id).room = "";
             return true;
         }
         catch (error) {
+            console.log(error);
             throw new websockets_1.WsException(error);
         }
     }

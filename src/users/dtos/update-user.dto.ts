@@ -1,4 +1,4 @@
-import { IsAlphanumeric, IsArray, IsEmail, IsOptional, IsString } from "class-validator";
+import { IsAlphanumeric, IsArray, IsEmail, IsIn, IsInt, IsOptional, IsString } from "class-validator";
 
 export class UpdateUserDto {
     @IsAlphanumeric()
@@ -24,4 +24,8 @@ export class UpdateUserDto {
     @IsString()
     @IsOptional()
     thumb: string
+
+    @IsInt()
+    @IsOptional()
+    availability: number
 }

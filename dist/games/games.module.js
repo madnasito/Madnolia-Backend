@@ -12,6 +12,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const game_schema_1 = require("./schemas/game.schema");
 const games_service_1 = require("./games.service");
 const axios_1 = require("@nestjs/axios");
+const games_controller_1 = require("./games.controller");
 let GamesModule = class GamesModule {
 };
 exports.GamesModule = GamesModule;
@@ -24,7 +25,8 @@ exports.GamesModule = GamesModule = __decorate([
             })
         ],
         providers: [games_service_1.GamesService],
-        exports: [games_service_1.GamesService]
+        exports: [games_service_1.GamesService],
+        controllers: [games_controller_1.GamesController]
     })
 ], GamesModule);
 //# sourceMappingURL=games.module.js.map

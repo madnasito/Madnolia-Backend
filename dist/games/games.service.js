@@ -42,12 +42,17 @@ let GamesService = class GamesService {
             return await createdGame.save();
         };
         this.findByRawId = async (gameId) => await this.gameModel.findOne({ gameId });
-        this.findById = async (gameId) => await this.gameModel.findById(gameId);
         this.getRawgGame = async (id) => {
             const apiKey = this.config.get('RAWG_API_KEY');
             const gameData = (await this.httpService.axiosRef.get(`/${id}?key=${apiKey}`)).data;
             return gameData;
         };
+    }
+    async findById(gameId) {
+        const gameDb = await this.gameModel.findById(gameId);
+        if (!gameDb)
+            throw new common_1.NotFoundException();
+        return gameDb;
     }
 };
 exports.GamesService = GamesService;

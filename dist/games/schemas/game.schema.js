@@ -40,7 +40,9 @@ __decorate([
     __metadata("design:type", Array)
 ], Game.prototype, "platforms", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({}),
+    (0, mongoose_1.Prop)({
+        default: ""
+    }),
     __metadata("design:type", String)
 ], Game.prototype, "background", void 0);
 __decorate([

@@ -8,7 +8,7 @@ export class GamesController {
     ){}
 
     @Get(':game')
-    getGame(@Param('game') game: string){
+    getGame(@Param('game') game: string) {
         return this.gamesService.findById(game);
     }
 }
