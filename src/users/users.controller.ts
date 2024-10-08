@@ -52,7 +52,6 @@ export class UserController {
     @Put('update')
     @UseGuards(UserGuard)
     async update(@Request() req:any, @Body() body:UpdateUserDto) {
-        console.log(body);
         return this.usersService.upadte(req.user.id, body)
     }
 

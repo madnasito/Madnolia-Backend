@@ -47,6 +47,7 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsIn)([0, 1, 2]),
     __metadata("design:type", Number)
 ], UpdateUserDto.prototype, "availability", void 0);
 //# sourceMappingURL=update-user.dto.js.map

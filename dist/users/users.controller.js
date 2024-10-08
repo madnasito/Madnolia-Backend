@@ -43,7 +43,6 @@ let UserController = class UserController {
         return this.usersService.getUserPartners(req.user.id);
     }
     async update(req, body) {
-        console.log(body);
         return this.usersService.upadte(req.user.id, body);
     }
     async uploadFile(req, img) {

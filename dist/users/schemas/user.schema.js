@@ -70,13 +70,29 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "partners", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.default.Schema.Types.ObjectId, ref: 'Game' }], default: [] }),
+    __metadata("design:type", Array)
+], User.prototype, "games", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ type: Number, default: 0 }),
     __metadata("design:type", Number)
 ], User.prototype, "notifications", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: Number, default: 1 }),
+    (0, mongoose_1.Prop)({ type: Number, default: 1, enum: [0, 1, 2] }),
     __metadata("design:type", Number)
 ], User.prototype, "availability", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Date, default: new Date() }),
+    __metadata("design:type", Date)
+], User.prototype, "createdAt", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Date }),
+    __metadata("design:type", Date)
+], User.prototype, "modifiedAt", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Date }),
+    __metadata("design:type", Date)
+], User.prototype, "deletedAt", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)()
 ], User);

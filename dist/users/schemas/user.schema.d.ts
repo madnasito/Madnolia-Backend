@@ -1,4 +1,5 @@
 import mongoose, { HydratedDocument } from 'mongoose';
+import { Game } from 'src/games/schemas/game.schema';
 export type UserDocument = HydratedDocument<User>;
 export declare class User {
     name: string;
@@ -10,8 +11,12 @@ export declare class User {
     img: string;
     thumb: string;
     partners: User[];
+    games: Game[];
     notifications: number;
     availability: number;
+    createdAt: Date;
+    modifiedAt: Date;
+    deletedAt: Date;
 }
 export declare const UserSchema: mongoose.Schema<User, mongoose.Model<User, any, any, any, mongoose.Document<unknown, any, User> & User & {
     _id: mongoose.Types.ObjectId;

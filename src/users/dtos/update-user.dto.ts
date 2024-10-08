@@ -27,5 +27,6 @@ export class UpdateUserDto {
 
     @IsInt()
     @IsOptional()
+    @IsIn([0, 1, 2])
     availability: number
 }
