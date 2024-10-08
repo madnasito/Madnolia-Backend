@@ -68,6 +68,9 @@ export class UserController {
             })
         ) img: Express.Multer.File,
      ) {
+
+        try {
+        
         const validExtension = [ 'jpg', 'jpeg', 'png'];
         const extension = img.mimetype.split('/')[1]
         if(!validExtension.includes(extension)){
@@ -97,8 +100,12 @@ export class UserController {
                 throw new BadRequestException()
             })
             .catch((err) => {
-                new BadGatewayException(err)
+                throw new BadGatewayException(err)
             })
+        } catch (error) {
+            throw new error;    
+        }
+        
         
         
     }
