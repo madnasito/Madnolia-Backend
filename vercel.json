@@ -2,8 +2,8 @@
     "version": 2,
     "builds": [
         {
-            "src": "dist/main.js",
-            "use": "packaje.json"
+            "src": "packaje.json",
+            "use": "@vercel/node"
         }
     ],
     "routes": [
