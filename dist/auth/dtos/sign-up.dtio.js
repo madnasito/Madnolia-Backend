@@ -17,11 +17,14 @@ exports.SignUpDto = SignUpDto;
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(20),
     __metadata("design:type", String)
 ], SignUpDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.Matches)(/^[a-z0-9-_@]+$/, { message: "Invalid username" }),
+    (0, class_validator_1.MaxLength)(20),
     __metadata("design:type", String)
 ], SignUpDto.prototype, "username", void 0);
 __decorate([

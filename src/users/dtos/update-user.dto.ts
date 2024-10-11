@@ -1,4 +1,4 @@
-import { IsAlphanumeric, IsArray, IsEmail, IsIn, IsInt, IsLowercase, IsOptional, IsString } from "class-validator";
+import { IsAlphanumeric, IsArray, IsEmail, IsIn, IsInt, IsOptional, IsString, Matches, MaxLength } from "class-validator";
 
 export class UpdateUserDto {
     @IsAlphanumeric()
@@ -6,8 +6,8 @@ export class UpdateUserDto {
     name: string;
 
     @IsOptional()
-    @IsAlphanumeric()
-    @IsLowercase()
+    @Matches(/^[a-z0-9-_@]+$/, {message: "Invalid username"})
+    @MaxLength(20)
     username: string;
 
     @IsOptional()
