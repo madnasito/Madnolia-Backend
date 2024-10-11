@@ -1,11 +1,13 @@
-import { IsAlphanumeric, IsArray, IsEmail, IsString, IsStrongPassword } from "class-validator";
+import { IsAlphanumeric, IsArray, IsEmail, IsLowercase, isLowercase, IsString, IsStrongPassword, Matches } from "class-validator";
 
 export class CreateUserDto {
 
     @IsAlphanumeric()
     name: string;
 
-    @IsString()
+    @IsAlphanumeric()
+    @IsLowercase()
+    @Matches(/^[a-z0-9-_@]+$/)
     username: string;
 
     @IsEmail()

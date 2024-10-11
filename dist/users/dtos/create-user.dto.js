@@ -19,7 +19,9 @@ __decorate([
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "name", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsAlphanumeric)(),
+    (0, class_validator_1.IsLowercase)(),
+    (0, class_validator_1.Matches)(/^[a-z0-9-_@]+$/),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "username", void 0);
 __decorate([

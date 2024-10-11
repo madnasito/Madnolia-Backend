@@ -29,6 +29,7 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_transformer_1.Expose)(),
+    (0, class_validator_1.Matches)(RegExp(/^[a-z0-9-_@]+$/)),
     __metadata("design:type", String)
 ], UserDto.prototype, "username", void 0);
 __decorate([

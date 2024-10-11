@@ -1,5 +1,5 @@
 import { Expose } from "class-transformer";
-import { IsArray, IsEmail, IsInt, IsMongoId, IsOptional, IsString, IsUrl } from "class-validator";
+import { IsArray, IsEmail, IsInt, IsMongoId, IsOptional, IsString, IsUrl, Matches } from "class-validator";
 
 export class UserDto {
 
@@ -14,6 +14,7 @@ export class UserDto {
 
     @IsString()
     @Expose()
+    @Matches(RegExp(/^[a-z0-9-_@]+$/))
     username: string;
 
     @IsEmail()

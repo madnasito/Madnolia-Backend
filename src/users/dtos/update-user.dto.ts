@@ -1,12 +1,13 @@
-import { IsAlphanumeric, IsArray, IsEmail, IsIn, IsInt, IsOptional, IsString } from "class-validator";
+import { IsAlphanumeric, IsArray, IsEmail, IsIn, IsInt, IsLowercase, IsOptional, IsString } from "class-validator";
 
 export class UpdateUserDto {
     @IsAlphanumeric()
     @IsOptional()
     name: string;
 
-    @IsString()
     @IsOptional()
+    @IsAlphanumeric()
+    @IsLowercase()
     username: string;
 
     @IsOptional()
