@@ -2,14 +2,22 @@
     "version": 2,
     "builds": [
         {
+<<<<<<< HEAD
             "src": "src/main.ts",
+=======
+            "src": "dist/main.js",
+>>>>>>> e008fe7c83b896489a613826969908e0b468ef8c
             "use": "@vercel/node"
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
+<<<<<<< HEAD
             "dest": "src/main.ts",
+=======
+            "dest": "dist/main.js",
+>>>>>>> e008fe7c83b896489a613826969908e0b468ef8c
             "methods": [
                 "GET",
                 "POST",
