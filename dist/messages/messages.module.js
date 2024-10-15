@@ -15,6 +15,7 @@ const messages_schema_1 = require("./schema/messages.schema");
 const users_module_1 = require("../users/users.module");
 const jwt_1 = require("@nestjs/jwt");
 const user_1 = require("./classes/user");
+const messages_controller_1 = require("./messages.controller");
 let MessagesModule = class MessagesModule {
 };
 exports.MessagesModule = MessagesModule;
@@ -26,7 +27,8 @@ exports.MessagesModule = MessagesModule = __decorate([
             jwt_1.JwtModule.register({ secret: 'hard!to-guess_secret', signOptions: { expiresIn: "10d" } })
         ],
         providers: [messages_service_1.MessagesService, messages_gateway_1.MessagesGateway, user_1.Users],
-        exports: [user_1.Users, messages_service_1.MessagesService]
+        exports: [user_1.Users, messages_service_1.MessagesService],
+        controllers: [messages_controller_1.MessagesController]
     })
 ], MessagesModule);
 //# sourceMappingURL=messages.module.js.map

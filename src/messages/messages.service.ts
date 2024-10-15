@@ -15,7 +15,13 @@ export class MessagesService {
     }
 
     getRoomMessages(room: string, skip: number = 0) {
-        return this.messageModel.find({room}, {}, {skip, populate: {path: 'user', select: '_id name username thumb'}});
+        const limit = 30;
+        return this.messageModel.find({room}, {}, {
+            limit: limit,
+            skip: skip * limit,
+            populate: {path: 'user', select: '_id name username thumb'},
+            sort: {_id: -1}
+        });
     }
 
     update(id: string, text: string){

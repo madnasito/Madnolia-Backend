@@ -26,7 +26,13 @@ let MessagesService = class MessagesService {
         return createdMessage.save();
     }
     getRoomMessages(room, skip = 0) {
-        return this.messageModel.find({ room }, {}, { skip, populate: { path: 'user', select: '_id name username thumb' } });
+        const limit = 30;
+        return this.messageModel.find({ room }, {}, {
+            limit: limit,
+            skip: skip * limit,
+            populate: { path: 'user', select: '_id name username thumb' },
+            sort: { _id: -1 }
+        });
     }
     update(id, text) {
         if (!mongoose_2.default.Types.ObjectId.isValid(id))

@@ -16,6 +16,7 @@ class CreateMatchDto {
 exports.CreateMatchDto = CreateMatchDto;
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(40),
     __metadata("design:type", String)
 ], CreateMatchDto.prototype, "title", void 0);
 __decorate([

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { Match } from './schemas/match.schema';
 import { CreateMatchDto } from './dtos/create-match.dto';
 import { UserGuard } from 'src/guards/user.guard';

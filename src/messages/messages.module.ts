@@ -6,6 +6,7 @@ import { Message, MessageSchema } from './schema/messages.schema';
 import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { Users } from './classes/user';
+import { MessagesController } from './messages.controller';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { Users } from './classes/user';
     JwtModule.register({ secret: 'hard!to-guess_secret', signOptions: {expiresIn: "10d"} })
   ],
   providers: [MessagesService, MessagesGateway, Users],
-  exports: [Users, MessagesService]
+  exports: [Users, MessagesService],
+  controllers: [MessagesController]
 })
 export class MessagesModule {}
