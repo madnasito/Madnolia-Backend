@@ -27,11 +27,7 @@ let UserSocketGuard = class UserSocketGuard {
             const payload = await this.jwtService.verifyAsync(token, {
                 secret: "hard!to-guess_secret"
             });
-            console.log("Token payload");
-            console.log(payload);
             request.getClient().user = payload.id;
-            console.log("Request client from guard");
-            console.log(request.getClient().user);
         }
         catch (error) {
             throw new websockets_1.WsException("Unauthorized");
