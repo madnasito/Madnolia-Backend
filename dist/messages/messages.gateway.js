@@ -68,6 +68,8 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
         try {
             this.logger.log(`Message received from client id: ${client.id}`);
             this.logger.debug(`Payload: ${payload}`);
+            console.log("Getaway request user: ");
+            console.log(request.user);
             const message = {
                 room: payload.room,
                 user: request.user,
