@@ -1,5 +1,5 @@
 export declare class MessageDto {
-    room: string;
+    to: string;
     text: string;
     user: string;
 }

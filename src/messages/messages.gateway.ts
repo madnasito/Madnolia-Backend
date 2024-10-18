@@ -38,7 +38,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       const { token } = client.handshake.headers
 
 
-      if (token === undefined || token === null) {
+      if (token === undefined || token === null || token === "") {
         client.disconnect(true)
         throw new WsException('Missing authentication token');
       }
@@ -83,7 +83,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       this.logger.debug(`Payload: ${payload}`);
     
       const message:MessageDto = {
-        room: payload.room,
+        to: payload.to,
         user: request.user,
         text: payload.text
       }
@@ -98,7 +98,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
         _id,
         text,
         date,
-        room: payload.room,
+        to: payload.to,
         user: {
           _id: user._id,
           name: user.name,
@@ -110,7 +110,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       
       this.logger.debug(`${this.users.getUser(client.id).room}`)
 
-      client.to(payload.room).emit('message', payloadEvent)
+      client.to(payload.to).emit('message', payloadEvent)
       client.emit('message', payloadEvent)
     } catch (error) {
       console.log(error);

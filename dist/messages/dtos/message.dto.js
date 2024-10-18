@@ -17,7 +17,7 @@ exports.MessageDto = MessageDto;
 __decorate([
     (0, class_validator_1.IsMongoId)(),
     __metadata("design:type", String)
-], MessageDto.prototype, "room", void 0);
+], MessageDto.prototype, "to", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)

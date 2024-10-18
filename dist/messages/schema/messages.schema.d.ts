@@ -2,7 +2,7 @@ import mongoose, { HydratedDocument } from "mongoose";
 import { User } from "src/users/schemas/user.schema";
 export type MessageDocument = HydratedDocument<Message>;
 export declare class Message {
-    room: string;
+    to: string;
     user: User;
     text: string;
     date: Date;

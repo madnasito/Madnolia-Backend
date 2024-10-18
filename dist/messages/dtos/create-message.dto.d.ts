@@ -1,5 +1,5 @@
 import { WsException } from "@nestjs/websockets";
 export declare class CreateMessageDto extends WsException {
-    room: string;
+    to: string;
     text: string;
 }

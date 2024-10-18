@@ -37,7 +37,7 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
         try {
             const { size } = this.io.sockets;
             const { token } = client.handshake.headers;
-            if (token === undefined || token === null) {
+            if (token === undefined || token === null || token === "") {
                 client.disconnect(true);
                 throw new websockets_1.WsException('Missing authentication token');
             }
@@ -69,7 +69,7 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
             this.logger.log(`Message received from client id: ${client.id}`);
             this.logger.debug(`Payload: ${payload}`);
             const message = {
-                room: payload.room,
+                to: payload.to,
                 user: request.user,
                 text: payload.text
             };
@@ -82,7 +82,7 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
                 _id,
                 text,
                 date,
-                room: payload.room,
+                to: payload.to,
                 user: {
                     _id: user._id,
                     name: user.name,
@@ -91,7 +91,7 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
                 }
             };
             this.logger.debug(`${this.users.getUser(client.id).room}`);
-            client.to(payload.room).emit('message', payloadEvent);
+            client.to(payload.to).emit('message', payloadEvent);
             client.emit('message', payloadEvent);
         }
         catch (error) {
