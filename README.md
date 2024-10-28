@@ -50,12 +50,16 @@ $ npm run test:cov
 
 ## Support
 
-Madnolia is an open source project by gamer community, you can support this donnating me a coffee
-🗣 Share it with your friends
-☕️  [Buy me a coffee](https://buymeacoffee.com/Madna).
+- 📱 Use the app and rate it  ⭐️
+- 🗣 Share it with your friends ❤️
+- ☕️  [Buy me a coffee](https://buymeacoffee.com/Madna) 🤎
+- ✉️ Suggest new features or bugfix (I promise to check every message 😅 )  ✅
+
+
+
 
 ## Stay in touch
 
-- Website - [https://madnolia.app](https://madnolia.app/)
-- Twitter - [@madnolia_app](https://twitter.com/madnolia_app)
-- Instagram - [@madnolia.app](https://instagram.com/madnolia.app)
+- :fa-globe: Website - [https://madnolia.app](https://madnolia.app/)
+-  :fa-twitter: Twitter - [@madnolia_app](https://twitter.com/madnolia_app)
+- :fa-instagram: Instagram - [@madnolia.app](https://instagram.com/madnolia.app)
