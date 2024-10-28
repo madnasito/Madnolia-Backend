@@ -39,8 +39,11 @@ $ npm run test:cov
 ## To-Do
 <label>
 	<input type="checkbox" disabled />  Community groups 👥
+	<br>
 	<input type="checkbox" disabled />  Voice messages 🎤
+	<br>
 	<input type="checkbox" disabled />  Realtime voice chat 🗣
+	<br>
 	<input type="checkbox" disabled />  Creating tournaments 🏆
 </label>
 
