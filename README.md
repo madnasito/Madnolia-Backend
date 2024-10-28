@@ -1,4 +1,4 @@
-[![Presentation](https://beeimg.com/images/q56916700251.png "Presentation")](https://beeimg.com/images/q56916700251.png "Presentation")
+[![Presentation](https://beeimg.com/images/r98045741583.png "Presentation")](https://beeimg.com/images/q56916700251.png "Presentation")
 
 ## Description
 
