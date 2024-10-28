@@ -35,10 +35,15 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', "public")
     }),
-    JwtModule.register({
+    JwtModule.registerAsync({
       global: true,
-      secret: "hard!to-guess_secret",
-      signOptions: { expiresIn: '10d' },
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return {
+          secret: config.get<string>('JWT_SECRET'),
+          signOptions: {expiresIn: '10d'}
+        }
+      },
     }),
     AuthModule,
     MatchesModule,
@@ -56,6 +61,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
         whitelist: true
       })
     }
-  ],
+  ]
 })
 export class AppModule {}

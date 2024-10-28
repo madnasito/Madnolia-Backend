@@ -11,11 +11,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserSocketGuard = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
 const jwt_1 = require("@nestjs/jwt");
 const websockets_1 = require("@nestjs/websockets");
 let UserSocketGuard = class UserSocketGuard {
-    constructor(jwtService) {
+    constructor(jwtService, config) {
         this.jwtService = jwtService;
+        this.config = config;
     }
     async canActivate(context) {
         const request = context.switchToWs();
@@ -24,8 +26,9 @@ let UserSocketGuard = class UserSocketGuard {
             throw new websockets_1.WsException("Invalid credentials");
         }
         try {
+            const secret = this.config.get('JWT_SECRET');
             const payload = await this.jwtService.verifyAsync(token, {
-                secret: "hard!to-guess_secret"
+                secret
             });
             request.getClient().user = payload.id;
         }
@@ -42,6 +45,7 @@ let UserSocketGuard = class UserSocketGuard {
 exports.UserSocketGuard = UserSocketGuard;
 exports.UserSocketGuard = UserSocketGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [jwt_1.JwtService])
+    __metadata("design:paramtypes", [jwt_1.JwtService,
+        config_1.ConfigService])
 ], UserSocketGuard);
 //# sourceMappingURL=user-sockets.guard.js.map

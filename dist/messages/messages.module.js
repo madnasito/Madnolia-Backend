@@ -16,6 +16,7 @@ const users_module_1 = require("../users/users.module");
 const jwt_1 = require("@nestjs/jwt");
 const user_1 = require("./classes/user");
 const messages_controller_1 = require("./messages.controller");
+const config_1 = require("@nestjs/config");
 let MessagesModule = class MessagesModule {
 };
 exports.MessagesModule = MessagesModule;
@@ -24,7 +25,15 @@ exports.MessagesModule = MessagesModule = __decorate([
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: messages_schema_1.Message.name, schema: messages_schema_1.MessageSchema }]),
             users_module_1.UsersModule,
-            jwt_1.JwtModule.register({ secret: 'hard!to-guess_secret', signOptions: { expiresIn: "10d" } })
+            jwt_1.JwtModule.registerAsync({
+                inject: [config_1.ConfigService],
+                useFactory: (config) => {
+                    return {
+                        secret: config.get('JWT_SECRET'),
+                        signOptions: { expiresIn: '10d' }
+                    };
+                },
+            })
         ],
         providers: [messages_service_1.MessagesService, messages_gateway_1.MessagesGateway, user_1.Users],
         exports: [user_1.Users, messages_service_1.MessagesService],

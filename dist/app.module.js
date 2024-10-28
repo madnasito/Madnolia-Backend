@@ -47,10 +47,15 @@ exports.AppModule = AppModule = __decorate([
             serve_static_1.ServeStaticModule.forRoot({
                 rootPath: (0, path_1.join)(__dirname, '..', "public")
             }),
-            jwt_1.JwtModule.register({
+            jwt_1.JwtModule.registerAsync({
                 global: true,
-                secret: "hard!to-guess_secret",
-                signOptions: { expiresIn: '10d' },
+                inject: [config_1.ConfigService],
+                useFactory: (config) => {
+                    return {
+                        secret: config.get('JWT_SECRET'),
+                        signOptions: { expiresIn: '10d' }
+                    };
+                },
             }),
             auth_module_1.AuthModule,
             matches_module_1.MatchesModule,
@@ -68,7 +73,7 @@ exports.AppModule = AppModule = __decorate([
                     whitelist: true
                 })
             }
-        ],
+        ]
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

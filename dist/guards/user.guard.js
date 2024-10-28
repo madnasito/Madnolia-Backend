@@ -11,10 +11,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserGuard = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
 const jwt_1 = require("@nestjs/jwt");
 let UserGuard = class UserGuard {
-    constructor(jwtService) {
+    constructor(jwtService, config) {
         this.jwtService = jwtService;
+        this.config = config;
     }
     async canActivate(context) {
         const request = context.switchToHttp().getRequest();
@@ -23,8 +25,9 @@ let UserGuard = class UserGuard {
             throw new common_1.UnauthorizedException();
         }
         try {
+            const secret = this.config.get('JWT_SECRET');
             const payload = await this.jwtService.verifyAsync(token, {
-                secret: "hard!to-guess_secret"
+                secret
             });
             request['user'] = payload;
         }
@@ -41,6 +44,7 @@ let UserGuard = class UserGuard {
 exports.UserGuard = UserGuard;
 exports.UserGuard = UserGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [jwt_1.JwtService])
+    __metadata("design:paramtypes", [jwt_1.JwtService,
+        config_1.ConfigService])
 ], UserGuard);
 //# sourceMappingURL=user.guard.js.map
