@@ -32,20 +32,20 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
-                envFilePath: `.env.${process.env.NODE_ENV}`
+                envFilePath: `.env.${process.env.NODE_ENV}`,
             }),
             mongoose_1.MongooseModule.forRootAsync({
                 inject: [config_1.ConfigService],
                 useFactory: (config) => {
                     return {
-                        uri: config.get('DB_URI')
+                        uri: config.get('DB_URI'),
                     };
-                }
+                },
             }),
             schedule_1.ScheduleModule.forRoot(),
             users_module_1.UsersModule,
             serve_static_1.ServeStaticModule.forRoot({
-                rootPath: (0, path_1.join)(__dirname, '..', "public")
+                rootPath: (0, path_1.join)(__dirname, '..', 'public'),
             }),
             jwt_1.JwtModule.registerAsync({
                 global: true,
@@ -53,7 +53,7 @@ exports.AppModule = AppModule = __decorate([
                 useFactory: (config) => {
                     return {
                         secret: config.get('JWT_SECRET'),
-                        signOptions: { expiresIn: '10d' }
+                        signOptions: { expiresIn: '10d' },
                     };
                 },
             }),
@@ -62,7 +62,7 @@ exports.AppModule = AppModule = __decorate([
             tournaments_module_1.TournamentsModule,
             games_module_1.GamesModule,
             messages_module_1.MessagesModule,
-            notifications_module_1.NotificationsModule
+            notifications_module_1.NotificationsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [
@@ -70,10 +70,10 @@ exports.AppModule = AppModule = __decorate([
             {
                 provide: core_1.APP_PIPE,
                 useValue: new common_1.ValidationPipe({
-                    whitelist: true
-                })
-            }
-        ]
+                    whitelist: true,
+                }),
+            },
+        ],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

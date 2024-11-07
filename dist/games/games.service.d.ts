@@ -11,4 +11,7 @@ export declare class GamesService {
     findByRawId: (gameId: number) => Promise<any>;
     findById(gameId: string): Promise<any>;
     getRawgGame: (id: number) => Promise<any>;
+    getGamesInfo: (games: any[]) => Promise<(import("mongoose").Document<unknown, {}, Game> & Game & {
+        _id: import("mongoose").Types.ObjectId;
+    })[]>;
 }

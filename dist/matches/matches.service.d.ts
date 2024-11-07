@@ -48,4 +48,5 @@ export declare class MatchesService {
         _id: mongoose.Types.ObjectId;
     })[]>;
     updatePastTimeMatches: () => Promise<Array<Match>>;
+    getLatestGamesByUserAndPlatform(user: string, platform: number): Promise<any>;
 }

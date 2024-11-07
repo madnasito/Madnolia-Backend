@@ -19,19 +19,19 @@ __decorate([
     (0, mongoose_1.Prop)({
         type: mongoose_2.default.Schema.Types.ObjectId,
         ref: 'Game',
-        required: true
+        required: true,
     }),
     __metadata("design:type", Object)
 ], Match.prototype, "game", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        required: true
+        required: true,
     }),
     __metadata("design:type", Number)
 ], Match.prototype, "platform", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        required: true
+        required: true,
     }),
     __metadata("design:type", Number)
 ], Match.prototype, "date", void 0);
@@ -39,20 +39,20 @@ __decorate([
     (0, mongoose_1.Prop)({
         type: mongoose_2.default.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: true,
     }),
     __metadata("design:type", mongoose_2.default.Schema.Types.ObjectId)
 ], Match.prototype, "user", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
         required: true,
-        type: [mongoose_2.default.Schema.Types.ObjectId]
+        type: [mongoose_2.default.Schema.Types.ObjectId],
     }),
     __metadata("design:type", Array)
 ], Match.prototype, "inviteds", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        default: ""
+        default: '',
     }),
     __metadata("design:type", String)
 ], Match.prototype, "title", void 0);
@@ -60,25 +60,25 @@ __decorate([
     (0, mongoose_1.Prop)({
         type: [mongoose_2.default.Schema.Types.ObjectId],
         ref: 'User',
-        default: []
+        default: [],
     }),
     __metadata("design:type", Array)
 ], Match.prototype, "likes", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        default: false
+        default: false,
     }),
     __metadata("design:type", Boolean)
 ], Match.prototype, "private", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        default: true
+        default: true,
     }),
     __metadata("design:type", Boolean)
 ], Match.prototype, "active", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        default: false
+        default: false,
     }),
     __metadata("design:type", Boolean)
 ], Match.prototype, "tournament", void 0);

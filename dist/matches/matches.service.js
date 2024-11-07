@@ -26,14 +26,15 @@ let MatchesService = class MatchesService {
         this.messagesService = messagesService;
         this.create = async (createMatchDto, user) => {
             const gameData = await this.gamesService.getGame(createMatchDto.game);
-            let newMatch = {
+            console.log(gameData);
+            const newMatch = {
                 date: createMatchDto.date,
                 game: gameData._id,
                 inviteds: createMatchDto.inviteds,
                 platform: createMatchDto.platform,
                 title: createMatchDto.title,
                 tournament: false,
-                user: user
+                user: user,
             };
             const createdMatch = new this.matchModel(newMatch);
             const matchDb = await createdMatch.save();
@@ -55,7 +56,7 @@ let MatchesService = class MatchesService {
             const match = await this.matchModel.findOne({ _id: id }, {}, {
                 populate: [
                     { path: 'game' },
-                    { path: 'likes', select: '_id name thumb username' }
+                    { path: 'likes', select: '_id name thumb username' },
                 ],
             });
             if (!match)
@@ -64,7 +65,11 @@ let MatchesService = class MatchesService {
             return { match, messages };
         };
         this.update = async (user, attrs) => {
-            const match = await this.matchModel.findOne({ _id: attrs._id, user, active: true });
+            const match = await this.matchModel.findOne({
+                _id: attrs._id,
+                user,
+                active: true,
+            });
             if (!match)
                 throw new common_1.NotFoundException('Match not found');
             Object.assign(match, attrs);
@@ -79,14 +84,16 @@ let MatchesService = class MatchesService {
             return matchDeleted;
         };
         this.addUserToMatch = (id, user) => {
-            if (!mongoose_2.default.Types.ObjectId.isValid(id) || !mongoose_2.default.Types.ObjectId.isValid(user))
+            if (!mongoose_2.default.Types.ObjectId.isValid(id) ||
+                !mongoose_2.default.Types.ObjectId.isValid(user))
                 throw new common_1.NotFoundException();
             return this.matchModel.findByIdAndUpdate(id, { $addToSet: { likes: user } }, { new: true });
         };
-        this.getPlayerMatches = async (user, skip = 0) => this.matchModel.find({ user }, {}, { populate: { path: 'game' } }).sort({ _id: -1 }).skip(0);
-        this.getPlayerInvitations = async (user, skip = 0) => {
-            return this.matchModel.find({ inviteds: user }, {}, { populate: { path: 'game' } });
-        };
+        this.getPlayerMatches = async (user, skip = 0) => this.matchModel
+            .find({ user }, {}, { populate: { path: 'game' } })
+            .sort({ _id: -1 })
+            .skip(skip);
+        this.getPlayerInvitations = async (user, skip = 0) => this.matchModel.find({ inviteds: user }, {}, { populate: { path: 'game' }, skip });
         this.getMatchesByPlatform = async (platform, skip = 0) => {
             const results = await this.matchModel.aggregate([
                 {
@@ -104,7 +111,7 @@ let MatchesService = class MatchesService {
                     },
                 },
                 {
-                    $unwind: '$gameDetails'
+                    $unwind: '$gameDetails',
                 },
                 {
                     $group: {
@@ -118,17 +125,28 @@ let MatchesService = class MatchesService {
                 {
                     $sort: {
                         count: -1,
-                    }
+                    },
+                    $skip: skip,
                 },
             ]);
             return results;
         };
         this.getMatchesByGameAndPlatform = async (platform, game, skip = 0) => this.matchModel.find({ platform, game, active: true }, {}, { skip });
         this.updatePastTimeMatches = async () => {
-            const matchesToUpdate = await this.matchModel.find({ active: true, date: { $lt: new Date().getTime() } });
+            const matchesToUpdate = await this.matchModel.find({
+                active: true,
+                date: { $lt: new Date().getTime() },
+            });
             await this.matchModel.updateMany({ date: { $lt: new Date().getTime() }, active: true }, { active: false });
             return matchesToUpdate;
         };
+    }
+    async getLatestGamesByUserAndPlatform(user, platform) {
+        const distinctGameIds = await this.matchModel
+            .distinct('game', { platform, user })
+            .exec();
+        const games = await this.gamesService.getGamesInfo(distinctGameIds);
+        return games;
     }
 };
 exports.MatchesService = MatchesService;

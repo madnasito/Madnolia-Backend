@@ -27,11 +27,12 @@ let UserGuard = class UserGuard {
         try {
             const secret = this.config.get('JWT_SECRET');
             const payload = await this.jwtService.verifyAsync(token, {
-                secret
+                secret,
             });
             request['user'] = payload;
         }
         catch (error) {
+            common_1.Logger.error(error);
             throw new common_1.UnauthorizedException();
         }
         return true;

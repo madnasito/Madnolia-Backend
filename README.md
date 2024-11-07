@@ -60,6 +60,6 @@ $ npm run test:cov
 
 ## Stay in touch
 
-- :fa-globe: Website - [https://madnolia.app](https://madnolia.app/)
--  :fa-twitter: Twitter - [@madnolia_app](https://twitter.com/madnolia_app)
-- :fa-instagram: Instagram - [@madnolia.app](https://instagram.com/madnolia.app)
+- 🌐 Website - [https://madnolia.app](https://madnolia.app/)
+- 🦜 X - [@madnolia_app](https://twitter.com/madnolia_app)
+- 📸 Instagram - [@madnolia.app](https://instagram.com/madnolia.app)

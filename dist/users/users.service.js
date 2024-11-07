@@ -42,14 +42,14 @@ let UsersService = class UsersService {
         this.userExists = async (username, email) => {
             const usernameDb = await this.userModel.findOne({ username });
             if (usernameDb)
-                throw new common_1.ConflictException("Username taked");
+                throw new common_1.ConflictException('Username taked');
             const emailDb = await this.userModel.findOne({ email });
             if (emailDb)
-                throw new common_1.ConflictException("Email taked");
+                throw new common_1.ConflictException('Email taked');
             return {};
         };
         this.searchUser = async (username) => {
-            let regex = new RegExp(username, 'i');
+            const regex = new RegExp(username, 'i');
             return await this.userModel.find({ username: regex, status: true }, { name: 1, username: 1, _id: 1, thumb: 1 }, { limit: 5 });
         };
         this.resetNotifications = async (user) => this.userModel.findOneAndUpdate({ _id: user }, { notification: 0 }, { new: true });
@@ -72,9 +72,11 @@ let UsersService = class UsersService {
         };
         this.uploadImage = async (form) => {
             return new Promise((resolve, reject) => {
-                axios_1.default.post('https://beeimg.com/api/upload/file/json/', form, {
-                    headers: {}
-                }).then((resp) => resolve(resp))
+                axios_1.default
+                    .post('https://beeimg.com/api/upload/file/json/', form, {
+                    headers: {},
+                })
+                    .then((resp) => resolve(resp))
                     .catch((err) => reject(err));
             });
         };

@@ -29,6 +29,8 @@ let GamesService = class GamesService {
             if (gameDb)
                 return gameDb;
             const rawGame = await this.getRawgGame(id);
+            if (!rawGame)
+                throw new common_1.BadGatewayException('error.loading_game');
             const newGame = {
                 name: rawGame.name,
                 slug: rawGame.slug,
@@ -36,17 +38,24 @@ let GamesService = class GamesService {
                 platforms: [],
                 background: rawGame.background_image,
                 screenshots: [],
-                description: rawGame.description_raw
+                description: rawGame.description_raw,
             };
             const createdGame = new this.gameModel(newGame);
             return await createdGame.save();
         };
         this.findByRawId = async (gameId) => await this.gameModel.findOne({ gameId });
         this.getRawgGame = async (id) => {
-            const apiKey = this.config.get('RAWG_API_KEY');
-            const gameData = (await this.httpService.axiosRef.get(`/${id}?key=${apiKey}`)).data;
-            return gameData;
+            try {
+                const apiKey = this.config.get('RAWG_API_KEY');
+                const gameData = (await this.httpService.axiosRef.get(`/${id}?key=${apiKey}`)).data;
+                return gameData;
+            }
+            catch (error) {
+                common_1.Logger.error(error);
+                common_1.Logger.error('Error loading game for rawg');
+            }
         };
+        this.getGamesInfo = async (games) => this.gameModel.find({ _id: { $in: games } });
     }
     async findById(gameId) {
         const gameDb = await this.gameModel.findById(gameId);
