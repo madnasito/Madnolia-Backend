@@ -50,19 +50,24 @@ let UserController = class UserController {
             const validExtension = ['jpg', 'jpeg', 'png'];
             const extension = img.mimetype.split('/')[1];
             if (!validExtension.includes(extension)) {
-                throw new common_1.HttpException('Not valid extension', common_1.HttpStatus.BAD_REQUEST);
+                throw new common_1.HttpException('NOT_VALID_EXTENSION', common_1.HttpStatus.BAD_REQUEST);
             }
             const form = new FormData();
             form.append('file', new Blob([img.buffer], { type: img.mimetype }));
-            form.append("apikey", "a639124c1b9448e386cdf89e3fa4597f");
-            return axios_1.default.post('https://beeimg.com/api/upload/file/json/', form, {
+            form.append('apikey', 'a639124c1b9448e386cdf89e3fa4597f');
+            return axios_1.default
+                .post('https://beeimg.com/api/upload/file/json/', form, {
                 headers: {
-                    "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
-                }
+                    'Content-Type': 'multipart/form-data; boundary=<calculated when request is sent>',
+                },
             })
                 .then((resp) => {
-                if (resp.data.files.status == "Success" || resp.data.files.status == "Duplicate") {
-                    return this.usersService.upadte(req.user.id, { thumb: resp.data.files.thumbnail_url, img: resp.data.files.url });
+                if (resp.data.files.status == 'Success' ||
+                    resp.data.files.status == 'Duplicate') {
+                    return this.usersService.upadte(req.user.id, {
+                        thumb: resp.data.files.thumbnail_url,
+                        img: resp.data.files.url,
+                    });
                 }
                 throw new common_1.BadRequestException();
             })
@@ -71,7 +76,7 @@ let UserController = class UserController {
             });
         }
         catch (error) {
-            throw new error;
+            throw new error();
         }
     }
 };

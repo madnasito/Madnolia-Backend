@@ -26,13 +26,13 @@ exports.AuthModule = AuthModule = __decorate([
                 useFactory: (config) => {
                     return {
                         secret: config.get('JWT_SECRET'),
-                        signOptions: { expiresIn: '10d' }
+                        signOptions: { expiresIn: '10d' },
                     };
                 },
-            })
+            }),
         ],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService]
+        providers: [auth_service_1.AuthService],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

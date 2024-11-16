@@ -26,7 +26,6 @@ let MatchesService = class MatchesService {
         this.messagesService = messagesService;
         this.create = async (createMatchDto, user) => {
             const gameData = await this.gamesService.getGame(createMatchDto.game);
-            console.log(gameData);
             const newMatch = {
                 date: createMatchDto.date,
                 game: gameData._id,
@@ -42,17 +41,17 @@ let MatchesService = class MatchesService {
         };
         this.getMatch = async (id) => {
             if (!mongoose_2.default.Types.ObjectId.isValid(id))
-                throw new common_1.NotFoundException();
+                throw new common_1.NotFoundException('NO_MATCH_FOUND');
             return this.matchModel.findById(id);
         };
         this.getMatchWithGame = async (id) => {
             if (!mongoose_2.default.Types.ObjectId.isValid(id))
-                throw new common_1.NotFoundException();
+                throw new common_1.NotFoundException('NO_GAME_FOUND');
             return this.matchModel.findOne({ _id: id }, {}, { populate: { path: 'game' } });
         };
         this.getFullMatch = async (id) => {
             if (!mongoose_2.default.Types.ObjectId.isValid(id))
-                throw new common_1.NotFoundException();
+                throw new common_1.NotFoundException('NO_MATCH_FOUND');
             const match = await this.matchModel.findOne({ _id: id }, {}, {
                 populate: [
                     { path: 'game' },
@@ -71,13 +70,13 @@ let MatchesService = class MatchesService {
                 active: true,
             });
             if (!match)
-                throw new common_1.NotFoundException('Match not found');
+                throw new common_1.NotFoundException('NO_MATCH_FOUND');
             Object.assign(match, attrs);
             return match.save();
         };
         this.delete = async (id, user) => {
             if (!mongoose_2.default.Types.ObjectId.isValid(id))
-                throw new common_1.NotFoundException();
+                throw new common_1.NotFoundException('NO_MATCH_FOUND');
             const matchDeleted = await this.matchModel.findOneAndUpdate({ _id: id, active: true, user }, { active: false }, { new: true });
             if (!matchDeleted)
                 throw new common_1.NotFoundException();
@@ -86,7 +85,7 @@ let MatchesService = class MatchesService {
         this.addUserToMatch = (id, user) => {
             if (!mongoose_2.default.Types.ObjectId.isValid(id) ||
                 !mongoose_2.default.Types.ObjectId.isValid(user))
-                throw new common_1.NotFoundException();
+                throw new common_1.NotFoundException('USER_NOT_FOUND');
             return this.matchModel.findByIdAndUpdate(id, { $addToSet: { likes: user } }, { new: true });
         };
         this.getPlayerMatches = async (user, skip = 0) => this.matchModel

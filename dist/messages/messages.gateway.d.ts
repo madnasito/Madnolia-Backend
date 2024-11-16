@@ -1,5 +1,5 @@
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, WsException } from '@nestjs/websockets';
-import { Namespace, Socket } from "socket.io";
+import { Namespace, Socket } from 'socket.io';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dtos/create-message.dto';
 import { Users } from './classes/user';

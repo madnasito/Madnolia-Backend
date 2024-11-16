@@ -31,17 +31,17 @@ let MessagesService = class MessagesService {
             limit: limit,
             skip: skip * limit,
             populate: { path: 'user', select: '_id name username thumb' },
-            sort: { _id: -1 }
+            sort: { _id: -1 },
         });
     }
     update(id, text) {
         if (!mongoose_2.default.Types.ObjectId.isValid(id))
-            throw new common_1.NotFoundException();
+            throw new common_1.NotFoundException('NO_MATCH_FOUND');
         return this.messageModel.findByIdAndUpdate(id, { text }, { new: true });
     }
     delete(id) {
         if (!mongoose_2.default.Types.ObjectId.isValid(id))
-            throw new common_1.NotFoundException();
+            throw new common_1.NotFoundException('NO_MATCH_FOUND');
         return this.messageModel.findByIdAndDelete(id);
     }
 };

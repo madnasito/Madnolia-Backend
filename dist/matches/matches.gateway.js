@@ -24,27 +24,24 @@ let MatchesGateway = MatchesGateway_1 = class MatchesGateway {
         this.users = users;
         this.logger = new common_1.Logger(MatchesGateway_1.name);
     }
-    handleDisconnect(client) {
-    }
-    afterInit(server) {
-    }
-    handleConnection(client, ...args) {
-    }
+    handleDisconnect(client) { }
+    afterInit(server) { }
+    handleConnection(client, ...args) { }
     async handleMatchCreated(client, payload) {
         this.logger.debug(client);
         this.logger.debug(payload);
         const match = await this.matchesService.getMatchWithGame(payload);
         this.logger.debug(match);
         if (!match)
-            throw new websockets_1.WsException('Not found match');
+            throw new websockets_1.WsException('NO_MATCH_FOUND');
         const matchUrl = `${process.env.URL}/match/info/${match._id}`;
         const eventPayload = {
             match: match._id,
             img: match.game.background,
             name: match.title,
-            url: matchUrl
+            url: matchUrl,
         };
-        match.inviteds.forEach(element => {
+        match.inviteds.forEach((element) => {
             const invitedUser = this.users.getUserById(element.toString());
             if (invitedUser) {
                 client.to(invitedUser.socketId).emit('invitation', eventPayload);
@@ -61,12 +58,15 @@ let MatchesGateway = MatchesGateway_1 = class MatchesGateway {
             this.logger.debug(matchUpdated);
             if (!matchUpdated) {
                 client.emit('added_to_match', false);
-                throw new websockets_1.WsException(common_1.NotFoundException);
+                throw new websockets_1.WsException(new common_1.NotFoundException('NO_MATCH_FOUND'));
             }
             client.emit('added_to_match', true);
             const { _id, name, thumb, username } = user;
             client.to(payload).emit('new_player_to_match', {
-                _id, name, thumb, username
+                _id,
+                name,
+                thumb,
+                username,
             });
             this.logger.debug(`Client id: ${client.id} joined to match`);
         }

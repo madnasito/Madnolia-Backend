@@ -31,10 +31,10 @@ let UsersService = class UsersService {
         };
         this.fincOneById = async (id) => {
             if (!mongoose_1.default.Types.ObjectId.isValid(id))
-                throw new common_1.NotFoundException();
+                throw new common_1.NotFoundException('USER_NOT_FOUND');
             const user = await this.userModel.findById(id);
             if (!user)
-                throw new common_1.NotFoundException();
+                throw new common_1.NotFoundException('USER_NOT_FOUND');
             return user;
         };
         this.getInfo = async (user) => await this.userModel.findOne({ _id: user, status: true });
@@ -42,10 +42,10 @@ let UsersService = class UsersService {
         this.userExists = async (username, email) => {
             const usernameDb = await this.userModel.findOne({ username });
             if (usernameDb)
-                throw new common_1.ConflictException('Username taked');
+                throw new common_1.ConflictException('USERNAME_IN_USE');
             const emailDb = await this.userModel.findOne({ email });
             if (emailDb)
-                throw new common_1.ConflictException('Email taked');
+                throw new common_1.ConflictException('EMAIL_IN_USE');
             return {};
         };
         this.searchUser = async (username) => {
@@ -67,7 +67,7 @@ let UsersService = class UsersService {
         this.addPartner = async (user, partner) => {
             const verifiedUser = await this.getInfo(partner);
             if (!verifiedUser)
-                throw new common_1.NotFoundException();
+                throw new common_1.NotFoundException('USER_NOT_FOUND');
             return this.userModel.findOneAndUpdate({ _id: user }, { $push: { partners: partner } }, { new: true });
         };
         this.uploadImage = async (form) => {

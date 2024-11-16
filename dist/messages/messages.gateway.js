@@ -31,15 +31,15 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
         this.logger = new common_1.Logger(MessagesGateway_1.name);
     }
     afterInit(socket) {
-        this.logger.log("Initialized");
+        this.logger.log(`Initialized`);
     }
     async handleConnection(client, ...args) {
         try {
             const { size } = this.io.sockets;
             const { token } = client.handshake.headers;
-            if (token === undefined || token === null || token === "") {
+            if (token === undefined || token === null || token === '') {
                 client.disconnect(true);
-                throw new websockets_1.WsException('Missing authentication token');
+                throw new websockets_1.WsException('MISSING_TOKEN');
             }
             const tokenPayload = await this.jwtService.verifyAsync(token);
             await this.users.addUser(tokenPayload.id, client.id);
@@ -71,11 +71,11 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
             const message = {
                 to: payload.to,
                 user: request.user,
-                text: payload.text
+                text: payload.text,
             };
             const messageSaved = await this.messagesService.create(message);
             if (!messageSaved)
-                throw new websockets_1.WsException("No message");
+                throw new websockets_1.WsException('NO_MESSAGE');
             const { text, _id, date } = messageSaved;
             const user = this.users.getUserById(request.user);
             const payloadEvent = {
@@ -87,8 +87,8 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
                     _id: user._id,
                     name: user.name,
                     username: user.username,
-                    thumb: user.thumb
-                }
+                    thumb: user.thumb,
+                },
             };
             this.logger.debug(`${this.users.getUser(client.id).room}`);
             client.to(payload.to).emit('message', payloadEvent);
@@ -102,7 +102,7 @@ let MessagesGateway = MessagesGateway_1 = class MessagesGateway {
     handleDisconnectChat(client) {
         try {
             this.logger.debug(`Leaved the room: ${client.id}`);
-            this.users.getUser(client.id).room = "";
+            this.users.getUser(client.id).room = '';
             return true;
         }
         catch (error) {
@@ -144,7 +144,8 @@ __decorate([
     __param(1, (0, websockets_1.MessageBody)()),
     __param(2, (0, websockets_1.ConnectedSocket)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, create_message_dto_1.CreateMessageDto, socket_io_1.Socket]),
+    __metadata("design:paramtypes", [Object, create_message_dto_1.CreateMessageDto,
+        socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
 ], MessagesGateway.prototype, "handleMessage", null);
 __decorate([

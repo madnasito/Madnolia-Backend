@@ -22,7 +22,6 @@ export class MatchesService {
       createMatchDto.game,
     );
 
-    console.log(gameData);
     const newMatch: NewMatchDto = {
       date: createMatchDto.date,
       game: gameData._id,
@@ -43,12 +42,14 @@ export class MatchesService {
   };
 
   getMatch = async (id: string) => {
-    if (!mongoose.Types.ObjectId.isValid(id)) throw new NotFoundException();
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new NotFoundException('NO_MATCH_FOUND');
     return this.matchModel.findById(id);
   };
 
   getMatchWithGame = async (id: string) => {
-    if (!mongoose.Types.ObjectId.isValid(id)) throw new NotFoundException();
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new NotFoundException('NO_GAME_FOUND');
     return this.matchModel.findOne(
       { _id: id },
       {},
@@ -57,7 +58,8 @@ export class MatchesService {
   };
 
   getFullMatch = async (id: string) => {
-    if (!mongoose.Types.ObjectId.isValid(id)) throw new NotFoundException();
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new NotFoundException('NO_MATCH_FOUND');
 
     const match = await this.matchModel.findOne(
       { _id: id },
@@ -84,7 +86,7 @@ export class MatchesService {
       active: true,
     });
 
-    if (!match) throw new NotFoundException('Match not found');
+    if (!match) throw new NotFoundException('NO_MATCH_FOUND');
 
     Object.assign(match, attrs);
 
@@ -92,7 +94,8 @@ export class MatchesService {
   };
 
   delete = async (id: string, user: string) => {
-    if (!mongoose.Types.ObjectId.isValid(id)) throw new NotFoundException();
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new NotFoundException('NO_MATCH_FOUND');
 
     const matchDeleted = await this.matchModel.findOneAndUpdate(
       { _id: id, active: true, user },
@@ -110,7 +113,7 @@ export class MatchesService {
       !mongoose.Types.ObjectId.isValid(id) ||
       !mongoose.Types.ObjectId.isValid(user)
     )
-      throw new NotFoundException();
+      throw new NotFoundException('USER_NOT_FOUND');
 
     return this.matchModel.findByIdAndUpdate(
       id,

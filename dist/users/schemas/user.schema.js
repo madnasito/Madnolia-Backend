@@ -17,60 +17,66 @@ let User = class User {
 exports.User = User;
 __decorate([
     (0, mongoose_1.Prop)({
-        required: true
+        required: true,
     }),
     __metadata("design:type", String)
 ], User.prototype, "name", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
         required: true,
-        unique: true
+        unique: true,
     }),
     __metadata("design:type", String)
 ], User.prototype, "username", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
         required: true,
-        unique: true
+        unique: true,
     }),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        required: true
+        required: true,
     }),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        default: true
+        default: true,
     }),
     __metadata("design:type", Boolean)
 ], User.prototype, "status", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        required: true
+        required: true,
     }),
     __metadata("design:type", Array)
 ], User.prototype, "platforms", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        default: "https://beeimg.com/images/w13588287183.jpg"
+        default: 'https://beeimg.com/images/w13588287183.jpg',
     }),
     __metadata("design:type", String)
 ], User.prototype, "img", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        default: "https://i.beeimg.com/images/thumb/w13588287183-xs.jpg"
+        default: 'https://i.beeimg.com/images/thumb/w13588287183-xs.jpg',
     }),
     __metadata("design:type", String)
 ], User.prototype, "thumb", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.default.Schema.Types.ObjectId, ref: 'User' }], default: [] }),
+    (0, mongoose_1.Prop)({
+        type: [{ type: mongoose_2.default.Schema.Types.ObjectId, ref: 'User' }],
+        default: [],
+    }),
     __metadata("design:type", Array)
 ], User.prototype, "partners", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.default.Schema.Types.ObjectId, ref: 'Game' }], default: [] }),
+    (0, mongoose_1.Prop)({
+        type: [{ type: mongoose_2.default.Schema.Types.ObjectId, ref: 'Game' }],
+        default: [],
+    }),
     __metadata("design:type", Array)
 ], User.prototype, "games", void 0);
 __decorate([

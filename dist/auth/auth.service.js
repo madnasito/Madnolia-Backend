@@ -26,38 +26,37 @@ let AuthService = class AuthService {
         this.signUp = async (signUpDto) => {
             const emailDb = await this.findOneByEmail(signUpDto.email);
             if (emailDb) {
-                throw new common_1.BadRequestException('Email in use');
+                throw new common_1.BadRequestException('EMAIL_IN_USE');
             }
             const userDb = await this.fincOneByUsername(signUpDto.username);
             if (userDb) {
-                throw new common_1.BadRequestException('Username in use');
+                throw new common_1.BadRequestException('USERNAME_IN_USE');
             }
             const createdUser = new this.userModel(signUpDto);
             const saltOrRounds = 10;
             const password = signUpDto.password;
             const hash = await (0, bcrypt_1.hash)(password, saltOrRounds);
-            const salt = await (0, bcrypt_1.genSalt)();
             createdUser.password = hash;
             await createdUser.save();
             const payload = { user: createdUser._id };
             const token = await this.jwtService.signAsync(payload);
             return {
                 user: createdUser,
-                token
+                token,
             };
         };
         this.signIn = async (signInDto) => {
             const user = await this.fincOneByUsername(signInDto.username);
             if (!user)
-                throw new common_1.NotFoundException('Not found user');
+                throw new common_1.NotFoundException('USER_NOT_FOUND');
             const isMatch = await (0, bcrypt_1.compare)(signInDto.password, user.password);
             if (!isMatch)
-                throw new common_1.BadRequestException("Wrong password");
+                throw new common_1.BadRequestException('WRONG_PASSWORD');
             const payload = { id: user._id };
             const token = await this.jwtService.signAsync(payload);
             return {
                 user,
-                token
+                token,
             };
         };
         this.fincOneByUsername = async (username) => {

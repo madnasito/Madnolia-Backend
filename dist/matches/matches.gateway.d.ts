@@ -1,5 +1,5 @@
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
-import { Namespace, Socket } from "socket.io";
+import { Namespace, Socket } from 'socket.io';
 import { MatchesService } from './matches.service';
 import { Users } from 'src/messages/classes/user';
 export declare class MatchesGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
