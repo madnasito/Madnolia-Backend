@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Match } from './schemas/match.schema';
 import mongoose, { Model } from 'mongoose';
@@ -49,7 +53,7 @@ export class MatchesService {
 
   getMatchWithGame = async (id: string) => {
     if (!mongoose.Types.ObjectId.isValid(id))
-      throw new NotFoundException('NO_GAME_FOUND');
+      throw new ConflictException('NO_GAME_FOUND');
     return this.matchModel.findOne(
       { _id: id },
       {},
@@ -154,7 +158,6 @@ export class MatchesService {
       {
         $unwind: '$gameDetails',
       },
-
       {
         $group: {
           _id: '$gameDetails._id', // Group by game ID
@@ -168,9 +171,12 @@ export class MatchesService {
         $sort: {
           count: -1,
         },
-        $skip: skip,
+      },
+      {
+        $skip: skip, // Move this out of the $sort stage
       },
     ]);
+
     return results;
   };
 

@@ -52,7 +52,7 @@ __decorate([
 ], Match.prototype, "inviteds", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        default: '',
+        default: 'Casual',
     }),
     __metadata("design:type", String)
 ], Match.prototype, "title", void 0);

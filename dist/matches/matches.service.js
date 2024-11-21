@@ -46,7 +46,7 @@ let MatchesService = class MatchesService {
         };
         this.getMatchWithGame = async (id) => {
             if (!mongoose_2.default.Types.ObjectId.isValid(id))
-                throw new common_1.NotFoundException('NO_GAME_FOUND');
+                throw new common_1.ConflictException('NO_GAME_FOUND');
             return this.matchModel.findOne({ _id: id }, {}, { populate: { path: 'game' } });
         };
         this.getFullMatch = async (id) => {
@@ -125,6 +125,8 @@ let MatchesService = class MatchesService {
                     $sort: {
                         count: -1,
                     },
+                },
+                {
                     $skip: skip,
                 },
             ]);
