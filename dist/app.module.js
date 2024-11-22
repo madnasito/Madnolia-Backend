@@ -24,6 +24,7 @@ const notifications_module_1 = require("./notifications/notifications.module");
 const schedule_1 = require("@nestjs/schedule");
 const path_1 = require("path");
 const serve_static_1 = require("@nestjs/serve-static");
+const app_version_module_1 = require("./app-version/app-version.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -63,6 +64,7 @@ exports.AppModule = AppModule = __decorate([
             games_module_1.GamesModule,
             messages_module_1.MessagesModule,
             notifications_module_1.NotificationsModule,
+            app_version_module_1.AppVersionModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

@@ -15,6 +15,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { AppVersionModule } from './app-version/app-version.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -50,6 +51,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     GamesModule,
     MessagesModule,
     NotificationsModule,
+    AppVersionModule,
   ],
   controllers: [AppController],
   providers: [

@@ -62,6 +62,7 @@ let UserController = class UserController {
                 },
             })
                 .then((resp) => {
+                console.log(resp);
                 if (resp.data.files.status == 'Success' ||
                     resp.data.files.status == 'Duplicate') {
                     return this.usersService.upadte(req.user.id, {
@@ -72,11 +73,13 @@ let UserController = class UserController {
                 throw new common_1.BadRequestException();
             })
                 .catch((err) => {
-                throw new common_1.BadGatewayException(err);
+                console.log(err);
+                throw new common_1.BadGatewayException();
             });
         }
         catch (error) {
-            throw new error();
+            common_1.Logger.error(error);
+            throw new common_1.BadGatewayException();
         }
     }
 };

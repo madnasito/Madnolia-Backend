@@ -15,6 +15,7 @@ import {
   HttpStatus,
   BadRequestException,
   BadGatewayException,
+  Logger,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserGuard } from 'src/guards/user.guard';
@@ -118,10 +119,11 @@ export class UserController {
         })
         .catch((err) => {
           console.log(err);
-          throw new BadGatewayException(err);
+          throw new BadGatewayException();
         });
     } catch (error) {
-      throw new error();
+      Logger.error(error);
+      throw new BadGatewayException();
     }
   }
 }
