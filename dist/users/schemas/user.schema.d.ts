@@ -1,5 +1,6 @@
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Game } from 'src/games/schemas/game.schema';
+import { Availability } from './availability.enum';
 export type UserDocument = HydratedDocument<User>;
 export declare class User {
     name: string;
@@ -13,7 +14,7 @@ export declare class User {
     partners: User[];
     games: Game[];
     notifications: number;
-    availability: number;
+    availability: Availability;
     createdAt: Date;
     modifiedAt: Date;
     deletedAt: Date;

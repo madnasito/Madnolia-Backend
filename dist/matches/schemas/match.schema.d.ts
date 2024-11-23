@@ -1,14 +1,17 @@
 import mongoose, { HydratedDocument } from 'mongoose';
+import { Game } from 'src/games/schemas/game.schema';
+import { Group } from 'src/groups/schema/group.schema';
 import { User } from 'src/users/schemas/user.schema';
 export type MatchDocument = HydratedDocument<Match>;
 export declare class Match {
-    game: any;
+    game: Game;
     platform: number;
     date: number;
-    user: mongoose.Schema.Types.ObjectId;
+    user: User;
+    group: Group;
     inviteds: Array<User>;
     title: string;
-    likes: Array<mongoose.Schema.Types.ObjectId>;
+    likes: User[];
     private: boolean;
     active: boolean;
     tournament: boolean;

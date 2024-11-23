@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { Game } from 'src/games/schemas/game.schema';
+import { Group } from 'src/groups/schema/group.schema';
 import { User } from 'src/users/schemas/user.schema';
 
 export type MatchDocument = HydratedDocument<Match>;
@@ -11,7 +13,7 @@ export class Match {
     ref: 'Game',
     required: true,
   })
-  game: any;
+  game: Game;
 
   @Prop({
     required: true,
@@ -28,7 +30,13 @@ export class Match {
     ref: 'User',
     required: true,
   })
-  user: mongoose.Schema.Types.ObjectId;
+  user: User;
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Group',
+  })
+  group: Group;
 
   @Prop({
     required: true,
@@ -38,6 +46,7 @@ export class Match {
 
   @Prop({
     default: 'Casual',
+    maxlength: 25,
   })
   title: string;
 
@@ -46,7 +55,7 @@ export class Match {
     ref: 'User',
     default: [],
   })
-  likes: Array<mongoose.Schema.Types.ObjectId>;
+  likes: User[];
 
   @Prop({
     default: false,

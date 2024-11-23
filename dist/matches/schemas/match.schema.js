@@ -12,6 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatchSchema = exports.Match = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
+const game_schema_1 = require("../../games/schemas/game.schema");
+const group_schema_1 = require("../../groups/schema/group.schema");
+const user_schema_1 = require("../../users/schemas/user.schema");
 let Match = class Match {
 };
 exports.Match = Match;
@@ -21,7 +24,7 @@ __decorate([
         ref: 'Game',
         required: true,
     }),
-    __metadata("design:type", Object)
+    __metadata("design:type", game_schema_1.Game)
 ], Match.prototype, "game", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
@@ -41,8 +44,15 @@ __decorate([
         ref: 'User',
         required: true,
     }),
-    __metadata("design:type", mongoose_2.default.Schema.Types.ObjectId)
+    __metadata("design:type", user_schema_1.User)
 ], Match.prototype, "user", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: mongoose_2.default.Schema.Types.ObjectId,
+        ref: 'Group',
+    }),
+    __metadata("design:type", group_schema_1.Group)
+], Match.prototype, "group", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
         required: true,
@@ -53,6 +63,7 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({
         default: 'Casual',
+        maxlength: 25,
     }),
     __metadata("design:type", String)
 ], Match.prototype, "title", void 0);

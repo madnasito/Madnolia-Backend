@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserSchema = exports.User = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
+const availability_enum_1 = require("./availability.enum");
 let User = class User {
 };
 exports.User = User;
@@ -69,6 +70,10 @@ __decorate([
     (0, mongoose_1.Prop)({
         type: [{ type: mongoose_2.default.Schema.Types.ObjectId, ref: 'User' }],
         default: [],
+        validate: [
+            (value) => value.length <= 1000,
+            'List of partners must not exceed 1000',
+        ],
     }),
     __metadata("design:type", Array)
 ], User.prototype, "partners", void 0);
@@ -76,6 +81,10 @@ __decorate([
     (0, mongoose_1.Prop)({
         type: [{ type: mongoose_2.default.Schema.Types.ObjectId, ref: 'Game' }],
         default: [],
+        validate: [
+            (value) => value.length <= 1000,
+            'List of games must not exceed 2000 items',
+        ],
     }),
     __metadata("design:type", Array)
 ], User.prototype, "games", void 0);
@@ -84,7 +93,7 @@ __decorate([
     __metadata("design:type", Number)
 ], User.prototype, "notifications", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: Number, default: 1, enum: [0, 1, 2] }),
+    (0, mongoose_1.Prop)({ default: availability_enum_1.Availability.EVERYONE, enum: availability_enum_1.Availability }),
     __metadata("design:type", Number)
 ], User.prototype, "availability", void 0);
 __decorate([
