@@ -3,6 +3,7 @@ import { Schema } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { User } from 'src/users/schemas/user.schema';
 import { Privacy } from './privacy.enum';
+import { JoinRequestApproval } from './join-request-approval.enum';
 
 export type GroupDocument = HydratedDocument<Group>;
 
@@ -79,10 +80,10 @@ export class Group {
   icon: string;
 
   @Prop({
-    type: Boolean,
-    default: false,
+    enum: JoinRequestApproval,
+    default: JoinRequestApproval.NO,
   })
-  joinRequestAdminApproval: boolean;
+  joinRequestApproval: JoinRequestApproval;
 
   @Prop({ type: Date, default: new Date() })
   createdAt: Date;

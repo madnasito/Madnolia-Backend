@@ -7,7 +7,6 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { User } from 'src/users/schemas/user.schema';
 import { Privacy } from '../schema/privacy.enum';
 
 export class CreateGroupDto {
@@ -22,7 +21,7 @@ export class CreateGroupDto {
   description: string;
 
   @IsArray()
-  members: User[];
+  members: string[];
 
   @IsEnum(Privacy)
   privacy: Privacy;
