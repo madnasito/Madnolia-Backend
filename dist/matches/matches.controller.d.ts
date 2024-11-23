@@ -25,6 +25,7 @@ export declare class MatchesController {
         _id: import("mongoose").Types.ObjectId;
     })[]>;
     getLatestUserGames(request: any, platform: string): Promise<any>;
+    joined(request: any): Promise<import("./schemas/match.schema").Match[]>;
     getMatchesByPlatform(platform: string): Promise<any[]>;
     getMatchesByGameAndPlatform(platform: string, game: string): Promise<(import("mongoose").Document<unknown, {}, import("./schemas/match.schema").Match> & import("./schemas/match.schema").Match & {
         _id: import("mongoose").Types.ObjectId;

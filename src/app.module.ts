@@ -16,6 +16,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AppVersionModule } from './app-version/app-version.module';
+import { GroupsModule } from './groups/groups.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -52,6 +53,7 @@ import { AppVersionModule } from './app-version/app-version.module';
     MessagesModule,
     NotificationsModule,
     AppVersionModule,
+    GroupsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -40,6 +40,9 @@ let MatchesController = class MatchesController {
     async getLatestUserGames(request, platform) {
         return this.matchesService.getLatestGamesByUserAndPlatform(request.user.id, parseInt(platform));
     }
+    joined(request) {
+        return this.matchesService.getMatchesWithUserLiked(request.user.id);
+    }
     async getMatchesByPlatform(platform) {
         return this.matchesService.getMatchesByPlatform(parseInt(platform));
     }
@@ -103,6 +106,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], MatchesController.prototype, "getLatestUserGames", null);
+__decorate([
+    (0, common_1.UseGuards)(user_guard_1.UserGuard),
+    (0, common_1.Get)('joined'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], MatchesController.prototype, "joined", null);
 __decorate([
     (0, common_1.Get)('platform/:platform'),
     __param(0, (0, common_1.Param)('platform')),

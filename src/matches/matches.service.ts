@@ -31,7 +31,7 @@ export class MatchesService {
       game: gameData._id,
       inviteds: createMatchDto.inviteds,
       platform: createMatchDto.platform,
-      title: createMatchDto.title,
+      title: createMatchDto.title != '' ? createMatchDto.title : 'Casual',
       tournament: false,
       user: user,
     };
@@ -180,11 +180,23 @@ export class MatchesService {
     return results;
   };
 
+  getMatchesWithUserLiked = (userId: string): Promise<Match[]> =>
+    this.matchModel.find(
+      { likes: userId },
+      {},
+      { populate: { path: 'game' }, sort: { _id: -1 } },
+    );
+
   getMatchesByGameAndPlatform = async (
     platform: number,
     game: string,
     skip: number = 0,
-  ) => this.matchModel.find({ platform, game, active: true }, {}, { skip });
+  ) =>
+    this.matchModel.find(
+      { platform, game, active: true },
+      {},
+      { skip, sort: { date: 1 } },
+    );
 
   updatePastTimeMatches = async (): Promise<Array<Match>> => {
     const matchesToUpdate = await this.matchModel.find({

@@ -44,6 +44,7 @@ export declare class MatchesService {
         _id: mongoose.Types.ObjectId;
     })[]>;
     getMatchesByPlatform: (platform: number, skip?: number) => Promise<any[]>;
+    getMatchesWithUserLiked: (userId: string) => Promise<Match[]>;
     getMatchesByGameAndPlatform: (platform: number, game: string, skip?: number) => Promise<(mongoose.Document<unknown, {}, Match> & Match & {
         _id: mongoose.Types.ObjectId;
     })[]>;

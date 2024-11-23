@@ -31,7 +31,7 @@ let MatchesService = class MatchesService {
                 game: gameData._id,
                 inviteds: createMatchDto.inviteds,
                 platform: createMatchDto.platform,
-                title: createMatchDto.title,
+                title: createMatchDto.title != '' ? createMatchDto.title : 'Casual',
                 tournament: false,
                 user: user,
             };
@@ -132,7 +132,8 @@ let MatchesService = class MatchesService {
             ]);
             return results;
         };
-        this.getMatchesByGameAndPlatform = async (platform, game, skip = 0) => this.matchModel.find({ platform, game, active: true }, {}, { skip });
+        this.getMatchesWithUserLiked = (userId) => this.matchModel.find({ likes: userId }, {}, { populate: { path: 'game' }, sort: { _id: -1 } });
+        this.getMatchesByGameAndPlatform = async (platform, game, skip = 0) => this.matchModel.find({ platform, game, active: true }, {}, { skip, sort: { date: 1 } });
         this.updatePastTimeMatches = async () => {
             const matchesToUpdate = await this.matchModel.find({
                 active: true,

@@ -57,6 +57,11 @@ export class MatchesController {
     );
   }
 
+  @UseGuards(UserGuard)
+  @Get('joined')
+  joined(@Request() request: any) {
+    return this.matchesService.getMatchesWithUserLiked(request.user.id);
+  }
   @Get('platform/:platform')
   async getMatchesByPlatform(@Param('platform') platform: string) {
     return this.matchesService.getMatchesByPlatform(parseInt(platform));
