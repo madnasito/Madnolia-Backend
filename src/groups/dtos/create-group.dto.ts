@@ -2,6 +2,7 @@ import {
   IsArray,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsUrl,
   MaxLength,
@@ -26,10 +27,12 @@ export class CreateGroupDto {
   @IsEnum(Privacy)
   privacy: Privacy;
 
+  @IsOptional()
   @IsString()
   @IsUrl()
   icon: string;
 
+  @IsOptional()
   @IsString()
   @IsUrl()
   banner: string;
