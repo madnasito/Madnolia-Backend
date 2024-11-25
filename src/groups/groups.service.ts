@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Group } from './schema/group.schema';
 import { Model } from 'mongoose';
 import { CreateGroupDto } from './dtos/create-group.dto';
-import { JoinRequestApproval } from './schema/join-request-approval.enum';
+import { JoinRequestApproval } from './enums/join-request-approval.enum';
 import { UserGroupDto } from './dtos/user-group.dto';
 import { UpdateGroupDto } from './dtos/update-group.dto';
 import { UsersService } from 'src/users/users.service';

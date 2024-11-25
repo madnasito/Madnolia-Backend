@@ -1,28 +1,40 @@
-import { IsArray, IsBoolean, IsDefined, IsInt, IsMongoId, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import {
+  IsArray,
+  IsBoolean,
+  IsDefined,
+  IsInt,
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class NewMatchDto {
+  @IsString()
+  title: string;
 
-    
-    @IsString()
-    title: string;
+  @IsNotEmpty()
+  @IsDefined()
+  @IsMongoId()
+  user: string;
 
-    @IsNotEmpty()
-    @IsDefined()
-    @IsMongoId()
-    user: string
+  @IsInt()
+  platform: number;
 
-    @IsInt()
-    platform: number;
+  @IsMongoId()
+  game: string;
 
-    @IsMongoId()
-    game: string;
+  @IsNumber()
+  date: number;
 
-    @IsNumber()
-    date: number;
+  @IsArray()
+  inviteds: Array<string>;
 
-    @IsArray()
-    inviteds: Array<string>
+  @IsBoolean()
+  tournament: boolean;
 
-    @IsBoolean()
-    tournament: boolean
+  @IsOptional()
+  @IsMongoId()
+  group: string;
 }

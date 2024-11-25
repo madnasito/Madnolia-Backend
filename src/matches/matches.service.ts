@@ -34,6 +34,7 @@ export class MatchesService {
       title: createMatchDto.title != '' ? createMatchDto.title : 'Casual',
       tournament: false,
       user: user,
+      group: createMatchDto.group,
     };
 
     const createdMatch = new this.matchModel(newMatch);

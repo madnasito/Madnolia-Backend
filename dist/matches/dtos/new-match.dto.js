@@ -44,4 +44,9 @@ __decorate([
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], NewMatchDto.prototype, "tournament", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsMongoId)(),
+    __metadata("design:type", String)
+], NewMatchDto.prototype, "group", void 0);
 //# sourceMappingURL=new-match.dto.js.map

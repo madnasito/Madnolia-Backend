@@ -8,13 +8,13 @@ import { MatchesGateway } from './matches.gateway';
 import { MessagesModule } from 'src/messages/messages.module';
 
 @Module({
-    imports: [
-        MongooseModule.forFeature([{ name: Match.name, schema: MatchSchema }]),
-        GamesModule,
-        MessagesModule
-    ],
-    providers: [MatchesService, MatchesGateway],
-    controllers: [MatchesController],
-    exports: []
+  imports: [
+    MongooseModule.forFeature([{ name: Match.name, schema: MatchSchema }]),
+    GamesModule,
+    MessagesModule,
+  ],
+  providers: [MatchesService, MatchesGateway],
+  controllers: [MatchesController],
+  exports: [],
 })
 export class MatchesModule {}

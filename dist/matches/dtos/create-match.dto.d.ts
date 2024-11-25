@@ -5,4 +5,5 @@ export declare class CreateMatchDto {
     date: number;
     inviteds: Array<string>;
     private: boolean;
+    group: string;
 }

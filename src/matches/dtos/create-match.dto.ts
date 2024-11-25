@@ -1,26 +1,38 @@
-import { IsArray, IsBoolean, IsInt, IsMongoId, IsNumber, IsOptional, IsString, MaxLength, Min } from "class-validator";
-
+import {
+  IsArray,
+  IsBoolean,
+  IsInt,
+  IsMongoId,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class CreateMatchDto {
-    @IsString()
-    @MaxLength(40)
-    title: string;
+  @IsString()
+  @MaxLength(40)
+  title: string;
 
-    @IsInt()
-    platform: number;
+  @IsInt()
+  platform: number;
 
-    @IsInt()
-    game: number;
+  @IsInt()
+  game: number;
 
-    @IsNumber()
-    @Min(new Date().getTime())
-    date: number;
+  @IsNumber()
+  @Min(new Date().getTime())
+  date: number;
 
-    @IsArray()
-    inviteds: Array<string>
+  @IsArray()
+  inviteds: Array<string>;
 
-    @IsOptional()
-    @IsBoolean()
-    private: boolean
+  @IsOptional()
+  @IsBoolean()
+  private: boolean;
 
+  @IsOptional()
+  @IsMongoId()
+  group: string;
 }

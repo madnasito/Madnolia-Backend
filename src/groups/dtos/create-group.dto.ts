@@ -8,7 +8,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Privacy } from '../schema/privacy.enum';
+import { Privacy } from '../enums/privacy.enum';
 
 export class CreateGroupDto {
   @IsString()

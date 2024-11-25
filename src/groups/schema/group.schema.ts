@@ -2,8 +2,8 @@ import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Schema } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { User } from 'src/users/schemas/user.schema';
-import { Privacy } from './privacy.enum';
-import { JoinRequestApproval } from './join-request-approval.enum';
+import { Privacy } from '../enums/privacy.enum';
+import { JoinRequestApproval } from '../enums/join-request-approval.enum';
 
 export type GroupDocument = HydratedDocument<Group>;
 

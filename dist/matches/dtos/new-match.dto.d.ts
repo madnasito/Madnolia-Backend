@@ -6,4 +6,5 @@ export declare class NewMatchDto {
     date: number;
     inviteds: Array<string>;
     tournament: boolean;
+    group: string;
 }
