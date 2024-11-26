@@ -37,6 +37,12 @@ __decorate([
     __metadata("design:type", Number)
 ], NewMatchDto.prototype, "date", void 0);
 __decorate([
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(5),
+    (0, class_validator_1.Max)(99),
+    __metadata("design:type", Number)
+], NewMatchDto.prototype, "duration", void 0);
+__decorate([
     (0, class_validator_1.IsArray)(),
     __metadata("design:type", Array)
 ], NewMatchDto.prototype, "inviteds", void 0);

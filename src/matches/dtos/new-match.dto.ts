@@ -8,6 +8,8 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
+  Min,
 } from 'class-validator';
 
 export class NewMatchDto {
@@ -27,6 +29,11 @@ export class NewMatchDto {
 
   @IsNumber()
   date: number;
+
+  @IsInt()
+  @Min(5)
+  @Max(99)
+  duration: number;
 
   @IsArray()
   inviteds: Array<string>;

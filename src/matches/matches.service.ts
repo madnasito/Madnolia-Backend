@@ -35,6 +35,7 @@ export class MatchesService {
       tournament: false,
       user: user,
       group: createMatchDto.group,
+      duration: createMatchDto.duration,
     };
 
     const createdMatch = new this.matchModel(newMatch);
@@ -204,6 +205,7 @@ export class MatchesService {
       active: true,
       date: { $lt: new Date().getTime() },
     });
+
     await this.matchModel.updateMany(
       { date: { $lt: new Date().getTime() }, active: true },
       { active: false },

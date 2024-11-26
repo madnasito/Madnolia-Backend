@@ -69,6 +69,15 @@ __decorate([
 ], Match.prototype, "title", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
+        type: Number,
+        default: 60,
+        max: 99,
+        min: 5,
+    }),
+    __metadata("design:type", Number)
+], Match.prototype, "duration", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
         type: [mongoose_2.default.Schema.Types.ObjectId],
         ref: 'User',
         default: [],

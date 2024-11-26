@@ -3,6 +3,7 @@ export declare class CreateMatchDto {
     platform: number;
     game: number;
     date: number;
+    duration: number;
     inviteds: Array<string>;
     private: boolean;
     group: string;

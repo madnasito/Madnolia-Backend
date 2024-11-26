@@ -11,6 +11,7 @@ export declare class Match {
     group: Group;
     inviteds: Array<User>;
     title: string;
+    duration: number;
     likes: User[];
     private: boolean;
     active: boolean;

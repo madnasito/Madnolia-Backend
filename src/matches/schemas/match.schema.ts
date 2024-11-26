@@ -51,6 +51,14 @@ export class Match {
   title: string;
 
   @Prop({
+    type: Number,
+    default: 60,
+    max: 99,
+    min: 5,
+  })
+  duration: number;
+
+  @Prop({
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'User',
     default: [],

@@ -35,6 +35,7 @@ let MatchesService = class MatchesService {
                 tournament: false,
                 user: user,
                 group: createMatchDto.group,
+                duration: createMatchDto.duration,
             };
             const createdMatch = new this.matchModel(newMatch);
             const matchDb = await createdMatch.save();

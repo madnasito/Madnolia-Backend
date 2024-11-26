@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
   MaxLength,
   Min,
 } from 'class-validator';
@@ -24,6 +25,11 @@ export class CreateMatchDto {
   @IsNumber()
   @Min(new Date().getTime())
   date: number;
+
+  @IsInt()
+  @Min(5)
+  @Max(99)
+  duration: number;
 
   @IsArray()
   inviteds: Array<string>;
