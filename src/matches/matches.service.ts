@@ -12,6 +12,7 @@ import { CreateMatchDto } from './dtos/create-match.dto';
 import { MatchDto } from './dtos/match.dto';
 import { NewMatchDto } from './dtos/new-match.dto';
 import { MessagesService } from 'src/messages/messages.service';
+import { MatchStatus } from './enums/status.enum';
 
 @Injectable()
 export class MatchesService {
@@ -89,7 +90,7 @@ export class MatchesService {
     const match = await this.matchModel.findOne({
       _id: attrs._id,
       user,
-      active: true,
+      status: { $ne: MatchStatus.FINISHED },
     });
 
     if (!match) throw new NotFoundException('NO_MATCH_FOUND');
@@ -104,8 +105,8 @@ export class MatchesService {
       throw new NotFoundException('NO_MATCH_FOUND');
 
     const matchDeleted = await this.matchModel.findOneAndUpdate(
-      { _id: id, active: true, user },
-      { active: false },
+      { _id: id, user },
+      { status: MatchStatus.FINISHED },
       { new: true },
     );
 
@@ -146,7 +147,7 @@ export class MatchesService {
       {
         $match: {
           platform,
-          active: true,
+          status: { $ne: MatchStatus.FINISHED },
         },
       },
       {
@@ -195,23 +196,42 @@ export class MatchesService {
     skip: number = 0,
   ) =>
     this.matchModel.find(
-      { platform, game, active: true },
+      { platform, game, status: { $ne: MatchStatus.FINISHED } },
       {},
       { skip, sort: { date: 1 } },
     );
 
   updatePastTimeMatches = async (): Promise<Array<Match>> => {
-    const matchesToUpdate = await this.matchModel.find({
-      active: true,
+    const currentTimeMillis = new Date().getTime();
+
+    const matches = await this.matchModel.find({
+      status: MatchStatus.WAITING,
       date: { $lt: new Date().getTime() },
     });
 
     await this.matchModel.updateMany(
-      { date: { $lt: new Date().getTime() }, active: true },
-      { active: false },
+      {
+        status: MatchStatus.WAITING,
+        date: { $lt: new Date().getTime() },
+      },
+      { status: MatchStatus.RUNNING },
     );
 
-    return matchesToUpdate;
+    await this.matchModel.updateMany(
+      {
+        $expr: {
+          $lt: [
+            {
+              $add: ['$date', { $multiply: ['$duration', 60000] }],
+            },
+            currentTimeMillis,
+          ],
+        },
+      },
+      { status: MatchStatus.FINISHED },
+    );
+
+    return matches;
   };
 
   async getLatestGamesByUserAndPlatform(

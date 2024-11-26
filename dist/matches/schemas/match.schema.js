@@ -15,6 +15,7 @@ const mongoose_2 = require("mongoose");
 const game_schema_1 = require("../../games/schemas/game.schema");
 const group_schema_1 = require("../../groups/schema/group.schema");
 const user_schema_1 = require("../../users/schemas/user.schema");
+const status_enum_1 = require("../enums/status.enum");
 let Match = class Match {
 };
 exports.Match = Match;
@@ -92,16 +93,17 @@ __decorate([
 ], Match.prototype, "private", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        default: true,
-    }),
-    __metadata("design:type", Boolean)
-], Match.prototype, "active", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({
         default: false,
     }),
     __metadata("design:type", Boolean)
 ], Match.prototype, "tournament", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        enum: status_enum_1.MatchStatus,
+        default: status_enum_1.MatchStatus.WAITING,
+    }),
+    __metadata("design:type", Number)
+], Match.prototype, "status", void 0);
 exports.Match = Match = __decorate([
     (0, mongoose_1.Schema)()
 ], Match);

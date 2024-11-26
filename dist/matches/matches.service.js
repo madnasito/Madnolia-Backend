@@ -19,6 +19,7 @@ const match_schema_1 = require("./schemas/match.schema");
 const mongoose_2 = require("mongoose");
 const games_service_1 = require("../games/games.service");
 const messages_service_1 = require("../messages/messages.service");
+const status_enum_1 = require("./enums/status.enum");
 let MatchesService = class MatchesService {
     constructor(matchModel, gamesService, messagesService) {
         this.matchModel = matchModel;
@@ -69,7 +70,7 @@ let MatchesService = class MatchesService {
             const match = await this.matchModel.findOne({
                 _id: attrs._id,
                 user,
-                active: true,
+                status: { $ne: status_enum_1.MatchStatus.FINISHED },
             });
             if (!match)
                 throw new common_1.NotFoundException('NO_MATCH_FOUND');
@@ -79,7 +80,7 @@ let MatchesService = class MatchesService {
         this.delete = async (id, user) => {
             if (!mongoose_2.default.Types.ObjectId.isValid(id))
                 throw new common_1.NotFoundException('NO_MATCH_FOUND');
-            const matchDeleted = await this.matchModel.findOneAndUpdate({ _id: id, active: true, user }, { active: false }, { new: true });
+            const matchDeleted = await this.matchModel.findOneAndUpdate({ _id: id, user }, { status: status_enum_1.MatchStatus.FINISHED }, { new: true });
             if (!matchDeleted)
                 throw new common_1.NotFoundException();
             return matchDeleted;
@@ -100,7 +101,7 @@ let MatchesService = class MatchesService {
                 {
                     $match: {
                         platform,
-                        active: true,
+                        status: { $ne: status_enum_1.MatchStatus.FINISHED },
                     },
                 },
                 {
@@ -135,14 +136,28 @@ let MatchesService = class MatchesService {
             return results;
         };
         this.getMatchesWithUserLiked = (userId) => this.matchModel.find({ likes: userId }, {}, { populate: { path: 'game' }, sort: { _id: -1 } });
-        this.getMatchesByGameAndPlatform = async (platform, game, skip = 0) => this.matchModel.find({ platform, game, active: true }, {}, { skip, sort: { date: 1 } });
+        this.getMatchesByGameAndPlatform = async (platform, game, skip = 0) => this.matchModel.find({ platform, game, status: { $ne: status_enum_1.MatchStatus.FINISHED } }, {}, { skip, sort: { date: 1 } });
         this.updatePastTimeMatches = async () => {
-            const matchesToUpdate = await this.matchModel.find({
-                active: true,
+            const currentTimeMillis = new Date().getTime();
+            const matches = await this.matchModel.find({
+                status: status_enum_1.MatchStatus.WAITING,
                 date: { $lt: new Date().getTime() },
             });
-            await this.matchModel.updateMany({ date: { $lt: new Date().getTime() }, active: true }, { active: false });
-            return matchesToUpdate;
+            await this.matchModel.updateMany({
+                status: status_enum_1.MatchStatus.WAITING,
+                date: { $lt: new Date().getTime() },
+            }, { status: status_enum_1.MatchStatus.RUNNING });
+            await this.matchModel.updateMany({
+                $expr: {
+                    $lt: [
+                        {
+                            $add: ['$date', { $multiply: ['$duration', 60000] }],
+                        },
+                        currentTimeMillis,
+                    ],
+                },
+            }, { status: status_enum_1.MatchStatus.FINISHED });
+            return matches;
         };
     }
     async getLatestGamesByUserAndPlatform(user, platform) {

@@ -3,6 +3,7 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { Game } from 'src/games/schemas/game.schema';
 import { Group } from 'src/groups/schema/group.schema';
 import { User } from 'src/users/schemas/user.schema';
+import { MatchStatus } from '../enums/status.enum';
 
 export type MatchDocument = HydratedDocument<Match>;
 
@@ -71,14 +72,15 @@ export class Match {
   private: boolean;
 
   @Prop({
-    default: true,
-  })
-  active: boolean;
-
-  @Prop({
     default: false,
   })
   tournament: boolean;
+
+  @Prop({
+    enum: MatchStatus,
+    default: MatchStatus.WAITING,
+  })
+  status: MatchStatus;
 }
 
 export const MatchSchema = SchemaFactory.createForClass(Match);
