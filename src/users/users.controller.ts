@@ -94,8 +94,11 @@ export class UserController {
       }
 
       const form = new FormData();
+
+      const apiKey = this.config.get<string>('IMGBB_KEY');
+
       form.append('file', new Blob([img.buffer], { type: img.mimetype }));
-      form.append('apikey', 'a639124c1b9448e386cdf89e3fa4597f');
+      form.append('apikey', apiKey);
 
       return axios
         .post('https://beeimg.com/api/upload/file/json/', form, {

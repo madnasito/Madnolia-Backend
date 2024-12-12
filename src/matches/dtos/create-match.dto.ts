@@ -23,7 +23,7 @@ export class CreateMatchDto {
   game: number;
 
   @IsNumber()
-  @Min(new Date().getTime())
+  @Min(new Date().getTime(), { message: 'INVALID_DATE' })
   date: number;
 
   @IsInt()

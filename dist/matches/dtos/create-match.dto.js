@@ -29,7 +29,7 @@ __decorate([
 ], CreateMatchDto.prototype, "game", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.Min)(new Date().getTime()),
+    (0, class_validator_1.Min)(new Date().getTime(), { message: 'INVALID_DATE' }),
     __metadata("design:type", Number)
 ], CreateMatchDto.prototype, "date", void 0);
 __decorate([
