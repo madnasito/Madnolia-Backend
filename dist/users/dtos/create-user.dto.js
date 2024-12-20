@@ -16,12 +16,14 @@ class CreateUserDto {
 exports.CreateUserDto = CreateUserDto;
 __decorate([
     (0, class_validator_1.IsAlphanumeric)(),
+    (0, class_validator_1.MaxLength)(17),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsAlphanumeric)(),
     (0, class_validator_1.IsLowercase)(),
     (0, class_validator_1.Matches)(/^[a-z0-9-_@]+$/),
+    (0, class_validator_1.MaxLength)(20),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "username", void 0);
 __decorate([

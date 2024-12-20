@@ -21,12 +21,12 @@ exports.GamesModule = GamesModule = __decorate([
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: game_schema_1.Game.name, schema: game_schema_1.GameSchema }]),
             axios_1.HttpModule.register({
-                baseURL: 'https://api.rawg.io/api/games'
-            })
+                baseURL: 'https://api.rawg.io/api/games',
+            }),
         ],
         providers: [games_service_1.GamesService],
         exports: [games_service_1.GamesService],
-        controllers: [games_controller_1.GamesController]
+        controllers: [games_controller_1.GamesController],
     })
 ], GamesModule);
 //# sourceMappingURL=games.module.js.map

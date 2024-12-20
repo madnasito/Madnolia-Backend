@@ -53,8 +53,9 @@ let UserController = class UserController {
                 throw new common_1.HttpException('NOT_VALID_EXTENSION', common_1.HttpStatus.BAD_REQUEST);
             }
             const form = new FormData();
+            const apiKey = this.config.get('IMGBB_KEY');
             form.append('file', new Blob([img.buffer], { type: img.mimetype }));
-            form.append('apikey', 'a639124c1b9448e386cdf89e3fa4597f');
+            form.append('apikey', apiKey);
             return axios_1.default
                 .post('https://beeimg.com/api/upload/file/json/', form, {
                 headers: {

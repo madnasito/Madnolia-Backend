@@ -3,7 +3,7 @@ export declare class UserDto {
     name: string;
     username: string;
     email: string;
-    platforms: Array<Number>;
+    platforms: Array<number>;
     img: string;
     thumb: string;
     partners: Array<string>;
