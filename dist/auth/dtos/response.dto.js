@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthResponseDto = void 0;
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
-const user_dto_1 = require("../../users/dtos/user.dto");
+const user_dto_1 = require("../../modules/users/dtos/user.dto");
 class AuthResponseDto {
 }
 exports.AuthResponseDto = AuthResponseDto;

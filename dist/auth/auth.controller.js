@@ -18,7 +18,7 @@ const auth_service_1 = require("./auth.service");
 const sign_up_dtio_1 = require("./dtos/sign-up.dtio");
 const sign_in_dto_1 = require("./dtos/sign-in.dto");
 const response_dto_1 = require("./dtos/response.dto");
-const auth_interceptor_1 = require("../interceptors/auth.interceptor");
+const auth_interceptor_1 = require("../common/interceptors/auth.interceptor");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;

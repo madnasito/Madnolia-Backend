@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("./users.service");
-const user_guard_1 = require("../guards/user.guard");
+const user_guard_1 = require("../common/guards/user.guard");
 const update_user_dto_1 = require("./dtos/update-user.dto");
 const serialize_interceptor_1 = require("../interceptors/serialize.interceptor");
 const user_dto_1 = require("./dtos/user.dto");

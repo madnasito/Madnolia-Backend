@@ -12,7 +12,7 @@ const users_controller_1 = require("./users.controller");
 const mongoose_1 = require("@nestjs/mongoose");
 const user_schema_1 = require("./schemas/user.schema");
 const users_service_1 = require("./users.service");
-const user_guard_1 = require("../guards/user.guard");
+const user_guard_1 = require("../common/guards/user.guard");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;

@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatchesController = void 0;
 const common_1 = require("@nestjs/common");
 const create_match_dto_1 = require("./dtos/create-match.dto");
-const user_guard_1 = require("../guards/user.guard");
+const user_guard_1 = require("../common/guards/user.guard");
 const matches_service_1 = require("./matches.service");
 const update_match_dto_1 = require("./dtos/update-match.dto");
 let MatchesController = class MatchesController {
