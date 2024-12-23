@@ -26,7 +26,9 @@ export class SerializeInterceptor implements NestInterceptor {
   ): Observable<any> | Promise<Observable<any>> {
     return next.handle().pipe(
       map((data: AuthResponseDto) => {
-        return plainToClass(this.dto, data, {});
+        return plainToClass(this.dto, data, {
+          excludePrefixes: ['password'],
+        });
       }),
     );
     // throw new Error("Method not implemented.");

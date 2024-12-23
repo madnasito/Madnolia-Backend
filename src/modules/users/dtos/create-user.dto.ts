@@ -1,4 +1,5 @@
 import {
+  ArrayMinSize,
   IsAlphanumeric,
   IsArray,
   IsEmail,
@@ -6,7 +7,9 @@ import {
   IsStrongPassword,
   Matches,
   MaxLength,
+  ValidateNested,
 } from 'class-validator';
+import { Platform } from 'src/common/enums/platforms.enum';
 
 export class CreateUserDto {
   @IsAlphanumeric()
@@ -26,5 +29,7 @@ export class CreateUserDto {
   password: string;
 
   @IsArray()
-  platforms: [];
+  @ValidateNested({ each: true })
+  @ArrayMinSize(1)
+  platforms: Array<Platform>;
 }
