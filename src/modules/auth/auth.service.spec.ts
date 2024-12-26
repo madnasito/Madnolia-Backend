@@ -85,7 +85,6 @@ describe('AuthService', () => {
 
   // TODO: DO IT ON users.service.spec
   it('It throws if an invalid password is provided', async () => {
-    console.log(users);
     await expect(
       service.signIn({ username: 'test', password: '12345' }),
     ).rejects.toThrow(BadRequestException);

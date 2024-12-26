@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 import { IsJWT, IsObject } from 'class-validator';
-import { UserDto } from 'src/modules/users/dtos/user.dto';
+import { UserDto } from '../../users/dtos/user.dto';
 
 export class AuthResponseDto {
   @Expose()

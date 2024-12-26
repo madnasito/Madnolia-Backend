@@ -9,7 +9,6 @@ import { map, Observable } from 'rxjs';
 import { AuthResponseDto } from 'src/modules/auth/dtos/response.dto';
 
 interface ClassConstructor {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   new (...args: any[]): {};
 }
 

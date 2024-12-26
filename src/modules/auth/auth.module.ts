@@ -4,6 +4,9 @@ import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersModule } from '../users/users.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { AuthSerialize } from 'src/common/interceptors/auth.interceptor';
+import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 
 @Module({
   imports: [
@@ -19,6 +22,6 @@ import { UsersModule } from '../users/users.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, { provide: APP_INTERCEPTOR, useClass: Serialize }],
 })
 export class AuthModule {}
