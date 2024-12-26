@@ -1,25 +1,53 @@
 import mongoose, { Model } from 'mongoose';
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { hashSync } from 'bcrypt';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import axios from 'axios';
+import { SignUpDto } from '../auth/dtos/sign-up.dtio';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  fincOneByUsername = async (username: string) => {
-    const user = await this.userModel.findOne({ username });
-    return user;
+  create = async (signUpDto: SignUpDto): Promise<User> => {
+    const emailDb = await this.findOneByEmail(signUpDto.email);
+
+    if (emailDb) {
+      throw new BadRequestException('EMAIL_IN_USE');
+    }
+
+    const userDb = await this.fincOneByUsername(signUpDto.username);
+    if (userDb) {
+      throw new BadRequestException('USERNAME_IN_USE');
+    }
+
+    const createdUser = new this.userModel(signUpDto);
+    const saltOrRounds = 10;
+    const password = signUpDto.password;
+    const hash = hashSync(password, saltOrRounds);
+
+    createdUser.password = hash;
+
+    await createdUser.save();
+
+    // Use toJSON method to convert _id to string
+    return createdUser.toJSON();
   };
 
-  findOneByEmail = async (email: string) => {
+  fincOneByUsername = async (username: string) => {
+    const user = await this.userModel.findOne({ username });
+    return user.toJSON();
+  };
+
+  findOneByEmail = async (email: string): Promise<User | null> => {
     const user = await this.userModel.findOne({ email });
-    return user;
+    return user.toJSON();
   };
 
   fincOneById = async (id: string) => {
@@ -38,7 +66,7 @@ export class UsersService {
 
   // getInvitations = async (user: string) => this.userModel.populate('')
 
-  upadte = async (user: string, attrs: Partial<User>) =>
+  upadte = async (user: string, attrs: Partial<User>): Promise<User | null> =>
     this.userModel.findOneAndUpdate({ _id: user }, attrs, { new: true });
 
   userExists = async (username: string, email: string) => {

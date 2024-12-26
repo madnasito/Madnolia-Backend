@@ -6,6 +6,8 @@ import { Availability } from './availability.enum';
 export type UserDocument = HydratedDocument<User>;
 @Schema()
 export class User {
+  _id: mongoose.Types.ObjectId;
+
   @Prop({
     required: true,
   })

@@ -1,58 +1,53 @@
-
-import { Injectable } from "@nestjs/common";
-import { UsersService } from "src/modules/users/users.service";
+import { Injectable } from '@nestjs/common';
+import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
 export class Users {
+  users: Array<User>;
 
-    users:Array<User>
+  constructor(private usersService?: UsersService) {
+    this.users = [];
+  }
 
-    constructor(
-        private usersService?:UsersService
-    ) {
-        this.users = []
+  addUser = async (userId: string, socketId: string) => {
+    const user = await this.usersService.fincOneById(userId);
+
+    if (!user) {
+      return;
     }
 
-    addUser = async(userId: string, socketId: string) => {
+    const { name, username, thumb, _id } = user;
 
-        const user = await this.usersService.fincOneById(userId)
+    this.users.push({ name, username, thumb, _id, socketId, room: '' });
 
-        if(!user){
-            return;
-        }
+    return this.users;
+  };
 
-        const { name, username, thumb, _id } = user
+  getUser = (id: string) =>
+    this.users.filter((user) => user.socketId === id)[0];
 
-        this.users.push({ name, username, thumb, _id, socketId, room: '' })
+  getUserById = (id: string) =>
+    this.users.filter((user) => user._id.toString() === id)[0];
 
-        return this.users
-    }
+  getUsers = () => this.users;
 
-    getUser = (id: string) => this.users.filter(user => user.socketId === id)[0]
-    
-    getUserById = (id:string) => this.users.filter(user => user._id.toString() === id)[0]
+  getUsersByRoom = (room: string) =>
+    this.users.filter((user) => user.room === room);
 
-    getUsers = () => this.users
+  deleteUser = (id: string) => {
+    let deletedUser = this.getUser(id);
 
-    getUsersByRoom = (room: string) => this.users.filter(user => user.room === room)
+    this.users = this.users.filter((user) => user.socketId != id);
 
-    deleteUser = (id: string) => {
-
-        let deletedUser = this.getUser(id)
-
-        this.users = this.users.filter(user => user.socketId != id)
-
-        return deletedUser
-    }
-
-
+    return deletedUser;
+  };
 }
 
 interface User {
-    name: string,
-    username: string,
-    thumb: string,
-    _id: any,
-    socketId: string,
-    room: string
+  name: string;
+  username: string;
+  thumb: string;
+  _id: any;
+  socketId: string;
+  room: string;
 }
