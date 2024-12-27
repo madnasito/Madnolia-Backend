@@ -9,7 +9,7 @@ import { map, Observable } from 'rxjs';
 import { AuthResponseDto } from 'src/modules/auth/dtos/response.dto';
 
 interface ClassConstructor {
-  new (...args: any[]): {};
+  new (...args: any[]): object;
 }
 
 export function AuthSerialize(dto: ClassConstructor) {
