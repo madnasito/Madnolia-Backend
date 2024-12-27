@@ -42,12 +42,12 @@ export class UsersService {
 
   fincOneByUsername = async (username: string) => {
     const user = await this.userModel.findOne({ username });
-    return user.toJSON();
+    return user;
   };
 
   findOneByEmail = async (email: string): Promise<User | null> => {
     const user = await this.userModel.findOne({ email });
-    return user.toJSON();
+    return user;
   };
 
   fincOneById = async (id: string) => {
