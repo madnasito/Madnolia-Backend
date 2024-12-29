@@ -6,7 +6,7 @@ const port = process.env.PORT || 3000;
 console.log(`Launching NestJS app on port ${port}, URL: http://0.0.0.0:${port}`);
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    app.setGlobalPrefix('api');
+    app.setGlobalPrefix('api/v1');
     await app.listen(port);
 }
 bootstrap();
