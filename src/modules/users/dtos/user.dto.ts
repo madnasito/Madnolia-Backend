@@ -4,7 +4,6 @@ import {
   IsEmail,
   IsInt,
   IsMongoId,
-  IsOptional,
   IsString,
   IsUrl,
   Matches,
@@ -12,7 +11,6 @@ import {
 
 export class UserDto {
   @IsMongoId()
-  @IsOptional()
   @Expose()
   _id: string;
 

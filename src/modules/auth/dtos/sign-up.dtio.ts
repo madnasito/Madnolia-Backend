@@ -15,7 +15,7 @@ export class SignUpDto {
 
   @IsNotEmpty()
   @IsString()
-  @Matches(/^[a-z0-9-_@]+$/, { message: 'Invalid username' })
+  @Matches(/^[a-zA-Z0-9-._$]+$/, { message: 'Invalid username' })
   @MaxLength(20)
   username: string;
 

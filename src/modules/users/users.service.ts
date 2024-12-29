@@ -62,7 +62,7 @@ export class UsersService {
   };
 
   getInfo = async (user: string) =>
-    await this.userModel.findOne({ _id: user, status: true });
+    (await this.userModel.findOne({ _id: user, status: true })).toJSON();
 
   // getInvitations = async (user: string) => this.userModel.populate('')
 
