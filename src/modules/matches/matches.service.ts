@@ -75,6 +75,7 @@ export class MatchesService {
         populate: [
           { path: 'game' },
           { path: 'joined', select: '_id name thumb username' },
+          { path: 'user', select: '_id name thumb username' },
         ],
       },
     );
