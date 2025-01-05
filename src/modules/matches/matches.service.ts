@@ -9,10 +9,10 @@ import mongoose, { Model } from 'mongoose';
 import { GamesService } from 'src/modules/games/games.service';
 import { GameInterface } from './interfaces/game.interface';
 import { CreateMatchDto } from './dtos/create-match.dto';
-import { MatchDto } from './dtos/match.dto';
 import { NewMatchDto } from './dtos/new-match.dto';
 import { MessagesService } from 'src/modules/messages/messages.service';
 import { MatchStatus } from './enums/status.enum';
+import { UpdateMatchDto } from './dtos/update-match.dto';
 
 @Injectable()
 export class MatchesService {
@@ -74,7 +74,7 @@ export class MatchesService {
       {
         populate: [
           { path: 'game' },
-          { path: 'likes', select: '_id name thumb username' },
+          { path: 'joined', select: '_id name thumb username' },
         ],
       },
     );
@@ -86,18 +86,22 @@ export class MatchesService {
     return { match, messages };
   };
 
-  update = async (user: string, attrs: Partial<MatchDto>) => {
-    const match = await this.matchModel.findOne({
-      _id: attrs._id,
-      user,
-      status: { $ne: MatchStatus.FINISHED },
-    });
+  update = async (id: string, user: string, attrs: Partial<UpdateMatchDto>) => {
+    const match = await this.matchModel.findOneAndUpdate(
+      {
+        _id: id,
+        user,
+        status: { $nin: [MatchStatus.FINISHED, MatchStatus.CANCELLED] },
+      },
+      attrs,
+      { new: true }, // Return the updated document
+    );
 
-    if (!match) throw new NotFoundException('NO_MATCH_FOUND');
+    if (!match) {
+      throw new NotFoundException('NO_MATCH_FOUND');
+    }
 
-    Object.assign(match, attrs);
-
-    return match.save();
+    return match;
   };
 
   delete = async (id: string, user: string) => {
@@ -106,7 +110,7 @@ export class MatchesService {
 
     const matchDeleted = await this.matchModel.findOneAndUpdate(
       { _id: id, user },
-      { status: MatchStatus.FINISHED },
+      { status: MatchStatus.CANCELLED },
       { new: true },
     );
 
@@ -124,7 +128,7 @@ export class MatchesService {
 
     return this.matchModel.findByIdAndUpdate(
       id,
-      { $addToSet: { likes: user } },
+      { $addToSet: { joined: user } },
       { new: true },
     );
   };
@@ -183,9 +187,9 @@ export class MatchesService {
     return results;
   };
 
-  getMatchesWithUserLiked = (userId: string): Promise<Match[]> =>
+  getMatchesWithUserJoined = (userId: string): Promise<Match[]> =>
     this.matchModel.find(
-      { likes: userId },
+      { joined: userId },
       {},
       { populate: { path: 'game' }, sort: { _id: -1 } },
     );

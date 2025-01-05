@@ -123,7 +123,7 @@ export class MatchesGateway
         if (hoster) this.io.to(hoster.socketId).emit('match_ready', payload);
 
         // Event to joined users
-        match.likes.forEach((user) => {
+        match.joined.forEach((user) => {
           const socketUser = this.users.getUserById(user.toString());
           if (socketUser) {
             this.io.to(socketUser.socketId).emit('match_ready', payload);

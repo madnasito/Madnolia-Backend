@@ -4,8 +4,8 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
-  Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -60,7 +60,7 @@ export class MatchesController {
   @UseGuards(UserGuard)
   @Get('joined')
   joined(@Request() request: any) {
-    return this.matchesService.getMatchesWithUserLiked(request.user.id);
+    return this.matchesService.getMatchesWithUserJoined(request.user.id);
   }
   @Get('platform/:platform')
   async getMatchesByPlatform(@Param('platform') platform: string) {
@@ -85,9 +85,13 @@ export class MatchesController {
   }
 
   @UseGuards(UserGuard)
-  @Put('update')
-  update(@Request() req: any, @Body() body: UpdateMatchDto) {
-    return this.matchesService.update(req.user.id, body);
+  @Patch('update/:id')
+  update(
+    @Param('id') id: string,
+    @Request() req: any,
+    @Body() body: UpdateMatchDto,
+  ) {
+    return this.matchesService.update(id, req.user.id, body);
   }
 
   @UseGuards(UserGuard)

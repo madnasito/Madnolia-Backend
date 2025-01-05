@@ -64,7 +64,7 @@ export class Match {
     ref: 'User',
     default: [],
   })
-  likes: User[];
+  joined: User[];
 
   @Prop({
     default: false,
