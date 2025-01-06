@@ -47,9 +47,15 @@ export class Match {
 
   @Prop({
     default: 'Casual',
-    maxlength: 25,
+    maxlength: 30,
   })
   title: string;
+
+  @Prop({
+    default: 'Casual',
+    maxlength: 80,
+  })
+  description: string;
 
   @Prop({
     type: Number,

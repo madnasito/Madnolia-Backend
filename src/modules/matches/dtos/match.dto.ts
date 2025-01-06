@@ -19,6 +19,9 @@ export class MatchDto {
   @IsString()
   title: string;
 
+  @IsString()
+  description: string;
+
   @IsNotEmpty()
   @IsDefined()
   @IsMongoId()

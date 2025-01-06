@@ -34,6 +34,7 @@ export class MatchesService {
       platform: createMatchDto.platform,
       title: createMatchDto.title != '' ? createMatchDto.title : 'Casual',
       tournament: false,
+      description: createMatchDto.description,
       user: user,
       group: createMatchDto.group,
       duration: createMatchDto.duration,

@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  MaxLength,
   Min,
 } from 'class-validator';
 import { User } from 'src/modules/users/schemas/user.schema';
@@ -11,7 +12,13 @@ import { User } from 'src/modules/users/schemas/user.schema';
 export class UpdateMatchDto {
   @IsOptional()
   @IsString()
+  @MaxLength(30)
   title: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  description: string;
 
   @IsOptional()
   @IsNumber()

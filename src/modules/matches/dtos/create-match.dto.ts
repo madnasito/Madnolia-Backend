@@ -13,8 +13,12 @@ import {
 
 export class CreateMatchDto {
   @IsString()
-  @MaxLength(40)
+  @MaxLength(30)
   title: string;
+
+  @IsString()
+  @MaxLength(80)
+  description: string;
 
   @IsInt()
   platform: number;
