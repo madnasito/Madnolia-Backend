@@ -17,7 +17,6 @@ export class AuthService {
 
   signUp = async (signUpDto: SignUpDto) => {
     signUpDto.username = signUpDto.username.toLowerCase();
-    console.log(signUpDto.username);
     const createdUser = await this.usersService.create(signUpDto);
 
     const payload = { id: createdUser._id };
