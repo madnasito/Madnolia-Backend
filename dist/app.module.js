@@ -26,6 +26,7 @@ const path_1 = require("path");
 const serve_static_1 = require("@nestjs/serve-static");
 const app_version_module_1 = require("./modules/app-version/app-version.module");
 const groups_module_1 = require("./modules/groups/groups.module");
+const chat_module_1 = require("./modules/chat/chat.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -67,6 +68,7 @@ exports.AppModule = AppModule = __decorate([
             notifications_module_1.NotificationsModule,
             app_version_module_1.AppVersionModule,
             groups_module_1.GroupsModule,
+            chat_module_1.ChatModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

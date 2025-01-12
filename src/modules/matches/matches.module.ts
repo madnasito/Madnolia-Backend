@@ -5,7 +5,7 @@ import { MatchesService } from './matches.service';
 import { MatchesController } from './matches.controller';
 import { GamesModule } from 'src/modules/games/games.module';
 import { MatchesGateway } from './matches.gateway';
-import { MessagesModule } from 'src/modules/messages/messages.module';
+import { MessagesModule } from 'src/modules/chat/messages/messages.module';
 
 @Module({
   imports: [

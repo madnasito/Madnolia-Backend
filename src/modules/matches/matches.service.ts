@@ -10,7 +10,7 @@ import { GamesService } from 'src/modules/games/games.service';
 import { GameInterface } from './interfaces/game.interface';
 import { CreateMatchDto } from './dtos/create-match.dto';
 import { NewMatchDto } from './dtos/new-match.dto';
-import { MessagesService } from 'src/modules/messages/messages.service';
+import { MessagesService } from 'src/modules/chat/messages/messages.service';
 import { MatchStatus } from './enums/status.enum';
 import { UpdateMatchDto } from './dtos/update-match.dto';
 

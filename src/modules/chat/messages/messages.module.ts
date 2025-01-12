@@ -11,20 +11,20 @@ import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{name: Message.name, schema: MessageSchema}]),
+    MongooseModule.forFeature([{ name: Message.name, schema: MessageSchema }]),
     UsersModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         return {
           secret: config.get<string>('JWT_SECRET'),
-          signOptions: {expiresIn: '10d'}
-        }
+          signOptions: { expiresIn: '10d' },
+        };
       },
-    })
+    }),
   ],
   providers: [MessagesService, MessagesGateway, Users],
   exports: [Users, MessagesService],
-  controllers: [MessagesController]
+  controllers: [MessagesController],
 })
 export class MessagesModule {}

@@ -11,7 +11,7 @@ import {
 import { Namespace, Socket } from 'socket.io';
 import { UserSocketGuard } from 'src/common/guards/user-sockets.guard';
 import { MatchesService } from './matches.service';
-import { Users } from 'src/modules/messages/classes/user';
+import { Users } from 'src/modules/chat/messages/classes/user';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { MatchDto } from './dtos/match.dto';
 

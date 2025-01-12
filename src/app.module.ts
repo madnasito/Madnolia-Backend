@@ -10,13 +10,13 @@ import { GamesModule } from './modules/games/games.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_PIPE } from '@nestjs/core';
-import { MessagesModule } from './modules/messages/messages.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AppVersionModule } from './modules/app-version/app-version.module';
 import { GroupsModule } from './modules/groups/groups.module';
+import { ChatModule } from './modules/chat/chat.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -50,10 +50,10 @@ import { GroupsModule } from './modules/groups/groups.module';
     MatchesModule,
     TournamentsModule,
     GamesModule,
-    MessagesModule,
     NotificationsModule,
     AppVersionModule,
     GroupsModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [
