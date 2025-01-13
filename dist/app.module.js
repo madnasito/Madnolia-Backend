@@ -19,7 +19,6 @@ const games_module_1 = require("./modules/games/games.module");
 const config_1 = require("@nestjs/config");
 const jwt_1 = require("@nestjs/jwt");
 const core_1 = require("@nestjs/core");
-const messages_module_1 = require("./modules/messages/messages.module");
 const notifications_module_1 = require("./modules/notifications/notifications.module");
 const schedule_1 = require("@nestjs/schedule");
 const path_1 = require("path");
@@ -64,7 +63,6 @@ exports.AppModule = AppModule = __decorate([
             matches_module_1.MatchesModule,
             tournaments_module_1.TournamentsModule,
             games_module_1.GamesModule,
-            messages_module_1.MessagesModule,
             notifications_module_1.NotificationsModule,
             app_version_module_1.AppVersionModule,
             groups_module_1.GroupsModule,
