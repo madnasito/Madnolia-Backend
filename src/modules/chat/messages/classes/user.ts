@@ -27,7 +27,10 @@ export class Users {
     this.users.filter((user) => user.socketId === id)[0];
 
   getUserById = (id: string) =>
-    this.users.filter((user) => user._id.toString() === id)[0];
+    this.users.find((user) => user._id.toString() === id);
+
+  getUserByUsername = (username: string) =>
+    this.users.find((user) => user.username === username);
 
   getUsers = () => this.users;
 
@@ -35,7 +38,7 @@ export class Users {
     this.users.filter((user) => user.room === room);
 
   deleteUser = (id: string) => {
-    let deletedUser = this.getUser(id);
+    const deletedUser = this.getUser(id);
 
     this.users = this.users.filter((user) => user.socketId != id);
 
