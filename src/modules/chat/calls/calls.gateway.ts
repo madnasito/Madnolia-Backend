@@ -10,11 +10,76 @@ import { Users } from '../messages/classes/user';
 @WebSocketGateway()
 export class CallsGateway implements OnGatewayConnection {
   @WebSocketServer() server: Server;
+  connectedUsers: { [userId: string]: string[] } = {}; // Map user IDs to their connected room IDs
 
   constructor(private readonly users: Users) {}
+
   handleConnection(socket: Socket) {
     console.log(`${socket.id} Connected to calls`);
     console.log(this.users.getUsers());
+  }
+
+  @SubscribeMessage('join_call_room')
+  handleJoinRoom(client: Socket, payload: { callRoom: string }) {
+    client.join(payload.callRoom);
+    this.addUserToRoom(payload.callRoom, client.id);
+    const user = this.users.getUser(client.id);
+    console.log(`Client ${user.username} joined room ${payload.callRoom}`);
+  }
+
+  @SubscribeMessage('leave_call_room')
+  handleLeaveRoom(client: Socket, roomId: string) {
+    client.leave(roomId);
+    this.removeUserFromRoom(roomId, client.id);
+    console.log(`Client ${client.id} left room ${roomId}`);
+  }
+
+  @SubscribeMessage('make_room_call')
+  handleMakeRoomCall(
+    client: Socket,
+    data: { calleeId: string; sdpOffer: any },
+  ) {
+    const { calleeId, sdpOffer } = data;
+    const calleeRooms = this.connectedUsers[calleeId] || [];
+
+    // Send offer to all connected rooms of the callee
+    for (const roomId in calleeRooms) {
+      client
+        .to(roomId)
+        .emit('new_room_call', { calleeId: client.id, sdpOffer });
+    }
+  }
+
+  @SubscribeMessage('answer_room_call')
+  handleAnswerRoomCall(
+    client: Socket,
+    data: { callerId: string; sdpAnswer: any },
+  ) {
+    const { callerId, sdpAnswer } = data;
+    const callerRooms = this.connectedUsers[callerId] || [];
+
+    // Send answer to all connected rooms to the caller
+    for (const roomId of callerRooms) {
+      client
+        .to(roomId)
+        .emit('room_call_answered', { callee: client.id, sdpAnswer });
+    }
+  }
+
+  @SubscribeMessage('room_ice_candidate')
+  handleRoomIceCandidate(
+    client: Socket,
+    data: { calleeId: string; iceCandidate: any },
+  ) {
+    const { calleeId, iceCandidate } = data;
+    const calleeRooms = this.connectedUsers[calleeId] || [];
+
+    // Send ice candidate to all connected rooms of the callee
+    for (const roomId of calleeRooms) {
+      client
+        .to(roomId)
+        .emit('room_ice_candidate', { sender: client.id, iceCandidate });
+    }
   }
 
   @SubscribeMessage('make_call')
@@ -56,5 +121,20 @@ export class CallsGateway implements OnGatewayConnection {
       sender: socket.id,
       iceCandidate: iceCandidate,
     });
+  }
+
+  private addUserToRoom(roomId: string, userId: string) {
+    if (!this.connectedUsers[userId]) {
+      this.connectedUsers[userId] = [];
+    }
+    this.connectedUsers[userId].push(roomId);
+  }
+
+  private removeUserFromRoom(roomId: string, userId: string) {
+    const userRooms = this.connectedUsers[userId] || [];
+    const index = userRooms.indexOf(roomId);
+    if (index !== -1) {
+      userRooms.splice(index, 1);
+    }
   }
 }
