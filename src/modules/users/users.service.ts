@@ -3,6 +3,8 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
+  NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
 import { hashSync } from 'bcrypt';
@@ -110,16 +112,47 @@ export class UsersService {
       .select('partners'); // Ensure only 'partners' is returned
   };
 
+  requestConnection = async (user: string, partner: string) => {
+    try {
+      const verifiedUser = await this.getInfo(user);
+      const verifiedPartner = await this.getInfo(partner);
+
+      if (!verifiedUser || !verifiedPartner)
+        throw new NotFoundException('USER_NOT_FOUND');
+
+      await this.userModel.findOneAndUpdate(
+        { _id: partner },
+        { $push: { connectionsRequests: user } },
+      );
+      return true;
+    } catch (error) {
+      Logger.error(error);
+      throw new NotAcceptableException(error);
+    }
+  };
+
   addPartner = async (user: string, partner: string) => {
-    const verifiedUser = await this.getInfo(partner);
+    try {
+      const verifiedUser = await this.getInfo(user);
+      const verifiedPartner = await this.getInfo(partner);
 
-    if (!verifiedUser) throw new NotFoundException('USER_NOT_FOUND');
+      if (!verifiedUser || !verifiedPartner)
+        throw new NotFoundException('USER_NOT_FOUND');
 
-    return this.userModel.findOneAndUpdate(
-      { _id: user },
-      { $push: { partners: partner } },
-      { new: true },
-    );
+      await this.userModel.findOneAndUpdate(
+        { _id: partner },
+        { $push: { partners: user } },
+      );
+
+      return this.userModel.findOneAndUpdate(
+        { _id: user },
+        { $push: { partners: partner } },
+        { new: true },
+      );
+    } catch (error) {
+      Logger.error(error);
+      throw new NotAcceptableException(error);
+    }
   };
 
   uploadImage = async (form: FormData): Promise<any> => {

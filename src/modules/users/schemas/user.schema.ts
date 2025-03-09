@@ -54,18 +54,24 @@ export class User {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     default: [],
     validate: [
-      (value: any) => value.length <= 1000,
-      'List of partners must not exceed 1000',
+      (value: any) => value.length <= 500,
+      'List of connections must not exceed 500',
     ],
   })
   partners: User[];
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    default: [],
+  })
+  connectionsRequests: User[];
 
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }],
     default: [],
     validate: [
       (value: any) => value.length <= 1000,
-      'List of games must not exceed 2000 items',
+      'List of games must not exceed 1000 items',
     ],
   })
   games: Game[];
