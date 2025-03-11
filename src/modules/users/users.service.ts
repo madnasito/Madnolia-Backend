@@ -79,15 +79,25 @@ export class UsersService {
     return {};
   };
 
-  searchUser = async (username: string) => {
+  searchUser(username: string, page: number = 1, limit: number = 5): Promise<User[]> {
     const regex = new RegExp(username, 'i');
 
-    return await this.userModel.find(
-      { username: regex, status: true },
-      { name: 1, username: 1, _id: 1, thumb: 1 },
-      { limit: 5 },
-    );
-  };
+    const skip = (page - 1) * limit;
+
+    return this.userModel
+      .find({
+        $or: [
+          { username: regex },
+          { name: regex }, // Buscar también en el campo 'name'
+        ],
+        status: true,
+      })
+      .select({ name: 1, username: 1, _id: 1, thumb: 1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .exec();
+  }
 
   resetNotifications = async (user: string) =>
     this.userModel.findOneAndUpdate(
