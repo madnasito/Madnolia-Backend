@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Scope } from '@nestjs/common';
 import { UsersService } from 'src/modules/users/users.service';
 
-@Injectable()
+@Injectable({ scope: Scope.DEFAULT })
 export class Users {
   users: Array<User>;
 
-  constructor(private usersService?: UsersService) {
+  constructor(private usersService: UsersService) {
     this.users = [];
   }
 

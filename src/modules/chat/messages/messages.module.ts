@@ -5,7 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Message, MessageSchema } from './schema/messages.schema';
 import { UsersModule } from 'src/modules/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
-import { Users } from './classes/user';
 import { MessagesController } from './messages.controller';
 import { ConfigService } from '@nestjs/config';
 
@@ -23,8 +22,8 @@ import { ConfigService } from '@nestjs/config';
       },
     }),
   ],
-  providers: [MessagesService, MessagesGateway, Users],
-  exports: [Users, MessagesService],
+  providers: [MessagesService, MessagesGateway],
+  exports: [MessagesService],
   controllers: [MessagesController],
 })
 export class MessagesModule {}

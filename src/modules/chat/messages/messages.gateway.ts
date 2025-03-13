@@ -22,8 +22,9 @@ import { UserGuard } from 'src/common/guards/user.guard';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dtos/create-message.dto';
 import { MessageDto } from './dtos/message.dto';
-import { Users } from './classes/user';
+import { Users } from '../../users/classes/user';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from 'src/modules/users/users.service';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -37,6 +38,7 @@ export class MessagesGateway
   constructor(
     private readonly messagesService: MessagesService,
     private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
     private users: Users,
   ) {}
 
