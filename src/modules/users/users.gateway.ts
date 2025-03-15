@@ -81,7 +81,7 @@ export class UsersGateway {
       client.emit('connection_rejected', requestId);
     } catch (error) {
       Logger.error(error);
-      throw new WsException(error);
+      throw new WsException('NOT_FOUND_REQUEST');
     }
   }
 
