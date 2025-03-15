@@ -8,19 +8,16 @@ import {
 } from '@nestjs/websockets';
 import { UsersService } from './users.service';
 import { UserSocketGuard } from 'src/common/guards/user-sockets.guard';
-import { Users } from './classes/user';
 import { Socket } from 'socket.io';
 import { ConnectionRequestService } from './connection-request/connection-request.service';
 import { ConnectionRequestStatus } from './connection-request/enums/connection-status.enum';
 import { Types } from 'mongoose';
-// import { Types } from 'mongoose';
 
 @WebSocketGateway()
 export class UsersGateway {
   constructor(
     private readonly usersService: UsersService,
     private readonly connectionRequestService: ConnectionRequestService,
-    private users: Users,
   ) {}
 
   @UseGuards(UserSocketGuard)
@@ -59,7 +56,7 @@ export class UsersGateway {
         connectionRequestDb.sender,
       );
 
-      client.emit('accept_connection', connectionRequestDb);
+      client.emit('connection_accepted', connectionRequestDb);
       return connectionRequestDb;
     } catch (error) {
       Logger.error(error);
@@ -72,12 +69,20 @@ export class UsersGateway {
   async rejectConnection(
     @MessageBody() requestId: Types.ObjectId,
     @Request() request: any,
+    @ConnectedSocket() client: Socket,
   ) {
-    return this.connectionRequestService.updateStatus(
-      requestId,
-      request.user,
-      ConnectionRequestStatus.REJECTED,
-    );
+    try {
+      await this.connectionRequestService.updateStatus(
+        requestId,
+        request.user,
+        ConnectionRequestStatus.REJECTED,
+      );
+
+      client.emit('connection_rejected', requestId);
+    } catch (error) {
+      Logger.error(error);
+      throw new WsException(error);
+    }
   }
 
   @UseGuards(UserSocketGuard)
