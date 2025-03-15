@@ -1,4 +1,4 @@
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import {
   BadRequestException,
   ConflictException,
@@ -49,6 +49,7 @@ export class UsersService {
 
   findOneByEmail = async (email: string): Promise<User | null> => {
     const user = await this.userModel.findOne({ email });
+    if (!user) throw new NotFoundException('USER_NOT_FOUND');
     return user;
   };
 
@@ -63,7 +64,7 @@ export class UsersService {
     return user;
   };
 
-  getInfo = async (user: string) =>
+  getInfo = async (user: Types.ObjectId) =>
     (await this.userModel.findOne({ _id: user, status: true })).toJSON();
 
   // getInvitations = async (user: string) => this.userModel.populate('')
@@ -79,7 +80,11 @@ export class UsersService {
     return {};
   };
 
-  searchUser(username: string, page: number = 1, limit: number = 5): Promise<User[]> {
+  searchUser(
+    username: string,
+    page: number = 1,
+    limit: number = 5,
+  ): Promise<User[]> {
     const regex = new RegExp(username, 'i');
 
     const skip = (page - 1) * limit;
@@ -122,7 +127,7 @@ export class UsersService {
       .select('partners'); // Ensure only 'partners' is returned
   };
 
-  requestConnection = async (user: string, partner: string) => {
+  requestConnection = async (user: Types.ObjectId, partner: Types.ObjectId) => {
     try {
       const verifiedUser = await this.getInfo(user);
       const verifiedPartner = await this.getInfo(partner);
@@ -141,24 +146,64 @@ export class UsersService {
     }
   };
 
-  addPartner = async (user: string, partner: string) => {
+  addPartner = async (user: Types.ObjectId, partner: Types.ObjectId) => {
     try {
       const verifiedUser = await this.getInfo(user);
       const verifiedPartner = await this.getInfo(partner);
 
-      if (!verifiedUser || !verifiedPartner)
+      if (!verifiedUser || !verifiedPartner) {
         throw new NotFoundException('USER_NOT_FOUND');
+      }
 
-      await this.userModel.findOneAndUpdate(
-        { _id: partner },
-        { $push: { partners: user } },
-      );
-
-      return this.userModel.findOneAndUpdate(
-        { _id: user },
+      // Add partner to user's partners array if not already present
+      const updatedUser = await this.userModel.findOneAndUpdate(
+        { _id: user, partners: { $ne: partner } }, // $ne means "not equal"
         { $push: { partners: partner } },
         { new: true },
       );
+
+      // Add user to partner's partners array if not already present
+      await this.userModel.findOneAndUpdate(
+        { _id: partner, partners: { $ne: user } },
+        { $push: { partners: user } },
+      );
+
+      if (!updatedUser) {
+        //If no update occured, it means the partner was already in user's partner list.
+        return this.getInfo(user); //Return the user info.
+      }
+      return updatedUser;
+    } catch (error) {
+      Logger.error(error);
+      throw new NotAcceptableException(error);
+    }
+  };
+  removePartner = async (user: Types.ObjectId, partner: Types.ObjectId) => {
+    try {
+      const verifiedUser = await this.getInfo(user);
+      const verifiedPartner = await this.getInfo(partner);
+
+      if (!verifiedUser || !verifiedPartner) {
+        throw new NotFoundException('USER_NOT_FOUND');
+      }
+      // Remove partner from user's partners array
+      const updatedUser = await this.userModel.findOneAndUpdate(
+        { _id: user },
+        { $pull: { partners: partner } },
+        { new: true },
+      );
+
+      // Remove user from partner's partners array
+      await this.userModel.findOneAndUpdate(
+        { _id: partner },
+        { $pull: { partners: user } },
+      );
+
+      if (!updatedUser) {
+        // If no update occurred, it means the partner was not in the user's partner list.
+        return this.getInfo(user); // Return the user info.
+      }
+      return updatedUser;
     } catch (error) {
       Logger.error(error);
       throw new NotAcceptableException(error);

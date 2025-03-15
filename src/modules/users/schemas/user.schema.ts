@@ -61,12 +61,6 @@ export class User {
   partners: User[];
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    default: [],
-  })
-  connectionsRequests: User[];
-
-  @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }],
     default: [],
     validate: [
