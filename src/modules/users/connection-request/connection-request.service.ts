@@ -77,18 +77,22 @@ export class ConnectionRequestService {
     userId: Types.ObjectId,
   ): Promise<ConnectionRequest[]> {
     return this.connectionRequestModel
-      .find({ sender: userId })
-      .populate('receiver')
+      .find({ sender: userId, status: ConnectionRequestStatus.PENDING })
       .exec();
   }
 
   async findRequestsByUser(
     userId: Types.ObjectId,
   ): Promise<ConnectionRequest[]> {
-    return this.connectionRequestModel
-      .find({ $or: [{ sender: userId }, { receiver: userId }] })
-      .populate('sender')
-      .populate('receiver')
-      .exec();
+    return (
+      this.connectionRequestModel
+        .find({
+          $or: [{ sender: userId }, { receiver: userId }],
+          status: ConnectionRequestStatus.PENDING,
+        })
+        // .populate('sender')
+        // .populate('receiver')
+        .exec()
+    );
   }
 }

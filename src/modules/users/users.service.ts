@@ -12,10 +12,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import axios from 'axios';
 import { SignUpDto } from '../auth/dtos/sign-up.dtio';
+// import { ConnectionRequestStatus } from './connection-request/enums/connection-status.enum';
+import { ConnectionRequestService } from './connection-request/connection-request.service';
+import { ConnectionStatus } from './enums/connection-status.enum';
+// import { SimpleUser } from './classes/simple-user';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private readonly connectionRequestService: ConnectionRequestService,
+  ) {}
 
   create = async (signUpDto: SignUpDto): Promise<User> => {
     const emailDb = await this.findOneByEmail(signUpDto.email);
@@ -49,7 +56,6 @@ export class UsersService {
 
   findOneByEmail = async (email: string): Promise<User | null> => {
     const user = await this.userModel.findOne({ email });
-    if (!user) throw new NotFoundException('USER_NOT_FOUND');
     return user;
   };
 
@@ -80,21 +86,32 @@ export class UsersService {
     return {};
   };
 
-  searchUser(
-    username: string,
+  async searchUser(
+    userId: Types.ObjectId,
+    query: string,
     page: number = 1,
     limit: number = 5,
-  ): Promise<User[]> {
-    const regex = new RegExp(username, 'i');
-
+  ): Promise<any> {
+    const regex = new RegExp(query, 'i');
     const skip = (page - 1) * limit;
 
-    return this.userModel
+    const userInfo = await this.userModel.findOne({ _id: userId });
+    const partners = userInfo?.partners || [];
+
+    const userRequests =
+      await this.connectionRequestService.findRequestsByUser(userId);
+
+    const requestsReceived = userRequests
+      .filter((request) => request.receiver.equals(userInfo._id))
+      .map((request) => request.sender);
+
+    const requestsSended = userRequests
+      .filter((request) => request.sender.equals(userInfo._id))
+      .map((request) => request.receiver);
+
+    const foundUsers = await this.userModel
       .find({
-        $or: [
-          { username: regex },
-          { name: regex }, // Buscar también en el campo 'name'
-        ],
+        $or: [{ username: regex }, { name: regex }],
         status: true,
       })
       .select({ name: 1, username: 1, _id: 1, thumb: 1 })
@@ -102,6 +119,35 @@ export class UsersService {
       .limit(limit)
       .lean()
       .exec();
+
+    const results = foundUsers.map((foundUser) => {
+      const connectionUser: any = foundUser;
+      connectionUser.connection = ConnectionStatus.NONE;
+
+      if (
+        partners.some((partnerId: Types.ObjectId) =>
+          partnerId.equals(foundUser._id),
+        )
+      ) {
+        connectionUser.connection = ConnectionStatus.PARTNER;
+      } else if (
+        requestsSended.some((senderId: Types.ObjectId) =>
+          senderId.equals(foundUser._id),
+        )
+      ) {
+        connectionUser.connection = ConnectionStatus.REQUEST_SENT;
+      } else if (
+        requestsReceived.some((receiverId: Types.ObjectId) =>
+          receiverId.equals(foundUser._id),
+        )
+      ) {
+        connectionUser.connection = ConnectionStatus.REQUEST_RECEIVED;
+      }
+
+      return connectionUser;
+    });
+
+    return results;
   }
 
   resetNotifications = async (user: string) =>

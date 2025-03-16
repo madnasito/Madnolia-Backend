@@ -35,9 +35,10 @@ export class UserController {
     private readonly config: ConfigService,
   ) {}
 
+  @UseGuards(UserGuard)
   @Get('search/:username')
-  async search(@Param('username') username: string) {
-    return this.usersService.searchUser(username);
+  async search(@Request() req: any, @Param('username') username: string) {
+    return this.usersService.searchUser(req.user.id, username);
   }
 
   @Get('user-exists/:username/:email')

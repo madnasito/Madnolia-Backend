@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { Game } from 'src/modules/games/schemas/game.schema';
-import { Availability } from './availability.enum';
+import { Availability } from '../enums/availability.enum';
 
 export type UserDocument = HydratedDocument<User>;
 @Schema()
@@ -58,7 +58,7 @@ export class User {
       'List of connections must not exceed 500',
     ],
   })
-  partners: User[];
+  partners: Types.ObjectId[];
 
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }],
