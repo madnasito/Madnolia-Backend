@@ -43,16 +43,37 @@ export class ConnectionRequestService {
   findAll = async (): Promise<ConnectionRequest[]> =>
     this.connectionRequestModel.find().exec();
 
-  async updateStatus(
-    id: Types.ObjectId,
-    user: Types.ObjectId,
-    status: ConnectionRequestStatus.ACCEPTED | ConnectionRequestStatus.REJECTED,
+  async acceptConnection(
+    sender: Types.ObjectId,
+    receiver: Types.ObjectId,
   ): Promise<ConnectionRequest | null> {
     return this.connectionRequestModel.findOneAndUpdate(
-      { _id: id, receiver: user },
-      { status, updatedAt: new Date() },
+      { sender, receiver, status: ConnectionRequestStatus.PENDING },
+      { status: ConnectionRequestStatus.ACCEPTED, updatedAt: new Date() },
       { new: true },
     );
+  }
+
+  async rejectConnection(
+    sender: Types.ObjectId,
+    receiver: Types.ObjectId,
+  ): Promise<ConnectionRequest | null> {
+    return this.connectionRequestModel.findOneAndUpdate(
+      { sender, receiver, status: ConnectionRequestStatus.PENDING },
+      { status: ConnectionRequestStatus.REJECTED, updatedAt: new Date() },
+      { new: true },
+    );
+  }
+
+  async cancelConnection(
+    sender: Types.ObjectId,
+    receiver: Types.ObjectId,
+  ): Promise<ConnectionRequest | null> {
+    return this.connectionRequestModel.findOneAndDelete({
+      sender,
+      receiver,
+      status: ConnectionRequestStatus.PENDING,
+    });
   }
 
   async delete(id: Types.ObjectId): Promise<ConnectionRequest | null> {

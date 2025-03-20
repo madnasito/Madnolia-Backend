@@ -10,7 +10,6 @@ import { UsersService } from './users.service';
 import { UserSocketGuard } from 'src/common/guards/user-sockets.guard';
 import { Socket } from 'socket.io';
 import { ConnectionRequestService } from './connection-request/connection-request.service';
-import { ConnectionRequestStatus } from './connection-request/enums/connection-status.enum';
 import { Types } from 'mongoose';
 
 @WebSocketGateway()
@@ -40,16 +39,15 @@ export class UsersGateway {
   @UseGuards(UserSocketGuard)
   @SubscribeMessage('accept_connection')
   async acceptConnection(
-    @MessageBody() requestId: Types.ObjectId,
+    @MessageBody() sender: Types.ObjectId,
     @ConnectedSocket() client: Socket,
     @Request() request: any,
   ) {
     try {
       const connectionRequestDb =
-        await this.connectionRequestService.updateStatus(
-          requestId,
+        await this.connectionRequestService.acceptConnection(
+          sender,
           request.user,
-          ConnectionRequestStatus.ACCEPTED,
         );
       await this.usersService.addPartner(
         connectionRequestDb.receiver,
@@ -67,21 +65,44 @@ export class UsersGateway {
   @UseGuards(UserSocketGuard)
   @SubscribeMessage('reject_connection')
   async rejectConnection(
-    @MessageBody() requestId: Types.ObjectId,
-    @Request() request: any,
+    @MessageBody() sender: Types.ObjectId,
     @ConnectedSocket() client: Socket,
+    @Request() request: any,
   ) {
     try {
-      await this.connectionRequestService.updateStatus(
-        requestId,
-        request.user,
-        ConnectionRequestStatus.REJECTED,
-      );
+      const connectionRequestDb =
+        await this.connectionRequestService.rejectConnection(
+          sender,
+          request.user,
+        );
 
-      client.emit('connection_rejected', requestId);
+      client.emit('connection_rejected', connectionRequestDb);
+      return connectionRequestDb;
     } catch (error) {
       Logger.error(error);
-      throw new WsException('NOT_FOUND_REQUEST');
+      throw new WsException('NOT_FOUND_REQUEST_CONNECTION');
+    }
+  }
+
+  @UseGuards(UserSocketGuard)
+  @SubscribeMessage('cancel_connection')
+  async cancelConnection(
+    @MessageBody() requestedId: Types.ObjectId,
+    @ConnectedSocket() client: Socket,
+    @Request() request: any,
+  ) {
+    try {
+      const connectionRequestDb =
+        await this.connectionRequestService.cancelConnection(
+          request.user,
+          requestedId,
+        );
+
+      client.emit('canceled_connection', connectionRequestDb);
+      return connectionRequestDb;
+    } catch (error) {
+      Logger.error(error);
+      throw new WsException('NOT_FOUND_REQUEST_CONNECTION');
     }
   }
 

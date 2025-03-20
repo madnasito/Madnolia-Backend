@@ -115,9 +115,9 @@ export class UsersService {
         status: true,
       })
       .select({ name: 1, username: 1, _id: 1, thumb: 1 })
+      .lean()
       .skip(skip)
       .limit(limit)
-      .lean()
       .exec();
 
     const results = foundUsers.map((foundUser) => {
@@ -147,7 +147,24 @@ export class UsersService {
       return connectionUser;
     });
 
-    return results;
+    // Ordenar los resultados: partners primero
+    results.sort((a, b) => {
+      if (
+        a.connection === ConnectionStatus.PARTNER &&
+        b.connection !== ConnectionStatus.PARTNER
+      ) {
+        return -1; // 'a' va antes que 'b'
+      } else if (
+        a.connection !== ConnectionStatus.PARTNER &&
+        b.connection === ConnectionStatus.PARTNER
+      ) {
+        return 1; // 'b' va antes que 'a'
+      }
+      return 0; // Mantener el orden relativo si ambos tienen el mismo estado
+    });
+
+    // Aplicar paginación después de ordenar
+    return results.slice(skip, skip + limit);
   }
 
   resetNotifications = async (user: string) =>
