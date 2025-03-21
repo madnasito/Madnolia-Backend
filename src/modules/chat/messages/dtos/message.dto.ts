@@ -1,13 +1,12 @@
-import { IsMongoId, IsString } from "class-validator";
+import { IsMongoId, IsString } from 'class-validator';
 
 export class MessageDto {
-    @IsMongoId()
-    to: string;
+  @IsMongoId()
+  to: string;
 
-    @IsString()
-    text: string;
+  @IsString()
+  text: string;
 
-    @IsMongoId()
-    user: string;
-    
+  @IsMongoId()
+  user: string;
 }

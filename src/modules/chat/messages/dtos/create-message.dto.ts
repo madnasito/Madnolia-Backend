@@ -1,13 +1,10 @@
-
-import { WsException } from "@nestjs/websockets";
-import { IsMongoId, IsString } from "class-validator";
+import { WsException } from '@nestjs/websockets';
+import { IsMongoId, IsString } from 'class-validator';
 
 export class CreateMessageDto extends WsException {
-    @IsMongoId()
-    to: string;
+  @IsMongoId()
+  to: string;
 
-    @IsString()
-    text: string;
-
+  @IsString()
+  text: string;
 }
-
