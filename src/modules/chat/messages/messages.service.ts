@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Message } from './schema/messages.schema';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { MessageDto } from './dtos/message.dto';
 
 @Injectable()
@@ -19,6 +19,24 @@ export class MessagesService {
     const limit = 30;
     return this.messageModel.find(
       { to: room },
+      {},
+      {
+        limit: limit,
+        skip: skip * limit,
+        populate: { path: 'user', select: '_id name username thumb' },
+        sort: { _id: -1 },
+      },
+    );
+  }
+
+  getUserChatMessages(
+    user1: Types.ObjectId,
+    user2: Types.ObjectId,
+    limit: number = 50,
+    skip: number = 0,
+  ) {
+    return this.messageModel.find(
+      {},
       {},
       {
         limit: limit,

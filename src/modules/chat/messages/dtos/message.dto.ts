@@ -1,4 +1,5 @@
-import { IsMongoId, IsString } from 'class-validator';
+import { IsEnum, IsMongoId, IsString } from 'class-validator';
+import { MessageType } from '../enums/message-type.enum';
 
 export class MessageDto {
   @IsMongoId()
@@ -9,4 +10,7 @@ export class MessageDto {
 
   @IsMongoId()
   user: string;
+
+  @IsEnum(MessageType)
+  type: MessageType;
 }

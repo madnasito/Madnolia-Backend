@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { User } from 'src/modules/users/schemas/user.schema';
+import { MessageType } from '../enums/message-type.enum';
 
 export type MessageDocument = HydratedDocument<Message>;
 
@@ -28,6 +29,9 @@ export class Message {
     default: new Date(),
   })
   date: Date;
+
+  @Prop({ required: true })
+  type: MessageType;
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message);

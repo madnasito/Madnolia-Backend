@@ -104,6 +104,7 @@ export class MessagesGateway
         to: payload.to,
         user: request.user,
         text: payload.text,
+        type: payload.type,
       };
 
       const messageSaved = await this.messagesService.create(message);
