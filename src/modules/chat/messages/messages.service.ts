@@ -36,7 +36,12 @@ export class MessagesService {
     skip: number = 0,
   ) {
     return this.messageModel.find(
-      {},
+      {
+        $or: [
+          { user: user1, to: user2 },
+          { user: user2, to: user1 },
+        ],
+      },
       {},
       {
         limit: limit,

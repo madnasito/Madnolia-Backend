@@ -25,6 +25,7 @@ import { MessageDto } from './dtos/message.dto';
 import { Users } from '../../users/classes/user';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/modules/users/users.service';
+import { MessageType } from './enums/message-type.enum';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -128,7 +129,14 @@ export class MessagesGateway
 
       this.logger.debug(`${this.users.getUser(client.id).room}`);
 
-      client.to(payload.to).emit('message', payloadEvent);
+      if (message.type != MessageType.USER) {
+        client.to(payload.to).emit('message', payloadEvent);
+      } else {
+        const receiver = this.users.getUserById(payload.to);
+        if (receiver)
+          client.to(receiver.socketId).emit('message', payloadEvent);
+      }
+
       client.emit('message', payloadEvent);
     } catch (error) {
       console.log(error);
