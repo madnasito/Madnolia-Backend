@@ -5,6 +5,7 @@ import {
   UseGuards,
   Request,
   Body,
+  Post,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { UserGuard } from 'src/common/guards/user.guard';
@@ -22,7 +23,7 @@ export class MessagesController {
     return this.messagesService.getRoomMessages(id, parseInt(skip));
   }
 
-  @Get('chat')
+  @Post('chat')
   @UseGuards(UserGuard)
   async getChatMessages(@Request() req: any, @Body() body: UserChatDto) {
     return this.messagesService.getUserChatMessages(
