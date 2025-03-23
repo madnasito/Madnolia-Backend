@@ -32,7 +32,6 @@ export class MessagesService {
   getUserChatMessages(
     user1: Types.ObjectId,
     user2: Types.ObjectId,
-    limit: number = 50,
     skip: number = 0,
   ) {
     return this.messageModel.find(
@@ -44,9 +43,8 @@ export class MessagesService {
       },
       {},
       {
-        limit: limit,
-        skip: skip * limit,
-        populate: { path: 'user', select: '_id name username thumb' },
+        limit: 50,
+        skip: skip,
         sort: { _id: -1 },
       },
     );

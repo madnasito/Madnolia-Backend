@@ -29,7 +29,6 @@ export class MessagesController {
     return this.messagesService.getUserChatMessages(
       req.user.id,
       body.user,
-      body.limit,
       body.skip,
     );
   }

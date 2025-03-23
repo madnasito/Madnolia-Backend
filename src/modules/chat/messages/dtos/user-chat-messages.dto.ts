@@ -8,8 +8,4 @@ export class UserChatDto {
   @IsOptional()
   @IsInt()
   skip: number;
-
-  @IsOptional()
-  @IsInt()
-  limit: number;
 }
