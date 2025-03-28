@@ -107,7 +107,6 @@ export class MessagesGateway
         text: payload.text,
         type: payload.type,
       };
-
       const messageSaved = await this.messagesService.create(message);
       if (!messageSaved) throw new WsException('NO_MESSAGE');
 

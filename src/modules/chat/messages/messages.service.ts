@@ -43,8 +43,8 @@ export class MessagesService {
       },
       {},
       {
-        limit: 50,
-        skip: skip,
+        limit: 30,
+        skip: skip * 30,
         sort: { _id: -1 },
       },
     );
