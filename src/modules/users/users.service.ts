@@ -112,6 +112,7 @@ export class UsersService {
     const foundUsers = await this.userModel
       .find({
         $or: [{ username: regex }, { name: regex }],
+        $nor: [{ _id: userId }],
         status: true,
       })
       .select({ name: 1, username: 1, _id: 1, thumb: 1 })
