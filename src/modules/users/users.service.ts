@@ -70,6 +70,22 @@ export class UsersService {
     return user;
   };
 
+  fincOneMinimalById = async (id: string) => {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new NotFoundException('USER_NOT_FOUND');
+
+    const user = await this.userModel.findById(id, {
+      _id: 1,
+      name: 1,
+      username: 1,
+      thumb: 1,
+    });
+
+    if (!user) throw new NotFoundException('USER_NOT_FOUND');
+
+    return user;
+  };
+
   getInfo = async (user: Types.ObjectId) =>
     (await this.userModel.findOne({ _id: user, status: true })).toJSON();
 

@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
-import { User } from 'src/modules/users/schemas/user.schema';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { MessageType } from '../enums/message-type.enum';
 
 export type MessageDocument = HydratedDocument<Message>;
@@ -11,14 +10,14 @@ export class Message {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   })
-  to: string;
+  to: Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   })
-  user: User;
+  user: Types.ObjectId;
 
   @Prop({
     required: true,

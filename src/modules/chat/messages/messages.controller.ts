@@ -15,6 +15,12 @@ import { UserChatDto } from './dtos/user-chat-messages.dto';
 export class MessagesController {
   constructor(private messagesService: MessagesService) {}
 
+  @Get('')
+  @UseGuards(UserGuard)
+  async getChats(@Request() req: any) {
+    return this.messagesService.getUserChats(req.user.id);
+  }
+
   @Get('match')
   async getMatchMessages(
     @Query('match') id: string,
