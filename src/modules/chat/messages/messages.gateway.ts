@@ -118,12 +118,16 @@ export class MessagesGateway
         text,
         date,
         to: payload.to,
-        user: {
-          _id: user._id,
-          name: user.name,
-          username: user.username,
-          thumb: user.thumb,
-        },
+        user:
+          payload.type == MessageType.USER
+            ? request.user
+            : {
+                _id: user._id,
+                name: user.name,
+                username: user.username,
+                thumb: user.thumb,
+              },
+        type: payload.type,
       };
 
       this.logger.debug(`${this.users.getUser(client.id).room}`);

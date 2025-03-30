@@ -25,7 +25,7 @@ export class MessagesService {
       {},
       {
         limit: limit,
-        skip: skip * limit,
+        skip: skip,
         populate: { path: 'user', select: '_id name username thumb' },
         sort: { _id: -1 },
       },
@@ -111,7 +111,7 @@ export class MessagesService {
       {},
       {
         limit: 30,
-        skip: skip * 30,
+        skip: skip,
         sort: { _id: -1 },
       },
     );
