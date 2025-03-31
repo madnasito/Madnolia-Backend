@@ -80,9 +80,7 @@ export class UserController {
     @Request() req: any,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 1000 * 1024 }), // 2MB max size
-        ],
+        validators: [new MaxFileSizeValidator({ maxSize: 1000 * 1024 })],
       }),
     )
     img: Express.Multer.File,
@@ -95,36 +93,36 @@ export class UserController {
       }
 
       const form = new FormData();
-
       const apiKey = this.config.get<string>('IMGBB_KEY');
 
       form.append('file', new Blob([img.buffer], { type: img.mimetype }));
       form.append('apikey', apiKey);
 
-      return axios
-        .post('https://beeimg.com/api/upload/file/json/', form, {
+      const resp = await axios.post(
+        'https://beeimg.com/api/upload/file/json/',
+        form,
+        {
           headers: {
-            'Content-Type':
-              'multipart/form-data; boundary=<calculated when request is sent>',
+            'Content-Type': 'multipart/form-data', // Corrected Content-Type
           },
-        })
-        .then((resp) => {
-          console.log(resp);
-          if (
-            resp.data.files.status == 'Success' ||
-            resp.data.files.status == 'Duplicate'
-          ) {
-            return this.usersService.upadte(req.user.id, {
-              thumb: resp.data.files.thumbnail_url,
-              img: resp.data.files.url,
-            });
-          }
-          throw new BadRequestException();
-        })
-        .catch((err) => {
-          console.log(err);
-          throw new BadGatewayException();
+        },
+      );
+
+      if (
+        resp.data.files.status === 'Success' ||
+        resp.data.files.status === 'Duplicate'
+      ) {
+        await this.usersService.upadte(req.user.id, {
+          thumb: resp.data.files.thumbnail_url,
+          img: resp.data.files.url,
         });
+        return {
+          thumb: resp.data.files.thumbnail_url,
+          img: resp.data.files.url,
+        }; // Return a simple JSON response
+      }
+
+      throw new BadRequestException();
     } catch (error) {
       Logger.error(error);
       throw new BadGatewayException();
