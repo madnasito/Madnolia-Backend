@@ -70,7 +70,7 @@ export class UsersService {
     return user;
   };
 
-  fincOneMinimalById = async (id: string) => {
+  fincOneMinimalById = async (id: Types.ObjectId) => {
     if (!mongoose.Types.ObjectId.isValid(id))
       throw new NotFoundException('USER_NOT_FOUND');
 

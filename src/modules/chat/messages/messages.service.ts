@@ -32,8 +32,9 @@ export class MessagesService {
     );
   }
 
-  async getUserChats(userId: Types.ObjectId): Promise<any[]> {
+  async getUserChats(userId: Types.ObjectId): Promise<any> {
     try {
+      // 1. Fetch all messages sorted by date (newest first)
       const allMessages = await this.messageModel
         .find({
           $or: [
@@ -42,57 +43,65 @@ export class MessagesService {
           ],
         })
         .sort({ date: -1 })
-        // .populate('user', '_id name username thumb')
         .populate('to', '_id name username thumb')
+        .lean()
         .exec();
-
-      const chatUsers = new Map<string, any>();
-
-      allMessages.forEach((message) => {
+  
+      // 2. Group messages by chat partner (most recent message per chat)
+      const chatMap = new Map<string, { user: any; lastMessage: any }>();
+  
+      for (const message of allMessages) {
         const otherUserId = message.user.equals(userId)
           ? message.to._id.toString()
           : message.user._id.toString();
-
-        if (!chatUsers.has(otherUserId)) {
-          const otherUser = message.user.equals(userId)
-            ? message.to
-            : message.user;
-          chatUsers.set(otherUserId, {
+  
+        if (!chatMap.has(otherUserId)) {
+          const otherUser = message.user.equals(userId) ? message.to : message.user;
+          chatMap.set(otherUserId, {
             user: otherUser,
             lastMessage: message,
           });
         }
-      });
-
-      const chats = Array.from(chatUsers.values()).map((chat) => ({
-        user: chat.user,
-        lastMessage: chat.lastMessage,
-      }));
-
-      // Ensure the 'user' in the chat is always the other user and populate it
-      const finalChats = await Promise.all(
-        chats.map(async (chat) => {
-          const otherUser = chat.user._id.equals(userId)
-            ? chat.lastMessage.user._id.equals(userId)
-              ? chat.lastMessage.to
-              : chat.lastMessage.user
-            : chat.user;
-
-          const populatedUser = await this.usersService.fincOneMinimalById(
-            otherUser._id,
-          );
-
-          return {
+      }
+  
+      // 3. Process and populate user data
+      const chats = Array.from(chatMap.values());
+      const finalChats = [];
+  
+      for (const chat of chats) {
+        try {
+          // Determine the correct other user
+          let otherUser: Types.ObjectId;
+          if (chat.user._id.equals(userId)) {
+            otherUser = chat.lastMessage.user.equals(userId)
+              ? chat.lastMessage.to._id
+              : chat.lastMessage.user._id;
+          } else {
+            otherUser = chat.user._id;
+          }
+  
+          // Populate user data
+          const populatedUser = await this.usersService.fincOneMinimalById(otherUser);
+  
+          finalChats.push({
             user: populatedUser,
             lastMessage: chat.lastMessage,
-          };
-        }),
+          });
+        } catch (error) {
+          Logger.error(`Error processing chat for user ${chat.user._id}: ${error}`);
+          continue;
+        }
+      }
+  
+      // 4. Sort chats by most recent message date
+      finalChats.sort((a, b) => 
+        new Date(b.lastMessage.date).getTime() - new Date(a.lastMessage.date).getTime()
       );
-
+  
       return finalChats;
     } catch (error) {
-      Logger.error(error);
-      throw error;
+      Logger.error(`Failed to get user chats: ${error}`);
+      throw new Error('Failed to retrieve chat list');
     }
   }
 
