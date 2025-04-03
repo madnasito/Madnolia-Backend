@@ -34,7 +34,12 @@ export class Notification {
   @Prop({
     type: String,
   })
-  subTitle: string;
+  subtitle: string;
+
+  @Prop({
+    type: String,
+  })
+  path: string;
 
   @Prop({
     type: Boolean,
