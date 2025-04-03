@@ -13,6 +13,9 @@ import { NewMatchDto } from './dtos/new-match.dto';
 import { MessagesService } from 'src/modules/chat/messages/messages.service';
 import { MatchStatus } from './enums/status.enum';
 import { UpdateMatchDto } from './dtos/update-match.dto';
+import { NotificationsService } from '../notifications/notifications.service';
+import { CreateNotificationDto } from '../notifications/dtos/create-notification.dto';
+import { NotificationType } from '../notifications/enums/notification-type.enum';
 
 @Injectable()
 export class MatchesService {
@@ -20,6 +23,7 @@ export class MatchesService {
     @InjectModel(Match.name) private matchModel: Model<Match>,
     private readonly gamesService: GamesService,
     private readonly messagesService: MessagesService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   create = async (createMatchDto: CreateMatchDto, user: string) => {
@@ -45,6 +49,19 @@ export class MatchesService {
     const matchDb = await createdMatch.save();
 
     // await this.gamesService.increaseAmountInPlatform(gameData.gameId, createMatchDto.platform)
+
+    matchDb.inviteds.forEach(async (element) => {
+      const newNotification: CreateNotificationDto = {
+        path: matchDb.id,
+        title: 'Invitation',
+        thumb: gameData.background,
+        type: NotificationType.INVITATION,
+        user: element,
+        subtitle: '',
+      };
+
+      await this.notificationsService.create(newNotification);
+    });
 
     return matchDb;
   };

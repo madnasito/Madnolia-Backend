@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { Game } from 'src/modules/games/schemas/game.schema';
 import { Group } from 'src/modules/groups/schema/group.schema';
 import { User } from 'src/modules/users/schemas/user.schema';
@@ -31,7 +31,7 @@ export class Match {
     ref: 'User',
     required: true,
   })
-  user: User;
+  user: Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -43,7 +43,7 @@ export class Match {
     required: true,
     type: [mongoose.Schema.Types.ObjectId],
   })
-  inviteds: Array<User>;
+  inviteds: Array<Types.ObjectId>;
 
   @Prop({
     default: 'Casual',
