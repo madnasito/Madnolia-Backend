@@ -20,6 +20,20 @@ export class NotificationsService {
   deleteById = (id: Types.ObjectId) =>
     this.notificationModel.findOneAndDelete({ id });
 
+  deleteRequestConnection = (
+    sender: Types.ObjectId,
+    receiver: Types.ObjectId,
+  ) =>
+    this.notificationModel.findOneAndDelete(
+      {
+        $or: [
+          { user: sender, path: receiver },
+          { user: receiver, path: sender },
+        ],
+      },
+      { new: true },
+    );
+
   readAllUserNotifications = (user: Types.ObjectId) =>
     this.notificationModel.updateMany({ user }, { read: true });
 

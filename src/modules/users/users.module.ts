@@ -7,11 +7,13 @@ import { UserGuard } from '../../common/guards/user.guard';
 import { UsersGateway } from './users.gateway';
 import { Users } from './classes/user';
 import { ConnectionRequestModule } from './connection-request/connection-request.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     ConnectionRequestModule,
+    NotificationsModule,
   ],
   controllers: [UserController],
   providers: [UsersService, UserGuard, UsersGateway, Users],

@@ -11,12 +11,16 @@ import { UserSocketGuard } from 'src/common/guards/user-sockets.guard';
 import { Socket } from 'socket.io';
 import { ConnectionRequestService } from './connection-request/connection-request.service';
 import { Types } from 'mongoose';
+import { NotificationsService } from '../notifications/notifications.service';
+import { CreateNotificationDto } from '../notifications/dtos/create-notification.dto';
+import { NotificationType } from '../notifications/enums/notification-type.enum';
 
 @WebSocketGateway()
 export class UsersGateway {
   constructor(
     private readonly usersService: UsersService,
     private readonly connectionRequestService: ConnectionRequestService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   @UseGuards(UserSocketGuard)
@@ -27,11 +31,25 @@ export class UsersGateway {
     @Request() request: any,
   ) {
     const requested = await this.usersService.fincOneById(requestedUser);
+    const { name, thumb, id, username } = await this.usersService.fincOneById(
+      request.user,
+    );
     if (!requested) throw new WsException('USER_NOT_FOUND');
     const requestDb = await this.connectionRequestService.create(
       request.user,
       requested.id,
     );
+
+    const newNotification: CreateNotificationDto = {
+      user: requested.id,
+      type: NotificationType.REQUEST,
+      title: name,
+      thumb,
+      subtitle: username,
+      path: id,
+    };
+
+    await this.notificationsService.create(newNotification);
     client.emit('new_request_connection', requestDb);
     return requestDb;
   }
@@ -50,6 +68,11 @@ export class UsersGateway {
           request.user,
         );
       await this.usersService.addPartner(
+        connectionRequestDb.receiver,
+        connectionRequestDb.sender,
+      );
+
+      await this.notificationsService.deleteRequestConnection(
         connectionRequestDb.receiver,
         connectionRequestDb.sender,
       );
@@ -76,6 +99,10 @@ export class UsersGateway {
           request.user,
         );
 
+      await this.notificationsService.deleteRequestConnection(
+        sender,
+        request.user,
+      );
       client.emit('connection_rejected', connectionRequestDb);
       return connectionRequestDb;
     } catch (error) {
@@ -97,6 +124,11 @@ export class UsersGateway {
           request.user,
           requestedId,
         );
+
+      await this.notificationsService.deleteRequestConnection(
+        request.user,
+        requestedId,
+      );
 
       client.emit('canceled_connection', connectionRequestDb);
       return connectionRequestDb;

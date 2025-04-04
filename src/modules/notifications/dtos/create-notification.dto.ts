@@ -2,6 +2,7 @@ import {
   IsEnum,
   IsMongoId,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsUrl,
 } from 'class-validator';
@@ -21,6 +22,7 @@ export class CreateNotificationDto {
   @IsString()
   title: string;
 
+  @IsOptional()
   @IsString()
   subtitle: string;
 

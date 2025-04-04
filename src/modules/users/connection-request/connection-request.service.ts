@@ -7,12 +7,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ConnectionRequest } from './schemas/connection-request.schema';
 import { Model, Types } from 'mongoose';
 import { ConnectionRequestStatus } from './enums/connection-status.enum';
+import { NotificationsService } from 'src/modules/notifications/notifications.service';
 
 @Injectable()
 export class ConnectionRequestService {
   constructor(
     @InjectModel(ConnectionRequest.name)
     private connectionRequestModel: Model<ConnectionRequest>,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(
@@ -34,6 +36,7 @@ export class ConnectionRequestService {
       sender,
       receiver,
     });
+
     return createdRequest.save();
   }
 
