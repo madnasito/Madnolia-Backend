@@ -24,5 +24,5 @@ export class NotificationsService {
     this.notificationModel.updateMany({ user }, { read: true });
 
   getUserNotifications = (user: Types.ObjectId) =>
-    this.notificationModel.find({ user });
+    this.notificationModel.find({ user }).exec();
 }
