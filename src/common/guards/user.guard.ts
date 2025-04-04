@@ -8,6 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { Types } from 'mongoose';
 @Injectable()
 export class UserGuard implements CanActivate {
   constructor(
@@ -25,7 +26,7 @@ export class UserGuard implements CanActivate {
 
     try {
       const secret = this.config.get<string>('JWT_SECRET');
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload: Types.ObjectId = await this.jwtService.verifyAsync(token, {
         secret,
       });
       // 💡 We're assigning the payload to the request object here

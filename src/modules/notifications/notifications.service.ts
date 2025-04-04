@@ -11,10 +11,10 @@ export class NotificationsService {
     private notificationModel: Model<Notification>,
   ) {}
 
-  create(payload: CreateNotificationDto) {
+  async create(payload: CreateNotificationDto) {
     const newNotification = new this.notificationModel(payload);
 
-    return newNotification.save();
+    return await newNotification.save();
   }
 
   deleteById = (id: Types.ObjectId) =>
@@ -23,6 +23,10 @@ export class NotificationsService {
   readAllUserNotifications = (user: Types.ObjectId) =>
     this.notificationModel.updateMany({ user }, { read: true });
 
-  getUserNotifications = (user: Types.ObjectId) =>
-    this.notificationModel.find({ user }).exec();
+  getUserNotifications = async (
+    user: Types.ObjectId,
+  ): Promise<Array<Notification>> => {
+    await this.readAllUserNotifications(user);
+    return this.notificationModel.find({ user });
+  };
 }
