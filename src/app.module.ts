@@ -17,6 +17,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { AppVersionModule } from './modules/app-version/app-version.module';
 import { GroupsModule } from './modules/groups/groups.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { MailModule } from './modules/mail/mail.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -54,6 +55,7 @@ import { ChatModule } from './modules/chat/chat.module';
     AppVersionModule,
     GroupsModule,
     ChatModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [
