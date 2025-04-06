@@ -14,6 +14,7 @@ import { Types } from 'mongoose';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CreateNotificationDto } from '../notifications/dtos/create-notification.dto';
 import { NotificationType } from '../notifications/enums/notification-type.enum';
+import { Users } from './classes/user';
 
 @WebSocketGateway()
 export class UsersGateway {
@@ -21,6 +22,7 @@ export class UsersGateway {
     private readonly usersService: UsersService,
     private readonly connectionRequestService: ConnectionRequestService,
     private readonly notificationsService: NotificationsService,
+    private users: Users,
   ) {}
 
   @UseGuards(UserSocketGuard)
@@ -51,6 +53,12 @@ export class UsersGateway {
 
     await this.notificationsService.create(newNotification);
     client.emit('new_request_connection', requestDb);
+
+    const requestedUserSocket = this.users.getUserById(requestedUser);
+    if (requestedUser)
+      client
+        .to(requestedUserSocket.socketId)
+        .emit('new_request_connection', requestDb);
     return requestDb;
   }
 

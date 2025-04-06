@@ -1,10 +1,10 @@
-import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+import { WebSocketGateway } from '@nestjs/websockets';
 
 @WebSocketGateway()
 export class NotificationsGateway {
-  @SubscribeMessage('message')
+  // @SubscribeMessage('message')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handleMessage(client: any, payload: any): string {
-    return 'Hello world!';
-  }
+  // handleMessage(client: any, payload: any): string {
+  //   return 'Hello world!';
+  // }
 }
