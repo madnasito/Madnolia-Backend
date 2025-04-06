@@ -1,0 +1,20 @@
+---
+deployment:
+  tasks:
+    - export NODE_VERSION=22 # O la versión que necesites
+    - /opt/alt/alt-nodejs$NODE_VERSION/bin/npm install
+    - /opt/alt/alt-nodejs$NODE_VERSION/bin/npm run build
+    - touch tmp/restart.txt
+
+application:
+  name: madnolia-backend
+  version: 0.0.1
+  type: nodejs
+  node_version: 22 # Asegúrate de usar una versión compatible con tus dependencias
+  worker_memory: 512 # En MB, ajusta según necesidades
+  worker_threads: 1
+  auto_restart: true
+  http2: false
+  environment_variables:
+    NODE_ENV: production
+    PORT: 3000 # Asegúrate que coincide con el puerto en tu aplicación
