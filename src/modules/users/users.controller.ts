@@ -86,7 +86,7 @@ export class UserController {
     img: Express.Multer.File,
   ) {
     try {
-      const validExtension = ['jpg', 'jpeg', 'png'];
+      const validExtension = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
       const extension = img.mimetype.split('/')[1];
       if (!validExtension.includes(extension)) {
         throw new HttpException('NOT_VALID_EXTENSION', HttpStatus.BAD_REQUEST);
