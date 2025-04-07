@@ -6,7 +6,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 export class MailController {
   constructor(private readonly mailService: MailService) {}
 
-  @Get('')
+  @Get('reset-password')
   async resetPassword(@Body() body: ResetPasswordDto) {
     return await this.mailService.sendEmail(
       'Reset password',
