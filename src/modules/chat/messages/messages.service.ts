@@ -36,6 +36,10 @@ export class MessagesService {
 
   async getUserChats(userId: Types.ObjectId): Promise<any> {
     try {
+      // OBtener todas las amistades del usuario, luego tomas sus id, luego buscar en messages en base al id, que sea
+      // el de la sala, pero tomar solamente un solo campo y luego hacer que no se repita los to para que solo tome uno
+      // (el primero) y agregar un populate del usuario que no sea el del request a cada dato del array
+
       // 1. Obtener todas las amistades del usuario
       const friendships =
         await this.friendshipService.findFriendshipsByUser(userId);
@@ -48,7 +52,7 @@ export class MessagesService {
       const friendshipIds = friendships.map((friendship) => friendship.id);
 
       // 4. Buscar mensajes asociados a estas amistades
-      const allMessages = await this.messageModel
+      const allMessages: any = await this.messageModel
         .find({
           to: { $in: friendshipIds },
           type: MessageType.USER,

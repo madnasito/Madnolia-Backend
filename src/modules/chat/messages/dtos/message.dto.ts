@@ -1,15 +1,16 @@
 import { IsEnum, IsMongoId, IsString } from 'class-validator';
 import { MessageType } from '../enums/message-type.enum';
+import { Types } from 'mongoose';
 
 export class MessageDto {
   @IsMongoId()
-  to: string;
+  to: Types.ObjectId;
 
   @IsString()
   text: string;
 
   @IsMongoId()
-  user: string;
+  user: Types.ObjectId;
 
   @IsEnum(MessageType)
   type: MessageType;

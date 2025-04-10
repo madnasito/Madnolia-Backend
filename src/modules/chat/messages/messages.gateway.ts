@@ -26,6 +26,7 @@ import { Users } from '../../users/classes/user';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/modules/users/users.service';
 import { MessageType } from './enums/message-type.enum';
+import { FriendshipService } from 'src/modules/friendship/friendship.service';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -40,6 +41,7 @@ export class MessagesGateway
     private readonly messagesService: MessagesService,
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
+    private readonly friendshipService: FriendshipService,
     private users: Users,
   ) {}
 
@@ -133,11 +135,15 @@ export class MessagesGateway
       this.logger.debug(`${this.users.getUser(client.id).room}`);
 
       if (message.type != MessageType.USER) {
-        client.to(payload.to).emit('message', payloadEvent);
+        client.to(payload.to.toString()).emit('message', payloadEvent);
       } else {
-        const receiver = this.users.getUserById(payload.to);
-        if (receiver)
-          client.to(receiver.socketId).emit('message', payloadEvent);
+        const friendship = await this.friendshipService.findFriendshipByUsers(
+          message.user,
+          payload.to,
+        );
+        if (friendship) {
+          client.broadcast.to(friendship.id).emit('message', payloadEvent);
+        }
       }
 
       client.emit('message', payloadEvent);
