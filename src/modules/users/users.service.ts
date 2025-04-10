@@ -17,6 +17,7 @@ import { ConnectionRequestService } from './connection-request/connection-reques
 import { ConnectionStatus } from './enums/connection-status.enum';
 import { FriendshipService } from '../friendship/friendship.service';
 import { FriendshipStatus } from '../friendship/enums/friendship-status.enum';
+import { Friendship } from '../friendship/schemas/friendship.schema';
 // import { SimpleUser } from './classes/simple-user';
 
 @Injectable()
@@ -117,8 +118,8 @@ export class UsersService {
     const userInfo = await this.userModel.findOne({ _id: userId });
 
     const partners = (
-      await this.frienshipService.findFriendshipByUser(userId)
-    ).map((e) => (e.user1 != userInfo.id ? e.user1 : e.user2));
+      await this.frienshipService.findFriendshipsByUser(userId)
+    ).map((e: Friendship) => (e.user1 != userInfo.id ? e.user1 : e.user2));
 
     const userRequests =
       await this.connectionRequestService.findRequestsByUser(userId);

@@ -7,11 +7,13 @@ import { UsersModule } from 'src/modules/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { MessagesController } from './messages.controller';
 import { ConfigService } from '@nestjs/config';
+import { FriendshipModule } from 'src/modules/friendship/friendship.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Message.name, schema: MessageSchema }]),
     UsersModule,
+    FriendshipModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {

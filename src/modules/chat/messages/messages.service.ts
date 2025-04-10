@@ -5,12 +5,14 @@ import mongoose, { Model, Types } from 'mongoose';
 import { MessageDto } from './dtos/message.dto';
 import { MessageType } from './enums/message-type.enum';
 import { UsersService } from 'src/modules/users/users.service';
+import { FriendshipService } from 'src/modules/friendship/friendship.service';
 
 @Injectable()
 export class MessagesService {
   constructor(
     @InjectModel(Message.name) private messageModel: Model<Message>,
     private readonly usersService: UsersService,
+    private readonly friendshipService: FriendshipService,
   ) {}
 
   create(createMessageDto: MessageDto) {
@@ -34,71 +36,67 @@ export class MessagesService {
 
   async getUserChats(userId: Types.ObjectId): Promise<any> {
     try {
-      // 1. Fetch all messages sorted by date (newest first)
+      // 1. Obtener todas las amistades del usuario
+      const friendships =
+        await this.friendshipService.findFriendshipsByUser(userId);
+      // 2. Si no tiene amigos, retornar array vacío
+      if (friendships.length === 0) {
+        return [];
+      }
+
+      // 3. Obtener IDs de las amistades
+      const friendshipIds = friendships.map((friendship) => friendship.id);
+
+      // 4. Buscar mensajes asociados a estas amistades
       const allMessages = await this.messageModel
         .find({
-          $or: [
-            { user: userId, type: MessageType.USER },
-            { to: userId, type: MessageType.USER },
-          ],
+          to: { $in: friendshipIds },
+          type: MessageType.USER,
         })
         .sort({ date: -1 })
-        .populate('to', '_id name username thumb')
+        .populate('user', '_id name username thumb')
+        .populate({
+          path: 'to',
+          populate: {
+            path: 'user1 user2',
+            select: '_id name username thumb',
+          },
+        })
         .lean()
         .exec();
 
-      // 2. Group messages by chat partner (most recent message per chat)
-      const chatMap = new Map<string, { user: any; lastMessage: any }>();
+      // 5. Procesar los mensajes y agrupar por amistad
+      const chatMap = new Map<
+        string,
+        { friendship: any; lastMessage: any; otherUser: any }
+      >();
 
       for (const message of allMessages) {
-        const otherUserId = message.user.equals(userId)
-          ? message.to._id.toString()
-          : message.user._id.toString();
+        const friendship = message.to;
+        const otherUser = friendship.user1._id.equals(userId)
+          ? friendship.user2
+          : friendship.user1;
 
-        if (!chatMap.has(otherUserId)) {
-          const otherUser = message.user.equals(userId)
-            ? message.to
-            : message.user;
-          chatMap.set(otherUserId, {
-            user: otherUser,
+        if (!chatMap.has(friendship._id.toString())) {
+          chatMap.set(friendship._id.toString(), {
+            friendship: friendship,
             lastMessage: message,
+            otherUser: otherUser,
           });
         }
       }
 
-      // 3. Process and populate user data
-      const chats = Array.from(chatMap.values());
-      const finalChats = [];
+      // 6. Construir la lista final de chats
+      const finalChats = Array.from(chatMap.values()).map((chat) => ({
+        friendship: {
+          _id: chat.friendship._id,
+          // Puedes incluir más datos de la amistad si es necesario
+        },
+        user: chat.otherUser,
+        lastMessage: chat.lastMessage,
+      }));
 
-      for (const chat of chats) {
-        try {
-          // Determine the correct other user
-          let otherUser: Types.ObjectId;
-          if (chat.user._id.equals(userId)) {
-            otherUser = chat.lastMessage.user.equals(userId)
-              ? chat.lastMessage.to._id
-              : chat.lastMessage.user._id;
-          } else {
-            otherUser = chat.user._id;
-          }
-
-          // Populate user data
-          const populatedUser =
-            await this.usersService.fincOneMinimalById(otherUser);
-
-          finalChats.push({
-            user: populatedUser,
-            lastMessage: chat.lastMessage,
-          });
-        } catch (error) {
-          Logger.error(
-            `Error processing chat for user ${chat.user._id}: ${error}`,
-          );
-          continue;
-        }
-      }
-
-      // 4. Sort chats by most recent message date
+      // 7. Ordenar chats por fecha del último mensaje (más reciente primero)
       finalChats.sort(
         (a, b) =>
           new Date(b.lastMessage.date).getTime() -
@@ -112,17 +110,21 @@ export class MessagesService {
     }
   }
 
-  getUserChatMessages(
+  async getUserChatMessages(
     user1: Types.ObjectId,
     user2: Types.ObjectId,
     skip: number = 0,
   ) {
+    const friendshipDb = await this.friendshipService.findFriendshipByUsers(
+      user1,
+      user2,
+    );
+
+    if (!friendshipDb) throw new NotFoundException();
+
     return this.messageModel.find(
       {
-        $or: [
-          { user: user1, to: user2 },
-          { user: user2, to: user1 },
-        ],
+        to: friendshipDb.id,
       },
       {},
       {

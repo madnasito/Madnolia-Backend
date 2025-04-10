@@ -25,6 +25,7 @@ export class FriendshipService {
     return createFrindship.save();
   }
 
+  // Get friendship between two users
   findFriendshipByUsers(user1: Types.ObjectId, user2: Types.ObjectId) {
     return this.friendshipModel.findOne({
       $or: [
@@ -34,7 +35,8 @@ export class FriendshipService {
     });
   }
 
-  findFriendshipByUser(user: Types.ObjectId) {
+  // Get all user friendships
+  findFriendshipsByUser(user: Types.ObjectId) {
     return this.friendshipModel.find({
       $or: [{ user1: user }, { user2: user }],
     });
