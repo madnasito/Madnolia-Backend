@@ -18,6 +18,7 @@ import { AppVersionModule } from './modules/app-version/app-version.module';
 import { GroupsModule } from './modules/groups/groups.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { MailModule } from './modules/mail/mail.module';
+import { FriendshipModule } from './modules/friendship/friendship.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -56,6 +57,7 @@ import { MailModule } from './modules/mail/mail.module';
     GroupsModule,
     ChatModule,
     MailModule,
+    FriendshipModule,
   ],
   controllers: [AppController],
   providers: [

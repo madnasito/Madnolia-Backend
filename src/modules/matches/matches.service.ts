@@ -206,7 +206,7 @@ export class MatchesService {
     return results;
   };
 
-  getMatchesWithUserJoined = (userId: string): Promise<Match[]> =>
+  getMatchesWithUserJoined = (userId: string) =>
     this.matchModel.find(
       { joined: userId },
       {},

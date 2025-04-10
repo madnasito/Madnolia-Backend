@@ -46,28 +46,30 @@ export class MessagesService {
         .populate('to', '_id name username thumb')
         .lean()
         .exec();
-  
+
       // 2. Group messages by chat partner (most recent message per chat)
       const chatMap = new Map<string, { user: any; lastMessage: any }>();
-  
+
       for (const message of allMessages) {
         const otherUserId = message.user.equals(userId)
           ? message.to._id.toString()
           : message.user._id.toString();
-  
+
         if (!chatMap.has(otherUserId)) {
-          const otherUser = message.user.equals(userId) ? message.to : message.user;
+          const otherUser = message.user.equals(userId)
+            ? message.to
+            : message.user;
           chatMap.set(otherUserId, {
             user: otherUser,
             lastMessage: message,
           });
         }
       }
-  
+
       // 3. Process and populate user data
       const chats = Array.from(chatMap.values());
       const finalChats = [];
-  
+
       for (const chat of chats) {
         try {
           // Determine the correct other user
@@ -79,25 +81,30 @@ export class MessagesService {
           } else {
             otherUser = chat.user._id;
           }
-  
+
           // Populate user data
-          const populatedUser = await this.usersService.fincOneMinimalById(otherUser);
-  
+          const populatedUser =
+            await this.usersService.fincOneMinimalById(otherUser);
+
           finalChats.push({
             user: populatedUser,
             lastMessage: chat.lastMessage,
           });
         } catch (error) {
-          Logger.error(`Error processing chat for user ${chat.user._id}: ${error}`);
+          Logger.error(
+            `Error processing chat for user ${chat.user._id}: ${error}`,
+          );
           continue;
         }
       }
-  
+
       // 4. Sort chats by most recent message date
-      finalChats.sort((a, b) => 
-        new Date(b.lastMessage.date).getTime() - new Date(a.lastMessage.date).getTime()
+      finalChats.sort(
+        (a, b) =>
+          new Date(b.lastMessage.date).getTime() -
+          new Date(a.lastMessage.date).getTime(),
       );
-  
+
       return finalChats;
     } catch (error) {
       Logger.error(`Failed to get user chats: ${error}`);
