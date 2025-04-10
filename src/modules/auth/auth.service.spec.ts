@@ -70,7 +70,6 @@ describe('AuthService', () => {
       platforms: [16],
       username: 'test',
     });
-    expect(user.user.partners).not.toEqual('123456');
 
     const hash = user.user.password;
     expect(hash).toBeDefined();

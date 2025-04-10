@@ -15,6 +15,8 @@ import { SignUpDto } from '../auth/dtos/sign-up.dtio';
 // import { ConnectionRequestStatus } from './connection-request/enums/connection-status.enum';
 import { ConnectionRequestService } from './connection-request/connection-request.service';
 import { ConnectionStatus } from './enums/connection-status.enum';
+import { FriendshipService } from '../friendship/friendship.service';
+import { FriendshipStatus } from '../friendship/enums/friendship-status.enum';
 // import { SimpleUser } from './classes/simple-user';
 
 @Injectable()
@@ -22,6 +24,7 @@ export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private readonly connectionRequestService: ConnectionRequestService,
+    private readonly frienshipService: FriendshipService,
   ) {}
 
   create = async (signUpDto: SignUpDto): Promise<User> => {
@@ -112,7 +115,6 @@ export class UsersService {
     const skip = (page - 1) * limit;
 
     const userInfo = await this.userModel.findOne({ _id: userId });
-    const partners = userInfo?.partners || [];
 
     const userRequests =
       await this.connectionRequestService.findRequestsByUser(userId);
@@ -191,22 +193,6 @@ export class UsersService {
       { new: true },
     );
 
-  getUserPartners = async (user: string) => {
-    return this.userModel
-      .findOne(
-        { _id: user },
-        { partners: 1 }, // Select only the 'partners' field
-        {
-          populate: {
-            path: 'partners',
-            match: { status: true },
-            select: 'name username img',
-          },
-        },
-      )
-      .select('partners'); // Ensure only 'partners' is returned
-  };
-
   requestConnection = async (user: Types.ObjectId, partner: Types.ObjectId) => {
     try {
       const verifiedUser = await this.getInfo(user);
@@ -226,64 +212,17 @@ export class UsersService {
     }
   };
 
-  addPartner = async (user: Types.ObjectId, partner: Types.ObjectId) => {
-    try {
-      const verifiedUser = await this.getInfo(user);
-      const verifiedPartner = await this.getInfo(partner);
-
-      if (!verifiedUser || !verifiedPartner) {
-        throw new NotFoundException('USER_NOT_FOUND');
-      }
-
-      // Add partner to user's partners array if not already present
-      const updatedUser = await this.userModel.findOneAndUpdate(
-        { _id: user, partners: { $ne: partner } }, // $ne means "not equal"
-        { $push: { partners: partner } },
-        { new: true },
-      );
-
-      // Add user to partner's partners array if not already present
-      await this.userModel.findOneAndUpdate(
-        { _id: partner, partners: { $ne: user } },
-        { $push: { partners: user } },
-      );
-
-      if (!updatedUser) {
-        //If no update occured, it means the partner was already in user's partner list.
-        return this.getInfo(user); //Return the user info.
-      }
-      return updatedUser;
-    } catch (error) {
-      Logger.error(error);
-      throw new NotAcceptableException(error);
-    }
-  };
   removePartner = async (user: Types.ObjectId, partner: Types.ObjectId) => {
     try {
-      const verifiedUser = await this.getInfo(user);
-      const verifiedPartner = await this.getInfo(partner);
-
-      if (!verifiedUser || !verifiedPartner) {
-        throw new NotFoundException('USER_NOT_FOUND');
-      }
-      // Remove partner from user's partners array
-      const updatedUser = await this.userModel.findOneAndUpdate(
-        { _id: user },
-        { $pull: { partners: partner } },
-        { new: true },
+      const friendshipDb = await this.frienshipService.findFriendshipByUsers(
+        user,
+        partner,
       );
 
-      // Remove user from partner's partners array
-      await this.userModel.findOneAndUpdate(
-        { _id: partner },
-        { $pull: { partners: user } },
+      return this.frienshipService.updateStatusById(
+        friendshipDb.id,
+        FriendshipStatus.BROKE,
       );
-
-      if (!updatedUser) {
-        // If no update occurred, it means the partner was not in the user's partner list.
-        return this.getInfo(user); // Return the user info.
-      }
-      return updatedUser;
     } catch (error) {
       Logger.error(error);
       throw new NotAcceptableException(error);

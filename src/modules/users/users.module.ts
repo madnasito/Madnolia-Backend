@@ -8,12 +8,14 @@ import { UsersGateway } from './users.gateway';
 import { Users } from './classes/user';
 import { ConnectionRequestModule } from './connection-request/connection-request.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { FriendshipModule } from '../friendship/friendship.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     ConnectionRequestModule,
     NotificationsModule,
+    FriendshipModule,
   ],
   controllers: [UserController],
   providers: [UsersService, UserGuard, UsersGateway, Users],

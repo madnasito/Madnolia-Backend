@@ -39,10 +39,6 @@ export class UserDto {
   @Expose()
   thumb: string;
 
-  @IsArray()
-  @Expose()
-  partners: Array<string>;
-
   @IsInt()
   @Expose()
   availability: number;

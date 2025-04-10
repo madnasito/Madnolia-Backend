@@ -75,10 +75,6 @@ export class UsersGateway {
           sender,
           request.user,
         );
-      await this.usersService.addPartner(
-        connectionRequestDb.receiver,
-        connectionRequestDb.sender,
-      );
 
       await this.notificationsService.deleteRequestConnection(
         connectionRequestDb.receiver,

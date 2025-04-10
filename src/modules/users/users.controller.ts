@@ -61,12 +61,6 @@ export class UserController {
     return this.usersService.resetNotifications(req.user.id);
   }
 
-  @Get('user-partners')
-  @UseGuards(UserGuard)
-  async userPartners(@Request() req: any) {
-    return this.usersService.getUserPartners(req.user.id);
-  }
-
   @Put('update')
   @UseGuards(UserGuard)
   async update(@Request() req: any, @Body() body: UpdateUserDto) {

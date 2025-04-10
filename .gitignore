@@ -1,6 +1,7 @@
 .env.development
 .env.production
 .env.test
+.cpanel.yml
 
 # compiled output
 /dist

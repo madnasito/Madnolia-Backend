@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
-import { Game } from 'src/modules/games/schemas/game.schema';
 import { Availability } from '../enums/availability.enum';
 
 export type UserDocument = HydratedDocument<User>;
@@ -51,16 +50,6 @@ export class User {
   thumb: string;
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    default: [],
-    validate: [
-      (value: any) => value.length <= 500,
-      'List of connections must not exceed 500',
-    ],
-  })
-  partners: Types.ObjectId[];
-
-  @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }],
     default: [],
     validate: [
@@ -68,7 +57,7 @@ export class User {
       'List of games must not exceed 1000 items',
     ],
   })
-  games: Game[];
+  games: Types.ObjectId[];
 
   @Prop({ type: Number, default: 0 })
   notifications: number;

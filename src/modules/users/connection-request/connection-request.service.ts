@@ -8,6 +8,9 @@ import { ConnectionRequest } from './schemas/connection-request.schema';
 import { Model, Types } from 'mongoose';
 import { ConnectionRequestStatus } from './enums/connection-status.enum';
 import { NotificationsService } from 'src/modules/notifications/notifications.service';
+import { FriendshipService } from 'src/modules/friendship/friendship.service';
+import { CreateFriendshipDto } from 'src/modules/friendship/dtos/create-frindship.dto';
+import { FriendshipStatus } from 'src/modules/friendship/enums/friendship-status.enum';
 
 @Injectable()
 export class ConnectionRequestService {
@@ -15,6 +18,7 @@ export class ConnectionRequestService {
     @InjectModel(ConnectionRequest.name)
     private connectionRequestModel: Model<ConnectionRequest>,
     private notificationsService: NotificationsService,
+    private friendshipService: FriendshipService,
   ) {}
 
   async create(
@@ -50,11 +54,25 @@ export class ConnectionRequestService {
     sender: Types.ObjectId,
     receiver: Types.ObjectId,
   ): Promise<ConnectionRequest | null> {
-    return this.connectionRequestModel.findOneAndUpdate(
-      { sender, receiver, status: ConnectionRequestStatus.PENDING },
-      { status: ConnectionRequestStatus.ACCEPTED, updatedAt: new Date() },
-      { new: true },
-    );
+    try {
+      const requestDb = await this.connectionRequestModel.findOneAndUpdate(
+        { sender, receiver, status: ConnectionRequestStatus.PENDING },
+        { status: ConnectionRequestStatus.ACCEPTED, updatedAt: new Date() },
+        { new: true },
+      );
+
+      const friendshipPayload: CreateFriendshipDto = {
+        user1: sender,
+        user2: receiver,
+        status: FriendshipStatus.ALIVE,
+      };
+
+      await this.friendshipService.create(friendshipPayload);
+
+      return requestDb;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async rejectConnection(
