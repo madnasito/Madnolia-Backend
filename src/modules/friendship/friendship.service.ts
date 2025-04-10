@@ -34,6 +34,12 @@ export class FriendshipService {
     });
   }
 
+  findFriendshipByUser(user: Types.ObjectId) {
+    return this.friendshipModel.find({
+      $or: [{ user1: user }, { user2: user }],
+    });
+  }
+
   updateStatusById(id: Types.ObjectId, status: FriendshipStatus) {
     return this.friendshipModel.findByIdAndUpdate(
       id,

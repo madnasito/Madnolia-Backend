@@ -116,6 +116,10 @@ export class UsersService {
 
     const userInfo = await this.userModel.findOne({ _id: userId });
 
+    const partners = (
+      await this.frienshipService.findFriendshipByUser(userId)
+    ).map((e) => (e.user1 != userInfo.id ? e.user1 : e.user2));
+
     const userRequests =
       await this.connectionRequestService.findRequestsByUser(userId);
 
