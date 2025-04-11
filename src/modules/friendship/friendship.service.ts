@@ -25,6 +25,10 @@ export class FriendshipService {
     return createFrindship.save();
   }
 
+  fincFriendshipById(id: Types.ObjectId) {
+    return this.friendshipModel.findById(id);
+  }
+
   // Get friendship between two users
   findFriendshipByUsers(user1: Types.ObjectId, user2: Types.ObjectId) {
     return this.friendshipModel.findOne({

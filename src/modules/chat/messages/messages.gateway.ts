@@ -68,6 +68,14 @@ export class MessagesGateway
       const tokenPayload = await this.jwtService.verifyAsync(token as string);
       await this.users.addUser(tokenPayload.id, client.id);
 
+      const friendshipsIds = (
+        await this.friendshipService.findFriendshipsByUser(tokenPayload.id)
+      ).map((e) => e.id);
+
+      friendshipsIds.forEach((element) => {
+        client.join(element);
+      });
+
       this.logger.debug(`Client id: ${client.id} connected`);
       this.logger.debug(`Number of connected clients: ${size}`);
     } catch (error) {
@@ -100,8 +108,7 @@ export class MessagesGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      this.logger.log(`Message received from client id: ${client.id}`);
-      this.logger.debug(`Payload: ${payload}`);
+      this.logger.debug(`Message received from client id: ${client.id}`);
 
       const message: MessageDto = {
         to: payload.to,
@@ -115,6 +122,7 @@ export class MessagesGateway
       const { text, _id, date } = messageSaved;
       const user = this.users.getUserById(request.user);
 
+      // Payload to emit to user
       const payloadEvent = {
         _id,
         text,
@@ -134,17 +142,7 @@ export class MessagesGateway
 
       this.logger.debug(`${this.users.getUser(client.id).room}`);
 
-      if (message.type != MessageType.USER) {
-        client.to(payload.to.toString()).emit('message', payloadEvent);
-      } else {
-        const friendship = await this.friendshipService.findFriendshipByUsers(
-          message.user,
-          payload.to,
-        );
-        if (friendship) {
-          client.broadcast.to(friendship.id).emit('message', payloadEvent);
-        }
-      }
+      client.to(messageSaved.to.toString()).emit('message', payloadEvent);
 
       client.emit('message', payloadEvent);
     } catch (error) {

@@ -22,6 +22,11 @@ export class Friendship {
     default: FriendshipStatus.ALIVE,
   })
   status: FriendshipStatus;
+
+  @Prop({
+    default: new Date(),
+  })
+  createdAt: Date;
 }
 
 export const FriendshipSchema = SchemaFactory.createForClass(Friendship);

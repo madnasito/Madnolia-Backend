@@ -10,7 +10,6 @@ import { GamesService } from 'src/modules/games/games.service';
 import { GameInterface } from './interfaces/game.interface';
 import { CreateMatchDto } from './dtos/create-match.dto';
 import { NewMatchDto } from './dtos/new-match.dto';
-import { MessagesService } from 'src/modules/chat/messages/messages.service';
 import { MatchStatus } from './enums/status.enum';
 import { UpdateMatchDto } from './dtos/update-match.dto';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -22,7 +21,6 @@ export class MatchesService {
   constructor(
     @InjectModel(Match.name) private matchModel: Model<Match>,
     private readonly gamesService: GamesService,
-    private readonly messagesService: MessagesService,
     private readonly notificationsService: NotificationsService,
   ) {}
 
@@ -100,9 +98,7 @@ export class MatchesService {
 
     if (!match) throw new NotFoundException();
 
-    const messages = await this.messagesService.getRoomMessages(id);
-
-    return { match, messages };
+    return { match };
   };
 
   update = async (id: string, user: string, attrs: Partial<UpdateMatchDto>) => {

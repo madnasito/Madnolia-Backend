@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Message } from './schema/messages.schema';
 import mongoose, { Model, Types } from 'mongoose';
@@ -6,6 +11,7 @@ import { MessageDto } from './dtos/message.dto';
 import { MessageType } from './enums/message-type.enum';
 import { UsersService } from 'src/modules/users/users.service';
 import { FriendshipService } from 'src/modules/friendship/friendship.service';
+import { MessageBody } from '@nestjs/websockets';
 
 @Injectable()
 export class MessagesService {
@@ -15,7 +21,20 @@ export class MessagesService {
     private readonly friendshipService: FriendshipService,
   ) {}
 
-  create(createMessageDto: MessageDto) {
+  async create(@MessageBody() createMessageDto: MessageDto) {
+    if (createMessageDto.type == MessageType.USER) {
+      const friendshipDB = await this.friendshipService.fincFriendshipById(
+        createMessageDto.to,
+      );
+
+      if (!friendshipDB) throw new NotFoundException();
+
+      if (
+        friendshipDB.user1 != createMessageDto.user &&
+        friendshipDB.user2 != createMessageDto.user
+      )
+        throw new UnauthorizedException();
+    }
     const createdMessage = new this.messageModel(createMessageDto);
     return createdMessage.save();
   }
@@ -36,78 +55,55 @@ export class MessagesService {
 
   async getUserChats(userId: Types.ObjectId): Promise<any> {
     try {
-      // OBtener todas las amistades del usuario, luego tomas sus id, luego buscar en messages en base al id, que sea
-      // el de la sala, pero tomar solamente un solo campo y luego hacer que no se repita los to para que solo tome uno
-      // (el primero) y agregar un populate del usuario que no sea el del request a cada dato del array
-
       // 1. Obtener todas las amistades del usuario
       const friendships =
         await this.friendshipService.findFriendshipsByUser(userId);
-      // 2. Si no tiene amigos, retornar array vacío
-      if (friendships.length === 0) {
-        return [];
-      }
 
-      // 3. Obtener IDs de las amistades
-      const friendshipIds = friendships.map((friendship) => friendship.id);
+      // 2. Obtener el último mensaje de cada amistad
+      const chats = await Promise.all(
+        friendships.map(async (friendship) => {
+          // Determinar el ID del otro usuario
+          const otherUserId =
+            friendship.user1 == userId ? friendship.user2 : friendship.user1;
 
-      // 4. Buscar mensajes asociados a estas amistades
-      const allMessages: any = await this.messageModel
-        .find({
-          to: { $in: friendshipIds },
-          type: MessageType.USER,
-        })
-        .sort({ date: -1 })
-        .populate('user', '_id name username thumb')
-        .populate({
-          path: 'to',
-          populate: {
-            path: 'user1 user2',
-            select: '_id name username thumb',
-          },
-        })
-        .lean()
-        .exec();
+          // Obtener información del otro usuario
+          const otherUser =
+            await this.usersService.fincOneMinimalById(otherUserId);
 
-      // 5. Procesar los mensajes y agrupar por amistad
-      const chatMap = new Map<
-        string,
-        { friendship: any; lastMessage: any; otherUser: any }
-      >();
+          // Obtener el último mensaje de esta amistad
+          const lastMessage = await this.messageModel
+            .findOne({
+              to: friendship._id,
+              type: MessageType.USER,
+            })
+            .sort({ date: -1 })
+            .lean()
+            .exec();
 
-      for (const message of allMessages) {
-        const friendship = message.to;
-        const otherUser = friendship.user1._id.equals(userId)
-          ? friendship.user2
-          : friendship.user1;
-
-        if (!chatMap.has(friendship._id.toString())) {
-          chatMap.set(friendship._id.toString(), {
-            friendship: friendship,
-            lastMessage: message,
-            otherUser: otherUser,
-          });
-        }
-      }
-
-      // 6. Construir la lista final de chats
-      const finalChats = Array.from(chatMap.values()).map((chat) => ({
-        friendship: {
-          _id: chat.friendship._id,
-          // Puedes incluir más datos de la amistad si es necesario
-        },
-        user: chat.otherUser,
-        lastMessage: chat.lastMessage,
-      }));
-
-      // 7. Ordenar chats por fecha del último mensaje (más reciente primero)
-      finalChats.sort(
-        (a, b) =>
-          new Date(b.lastMessage.date).getTime() -
-          new Date(a.lastMessage.date).getTime(),
+          return {
+            _id: friendship._id,
+            user: otherUser,
+            lastMessage: lastMessage || null,
+            // Puedes añadir más datos de la amistad si los necesitas
+            status: friendship.status,
+            createdAt: friendship.createdAt,
+          };
+        }),
       );
 
-      return finalChats;
+      // 3. Filtrar chats que tengan al menos un mensaje y ordenar por fecha
+      const filteredChats = chats
+        .filter((chat) => chat.lastMessage !== null)
+        .sort((a, b) => {
+          if (!a.lastMessage) return 1;
+          if (!b.lastMessage) return -1;
+          return (
+            new Date(b.lastMessage.date).getTime() -
+            new Date(a.lastMessage.date).getTime()
+          );
+        });
+
+      return filteredChats;
     } catch (error) {
       Logger.error(`Failed to get user chats: ${error}`);
       throw new Error('Failed to retrieve chat list');

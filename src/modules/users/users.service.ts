@@ -149,9 +149,7 @@ export class UsersService {
       connectionUser.connection = ConnectionStatus.NONE;
 
       if (
-        partners.some((partnerId: Types.ObjectId) =>
-          partnerId.equals(foundUser._id),
-        )
+        partners.some((partnerId: Types.ObjectId) => partnerId == foundUser._id)
       ) {
         connectionUser.connection = ConnectionStatus.PARTNER;
       } else if (
