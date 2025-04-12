@@ -55,7 +55,7 @@ export class UsersGateway {
     client.emit('new_request_connection', requestDb);
 
     const requestedUserSocket = this.users.getUserById(requestedUser);
-    if (requestedUser)
+    if (requestedUserSocket)
       client
         .to(requestedUserSocket.socketId)
         .emit('new_request_connection', requestDb);
