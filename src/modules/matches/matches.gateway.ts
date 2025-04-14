@@ -14,6 +14,7 @@ import { MatchesService } from './matches.service';
 import { Users } from 'src/modules/users/classes/user';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { MatchDto } from './dtos/match.dto';
+import { UsersService } from '../users/users.service';
 
 @WebSocketGateway()
 export class MatchesGateway
@@ -23,6 +24,7 @@ export class MatchesGateway
 
   constructor(
     private matchesService: MatchesService,
+    private usersService: UsersService,
     private users: Users,
   ) {}
 
@@ -49,13 +51,15 @@ export class MatchesGateway
 
     const matchUrl = `${process.env.URL}/match/info/${match._id}`;
 
-    // const user = this.users.getUser(client.id)
+    const user = (await this.usersService.fincOneById(match.user.toString()))
+      .username;
 
     const eventPayload = {
       match: match._id,
       img: match.game.background,
       name: match.title,
       url: matchUrl,
+      user,
     };
 
     match.inviteds.forEach((element) => {

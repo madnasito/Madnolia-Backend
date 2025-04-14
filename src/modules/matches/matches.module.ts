@@ -14,6 +14,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
     GamesModule,
     UsersModule,
     NotificationsModule,
+    UsersModule,
   ],
   providers: [MatchesService, MatchesGateway],
   controllers: [MatchesController],
