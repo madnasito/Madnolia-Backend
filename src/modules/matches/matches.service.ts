@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Match } from './schemas/match.schema';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { GamesService } from 'src/modules/games/games.service';
 import { GameInterface } from './interfaces/game.interface';
 import { CreateMatchDto } from './dtos/create-match.dto';
@@ -207,6 +207,19 @@ export class MatchesService {
       { joined: userId },
       {},
       { populate: { path: 'game' }, sort: { _id: -1 } },
+    );
+
+  getMatchesJoinedOrCreatedByUser = (userId: Types.ObjectId) =>
+    this.matchModel.find(
+      {
+        $or: [
+          { status: MatchStatus.RUNNING },
+          { status: MatchStatus.WAITING },
+          { $or: [{ user: userId }, { joined: userId }] },
+        ],
+      },
+      {},
+      { sort: { _id: -1 } },
     );
 
   getMatchesByGameAndPlatform = async (

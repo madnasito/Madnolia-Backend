@@ -24,9 +24,10 @@ import { CreateMessageDto } from './dtos/create-message.dto';
 import { MessageDto } from './dtos/message.dto';
 import { Users } from '../../users/classes/user';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/modules/users/users.service';
+// import { UsersService } from 'src/modules/users/users.service';
 import { MessageType } from './enums/message-type.enum';
 import { FriendshipService } from 'src/modules/friendship/friendship.service';
+import { MatchesService } from 'src/modules/matches/matches.service';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -40,8 +41,9 @@ export class MessagesGateway
   constructor(
     private readonly messagesService: MessagesService,
     private readonly jwtService: JwtService,
-    private readonly usersService: UsersService,
+    // private readonly usersService: UsersService,
     private readonly friendshipService: FriendshipService,
+    private readonly matchesService: MatchesService,
     private users: Users,
   ) {}
 
@@ -72,9 +74,15 @@ export class MessagesGateway
         await this.friendshipService.findFriendshipsByUser(tokenPayload.id)
       ).map((e) => e.id);
 
-      friendshipsIds.forEach((element) => {
-        client.join(element);
-      });
+      const userMatchesIds: string[] = (
+        await this.matchesService.getMatchesJoinedOrCreatedByUser(
+          tokenPayload.id,
+        )
+      ).map((match) => match.id);
+
+      userMatchesIds.forEach((id) => client.join(id));
+
+      friendshipsIds.forEach((element) => client.join(element));
 
       this.logger.debug(`Client id: ${client.id} connected`);
       this.logger.debug(`Number of connected clients: ${size}`);

@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MessagesController } from './messages.controller';
 import { ConfigService } from '@nestjs/config';
 import { FriendshipModule } from 'src/modules/friendship/friendship.module';
+import { MatchesModule } from 'src/modules/matches/matches.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { FriendshipModule } from 'src/modules/friendship/friendship.module';
         };
       },
     }),
+    MatchesModule,
   ],
   providers: [MessagesService, MessagesGateway],
   exports: [MessagesService],
