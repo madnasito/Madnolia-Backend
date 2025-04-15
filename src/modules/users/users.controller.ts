@@ -26,6 +26,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 
 import axios from 'axios';
+import { Types } from 'mongoose';
 
 @Controller('user')
 @Serialize(UserDto)
@@ -53,6 +54,12 @@ export class UserController {
   @UseGuards(UserGuard)
   async getInfo(@Request() req: any) {
     return this.usersService.getInfo(req.user.id);
+  }
+
+  @Get('info/:id')
+  @UseGuards(UserGuard)
+  async getInfoById(@Request() req: any, @Param('id') id: Types.ObjectId) {
+    return this.usersService.getInfo(id);
   }
 
   @Get('reset-notifications')
