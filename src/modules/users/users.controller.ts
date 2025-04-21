@@ -58,8 +58,8 @@ export class UserController {
 
   @Get('info/:id')
   @UseGuards(UserGuard)
-  async getInfoById(@Request() req: any, @Param('id') id: Types.ObjectId) {
-    return this.usersService.getInfo(id);
+  async getInfoById(@Param('id') id: Types.ObjectId, @Request() req: any) {
+    return this.usersService.getUserInfo(id, req.user.id);
   }
 
   @Get('reset-notifications')

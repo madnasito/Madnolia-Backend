@@ -47,7 +47,6 @@ export class MessagesService {
       {
         limit: limit,
         skip: skip,
-        populate: { path: 'user', select: '_id name username thumb' },
         sort: { _id: -1 },
       },
     );

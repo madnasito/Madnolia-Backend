@@ -25,7 +25,7 @@ import { MessageDto } from './dtos/message.dto';
 import { Users } from '../../users/classes/user';
 import { JwtService } from '@nestjs/jwt';
 // import { UsersService } from 'src/modules/users/users.service';
-import { MessageType } from './enums/message-type.enum';
+// import { MessageType } from './enums/message-type.enum';
 import { FriendshipService } from 'src/modules/friendship/friendship.service';
 import { MatchesService } from 'src/modules/matches/matches.service';
 
@@ -128,7 +128,7 @@ export class MessagesGateway
       if (!messageSaved) throw new WsException('NO_MESSAGE');
 
       const { text, _id, date } = messageSaved;
-      const user = this.users.getUserById(request.user);
+      // const user = this.users.getUserById(request.user);
 
       // Payload to emit to user
       const payloadEvent = {
@@ -136,15 +136,7 @@ export class MessagesGateway
         text,
         date,
         to: payload.to,
-        user:
-          payload.type == MessageType.USER
-            ? request.user
-            : {
-                _id: user._id,
-                name: user.name,
-                username: user.username,
-                thumb: user.thumb,
-              },
+        user: request.user,
         type: payload.type,
       };
 

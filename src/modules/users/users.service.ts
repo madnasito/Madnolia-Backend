@@ -93,6 +93,30 @@ export class UsersService {
   getInfo = async (user: Types.ObjectId) =>
     (await this.userModel.findOne({ _id: user, status: true })).toJSON();
 
+  getUserInfo = async (user1: Types.ObjectId, user2: Types.ObjectId) => {
+    const friendship = await this.frienshipService.findFriendshipByUsers(
+      user1,
+      user2,
+    );
+
+    const { _id, name, username, thumb } = (
+      await this.userModel.findOne({ _id: user1, status: true })
+    ).toJSON();
+
+    const connection =
+      friendship == null || friendship.status == FriendshipStatus.BROKE
+        ? FriendshipStatus.BROKE
+        : FriendshipStatus.ALIVE;
+
+    return {
+      _id,
+      name,
+      username,
+      thumb,
+      connection,
+    };
+  };
+
   // getInvitations = async (user: string) => this.userModel.populate('')
 
   upadte = async (user: string, attrs: Partial<User>): Promise<User | null> =>
