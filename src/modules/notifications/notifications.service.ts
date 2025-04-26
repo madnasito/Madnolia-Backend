@@ -43,4 +43,7 @@ export class NotificationsService {
     await this.readAllUserNotifications(user);
     return this.notificationModel.find({ user });
   };
+
+  getUserUnreadNotificationsCount = (user: Types.ObjectId) =>
+    this.notificationModel.countDocuments({ user, read: false });
 }

@@ -33,9 +33,10 @@ export class Notification {
   thumb: string;
 
   @Prop({
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
   })
-  subtitle: string;
+  sender: string;
 
   @Prop({
     type: String,

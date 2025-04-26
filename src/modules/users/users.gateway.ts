@@ -33,7 +33,7 @@ export class UsersGateway {
     @Request() request: any,
   ) {
     const requested = await this.usersService.fincOneById(requestedUser);
-    const { name, thumb, id, username } = await this.usersService.fincOneById(
+    const { name, thumb, id } = await this.usersService.fincOneById(
       request.user,
     );
     if (!requested) throw new WsException('USER_NOT_FOUND');
@@ -47,7 +47,7 @@ export class UsersGateway {
       type: NotificationType.REQUEST,
       title: name,
       thumb,
-      subtitle: username,
+      sender: request.user,
       path: id,
     };
 

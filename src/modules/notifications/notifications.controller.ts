@@ -10,4 +10,12 @@ export class NotificationsController {
   getNotifications(@Request() request: any) {
     return this.notificationsService.getUserNotifications(request.user.id);
   }
+
+  @UseGuards(UserGuard)
+  @Get('unread-count')
+  getUnreadNotificationsCount(@Request() request: any) {
+    return this.notificationsService.getUserUnreadNotificationsCount(
+      request.user.id,
+    );
+  }
 }

@@ -51,11 +51,11 @@ export class MatchesService {
     matchDb.inviteds.forEach(async (element) => {
       const newNotification: CreateNotificationDto = {
         path: matchDb.id,
-        title: 'Invitation',
+        title: matchDb.title,
         thumb: gameData.background,
         type: NotificationType.INVITATION,
         user: element,
-        subtitle: '',
+        sender: matchDb.user.toString(),
       };
 
       await this.notificationsService.create(newNotification);
