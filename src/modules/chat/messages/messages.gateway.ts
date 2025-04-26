@@ -24,8 +24,6 @@ import { CreateMessageDto } from './dtos/create-message.dto';
 import { MessageDto } from './dtos/message.dto';
 import { Users } from '../../users/classes/user';
 import { JwtService } from '@nestjs/jwt';
-// import { UsersService } from 'src/modules/users/users.service';
-// import { MessageType } from './enums/message-type.enum';
 import { FriendshipService } from 'src/modules/friendship/friendship.service';
 import { MatchesService } from 'src/modules/matches/matches.service';
 
@@ -41,7 +39,6 @@ export class MessagesGateway
   constructor(
     private readonly messagesService: MessagesService,
     private readonly jwtService: JwtService,
-    // private readonly usersService: UsersService,
     private readonly friendshipService: FriendshipService,
     private readonly matchesService: MatchesService,
     private users: Users,

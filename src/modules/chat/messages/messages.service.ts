@@ -9,7 +9,6 @@ import { Message } from './schema/messages.schema';
 import mongoose, { Model, Types } from 'mongoose';
 import { MessageDto } from './dtos/message.dto';
 import { MessageType } from './enums/message-type.enum';
-import { UsersService } from 'src/modules/users/users.service';
 import { FriendshipService } from 'src/modules/friendship/friendship.service';
 import { MessageBody } from '@nestjs/websockets';
 
@@ -17,7 +16,6 @@ import { MessageBody } from '@nestjs/websockets';
 export class MessagesService {
   constructor(
     @InjectModel(Message.name) private messageModel: Model<Message>,
-    private readonly usersService: UsersService,
     private readonly friendshipService: FriendshipService,
   ) {}
 
@@ -65,10 +63,6 @@ export class MessagesService {
           const otherUserId =
             friendship.user1 == userId ? friendship.user2 : friendship.user1;
 
-          // Obtener información del otro usuario
-          const otherUser =
-            await this.usersService.fincOneMinimalById(otherUserId);
-
           // Obtener el último mensaje de esta amistad
           const lastMessage = await this.messageModel
             .findOne({
@@ -81,7 +75,7 @@ export class MessagesService {
 
           return {
             _id: friendship._id,
-            user: otherUser,
+            user: otherUserId,
             lastMessage: lastMessage || null,
             // Puedes añadir más datos de la amistad si los necesitas
             status: friendship.status,
