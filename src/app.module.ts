@@ -19,6 +19,7 @@ import { GroupsModule } from './modules/groups/groups.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { MailModule } from './modules/mail/mail.module';
 import { FriendshipModule } from './modules/friendship/friendship.module';
+import { SuperModule } from './modules/super/super.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -58,6 +59,7 @@ import { FriendshipModule } from './modules/friendship/friendship.module';
     ChatModule,
     MailModule,
     FriendshipModule,
+    SuperModule,
   ],
   controllers: [AppController],
   providers: [

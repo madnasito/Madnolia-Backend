@@ -141,4 +141,7 @@ export class MessagesService {
 
     return this.messageModel.findByIdAndDelete(id);
   }
+
+  deleteAllUserMessages = (user: Types.ObjectId) =>
+    this.messageModel.deleteMany({ user });
 }

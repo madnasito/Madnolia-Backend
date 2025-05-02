@@ -266,4 +266,7 @@ export class UsersService {
         .catch((err) => reject(err));
     });
   };
+
+  delete = async (user: Types.ObjectId) =>
+    this.userModel.findByIdAndDelete(user);
 }

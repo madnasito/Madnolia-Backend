@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -278,4 +279,25 @@ export class MatchesService {
 
     return games;
   }
+
+  deleteUserFromMatches = async (user: Types.ObjectId) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      await this.matchModel.deleteMany({ user });
+      await this.matchModel.updateMany(
+        {
+          joined: user,
+          inviteds: user,
+        },
+        { $pull: { joined: user, inviteds: user } },
+      );
+      await session.commitTransaction();
+    } catch (error) {
+      Logger.error(error);
+      session.abortTransaction();
+    } finally {
+      session.endSession();
+    }
+  };
 }
