@@ -3,12 +3,14 @@ import { UsersService } from '../users/users.service';
 import { FriendshipService } from '../friendship/friendship.service';
 import { MessagesService } from '../chat/messages/messages.service';
 import { MatchesService } from '../matches/matches.service';
-import mongoose, { Types } from 'mongoose';
+import * as mongoose from 'mongoose';
 import { NotificationsService } from '../notifications/notifications.service';
+import { InjectConnection } from '@nestjs/mongoose';
 
 @Injectable()
 export class SuperService {
   constructor(
+    @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly usersService: UsersService,
     private readonly friendshipService: FriendshipService,
     private readonly messagesService: MessagesService,
@@ -16,8 +18,11 @@ export class SuperService {
     private readonly notificationsService: NotificationsService,
   ) {}
 
-  async deleteUser(user: Types.ObjectId) {
-    const session = await mongoose.startSession();
+  async deleteUser(user: mongoose.Types.ObjectId) {
+    // To-Do: Desactivate the user and check setting the deletedAt value with a new date
+    // Verify with a cronjob if the user is deleted, this is for recover an user by a month
+    // If it is not recovered during a month it will be deleted from db and all its documents
+    const session = await this.connection.startSession();
     session.startTransaction();
     try {
       await this.usersService.delete(user);
@@ -25,12 +30,12 @@ export class SuperService {
       await this.notificationsService.deleteUserNotifications(user);
       await this.matchesService.deleteUserFromMatches(user);
       await this.messagesService.deleteAllUserMessages(user);
-      session.commitTransaction();
+      await session.commitTransaction();
     } catch (error) {
       Logger.error(error);
       await session.abortTransaction();
     } finally {
-      session.endSession();
+      await session.endSession();
       return { ok: true };
     }
   }

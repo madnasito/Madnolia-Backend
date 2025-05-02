@@ -31,6 +31,10 @@ import { SuperModule } from './modules/super/super.module';
       useFactory: (config: ConfigService) => {
         return {
           uri: config.get<string>('DB_URI'),
+          serverSelectionTimeoutMS: 30000, // 30 seconds
+          socketTimeoutMS: 45000, // 45 seconds
+          retryAttempts: 3, // Retry up to 3 times
+          retryDelay: 1000,
         };
       },
     }),
