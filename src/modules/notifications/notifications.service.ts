@@ -48,5 +48,5 @@ export class NotificationsService {
     this.notificationModel.countDocuments({ user, read: false });
 
   deleteUserNotifications = (user: Types.ObjectId) =>
-    this.notificationModel.deleteMany({ user, sender: user });
+    this.notificationModel.deleteMany({ $or: [{ user }, { sender: user }] });
 }
