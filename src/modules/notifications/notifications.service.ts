@@ -41,7 +41,7 @@ export class NotificationsService {
     user: Types.ObjectId,
   ): Promise<Array<Notification>> => {
     await this.readAllUserNotifications(user);
-    return this.notificationModel.find({ user });
+    return this.notificationModel.find({ user }, {}, { sort: { _id: -1 } });
   };
 
   getUserUnreadNotificationsCount = (user: Types.ObjectId) =>
