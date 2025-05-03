@@ -6,6 +6,7 @@ import { MatchesService } from '../matches/matches.service';
 import * as mongoose from 'mongoose';
 import { NotificationsService } from '../notifications/notifications.service';
 import { InjectConnection } from '@nestjs/mongoose';
+import { Users } from '../users/classes/user';
 
 @Injectable()
 export class SuperService {
@@ -16,6 +17,7 @@ export class SuperService {
     private readonly messagesService: MessagesService,
     private readonly matchesService: MatchesService,
     private readonly notificationsService: NotificationsService,
+    private users: Users,
   ) {}
 
   async deleteUser(user: mongoose.Types.ObjectId) {
@@ -36,6 +38,7 @@ export class SuperService {
       await session.abortTransaction();
     } finally {
       await session.endSession();
+      this.users.deleteUser(user.toString());
       return { ok: true };
     }
   }
