@@ -281,8 +281,6 @@ export class MatchesService {
   }
 
   deleteUserFromMatches = async (user: Types.ObjectId) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
     try {
       await this.matchModel.deleteMany({ user });
       await this.matchModel.updateMany(
@@ -292,12 +290,9 @@ export class MatchesService {
         },
         { $pull: { joined: user, inviteds: user } },
       );
-      await session.commitTransaction();
     } catch (error) {
       Logger.error(error);
-      session.abortTransaction();
     } finally {
-      session.endSession();
     }
   };
 }
