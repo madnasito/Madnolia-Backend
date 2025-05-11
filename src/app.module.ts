@@ -41,7 +41,7 @@ import { SuperModule } from './modules/super/super.module';
     ScheduleModule.forRoot(),
     UsersModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      rootPath: join(__dirname, '..', 'public/browser'),
     }),
     JwtModule.registerAsync({
       global: true,
