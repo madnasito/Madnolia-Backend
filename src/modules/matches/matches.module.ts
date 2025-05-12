@@ -7,6 +7,7 @@ import { GamesModule } from 'src/modules/games/games.module';
 import { MatchesGateway } from './matches.gateway';
 import { UsersModule } from '../users/users.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { PlatformsModule } from '../platforms/platforms.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
     UsersModule,
     NotificationsModule,
     UsersModule,
+    PlatformsModule,
   ],
   providers: [MatchesService, MatchesGateway],
   controllers: [MatchesController],

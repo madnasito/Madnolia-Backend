@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import { CreateMatchDto } from './dtos/create-match.dto';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { MatchesService } from './matches.service';
 import { UpdateMatchDto } from './dtos/update-match.dto';
+import { PlatformParent } from '../platforms/enums/platform-parent.enum';
 
 @Controller('match')
 export class MatchesController {
@@ -21,6 +23,11 @@ export class MatchesController {
   @Get('info/:id')
   async getMatch(@Param('id') id: string) {
     return this.matchesService.getMatch(id);
+  }
+
+  @Get('get-by')
+  async getByPlatformDaddy(@Query('parent') parent: PlatformParent) {
+    return this.matchesService.getMatchesByPlatformParent(parent);
   }
 
   @Get('with-game/:id')

@@ -16,6 +16,8 @@ import { UpdateMatchDto } from './dtos/update-match.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CreateNotificationDto } from '../notifications/dtos/create-notification.dto';
 import { NotificationType } from '../notifications/enums/notification-type.enum';
+import { PlatformParent } from '../platforms/enums/platform-parent.enum';
+import { PlatformsService } from '../platforms/platforms.service';
 
 @Injectable()
 export class MatchesService {
@@ -23,6 +25,7 @@ export class MatchesService {
     @InjectModel(Match.name) private matchModel: Model<Match>,
     private readonly gamesService: GamesService,
     private readonly notificationsService: NotificationsService,
+    private readonly platformsService: PlatformsService,
   ) {}
 
   create = async (createMatchDto: CreateMatchDto, user: string) => {
@@ -201,6 +204,25 @@ export class MatchesService {
     ]);
 
     return results;
+  };
+
+  getMatchesByPlatformParent = async (parent: PlatformParent) => {
+    const platforms = await this.platformsService.getByParent(parent);
+
+    // Fetch all platform matches in parallel
+    const platformMatches = await Promise.all(
+      platforms.map(async (platform) => {
+        const matches = await this.getMatchesByPlatform(platform.apiId);
+        return {
+          name: platform.name,
+          apiId: platform.apiId,
+          matches,
+        };
+      }),
+    );
+
+    // Sort by matchCount in descending order
+    return platformMatches.sort((a, b) => b.matches.length - a.matches.length);
   };
 
   getMatchesWithUserJoined = (userId: string) =>
