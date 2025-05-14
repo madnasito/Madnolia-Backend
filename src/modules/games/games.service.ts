@@ -46,6 +46,9 @@ export class GamesService {
   findByRawId = async (gameId: number): Promise<any> =>
     await this.gameModel.findOne({ gameId });
 
+  findBySlug = async (slug: string): Promise<Game> =>
+    await this.gameModel.findOne({ slug });
+
   async findById(gameId: string): Promise<any> {
     const gameDb = await this.gameModel.findById(gameId);
 

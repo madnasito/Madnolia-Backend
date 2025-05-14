@@ -85,6 +85,17 @@ export class MatchesController {
     );
   }
 
+  @Get('by-platform-and-game-slug/:platform/:game')
+  async getMatchesByGameSlugAndPlatform(
+    @Param('platform') platform: string,
+    @Param('game') game: string,
+  ) {
+    return this.matchesService.getMatchesByGameSlugAndPlatform(
+      parseInt(platform),
+      game,
+    );
+  }
+
   @UseGuards(UserGuard)
   @Post('create')
   async create(@Request() req: any, @Body() body: CreateMatchDto) {

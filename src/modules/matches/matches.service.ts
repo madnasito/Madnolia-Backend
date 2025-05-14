@@ -165,7 +165,11 @@ export class MatchesService {
       { populate: { path: 'game' }, skip },
     );
 
-  getMatchesByPlatform = async (platform: number, skip: number = 0) => {
+  getMatchesByPlatform = async (
+    platform: number,
+    skip: number = 0,
+    limit: number = 30, // Default limit of 10 documents
+  ) => {
     const results = await this.matchModel.aggregate([
       {
         $match: {
@@ -175,7 +179,7 @@ export class MatchesService {
       },
       {
         $lookup: {
-          from: 'games', // Assuming the collection for games is named 'games'
+          from: 'games',
           localField: 'game',
           foreignField: '_id',
           as: 'gameDetails',
@@ -186,11 +190,11 @@ export class MatchesService {
       },
       {
         $group: {
-          _id: '$gameDetails._id', // Group by game ID
+          _id: '$gameDetails._id',
           count: { $sum: 1 },
-          name: { $first: '$gameDetails.name' }, // Or any other field from Game
-          background: { $first: '$gameDetails.background' }, // Include background property
-          slug: { $first: '$gameDetails.slug' }, // Include slug property
+          name: { $first: '$gameDetails.name' },
+          background: { $first: '$gameDetails.background' },
+          slug: { $first: '$gameDetails.slug' },
         },
       },
       {
@@ -199,7 +203,10 @@ export class MatchesService {
         },
       },
       {
-        $skip: skip, // Move this out of the $sort stage
+        $skip: skip,
+      },
+      {
+        $limit: limit, // Add the limit stage
       },
     ]);
 
@@ -212,9 +219,10 @@ export class MatchesService {
     // Fetch all platform matches in parallel
     const platformMatches = await Promise.all(
       platforms.map(async (platform) => {
-        const matches = await this.getMatchesByPlatform(platform.apiId);
+        const matches = await this.getMatchesByPlatform(platform.apiId, 0, 6);
         return {
           name: platform.name,
+          slug: platform.slug,
           apiId: platform.apiId,
           matches,
         };
@@ -255,6 +263,20 @@ export class MatchesService {
       {},
       { skip, sort: { date: 1 } },
     );
+
+  getMatchesByGameSlugAndPlatform = async (
+    platform: number,
+    gameSlug: string,
+    skip: number = 0,
+  ) => {
+    const game = await this.gamesService.findBySlug(gameSlug);
+
+    return this.matchModel.find(
+      { platform, game: game._id, status: { $ne: MatchStatus.FINISHED } },
+      {},
+      { skip, sort: { date: 1 } },
+    );
+  };
 
   updatePastTimeMatches = async (): Promise<Array<Match>> => {
     const currentTimeMillis = new Date().getTime();
