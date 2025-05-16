@@ -6,10 +6,24 @@ export default `<!doctype html>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="stylesheet" href="styles-P2CYIHZC.css"></head>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Madnolia",
+    "url": "https://madnolia.app",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://madnolia.app/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+</script>
+  
+<link rel="stylesheet" href="styles-JTUCIHJV.css"></head>
 <body><script type="text/javascript" id="ng-event-dispatch-contract">(()=>{function p(t,n,r,o,e,i,f,m){return{eventType:t,event:n,targetElement:r,eic:o,timeStamp:e,eia:i,eirp:f,eiack:m}}function u(t){let n=[],r=e=>{n.push(e)};return{c:t,q:n,et:[],etc:[],d:r,h:e=>{r(p(e.type,e,e.target,t,Date.now()))}}}function s(t,n,r){for(let o=0;o<n.length;o++){let e=n[o];(r?t.etc:t.et).push(e),t.c.addEventListener(e,t.h,r)}}function c(t,n,r,o,e=window){let i=u(t);e._ejsas||(e._ejsas={}),e._ejsas[n]=i,s(i,r),s(i,o,!0)}window.__jsaction_bootstrap=c;})();
 </script>
   <app-root></app-root>
-<link rel="modulepreload" href="chunk-LU63MRN2.js"><script src="polyfills-UVBBIKA3.js" type="module"></script><script src="scripts-Z6VWI63P.js" defer=""></script><script src="main-3AQN4AZW.js" type="module"></script></body>
+<link rel="modulepreload" href="chunk-KG6AX2TG.js"><script src="polyfills-UVBBIKA3.js" type="module"></script><script src="scripts-Z6VWI63P.js" defer=""></script><script src="main-I4O3A54Y.js" type="module"></script></body>
 </html>
 `;

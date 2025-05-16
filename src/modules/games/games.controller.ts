@@ -3,12 +3,10 @@ import { GamesService } from './games.service';
 
 @Controller('games')
 export class GamesController {
-    constructor(
-        private readonly gamesService: GamesService
-    ){}
+  constructor(private readonly gamesService: GamesService) {}
 
-    @Get(':game')
-    getGame(@Param('game') game: string) {
-        return this.gamesService.findById(game);
-    }
+  @Get(':game')
+  getGame(@Param('game') game: string) {
+    return this.gamesService.findBySlug(game);
+  }
 }
