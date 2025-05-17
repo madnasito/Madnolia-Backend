@@ -108,7 +108,7 @@ export class MatchesGateway
   @Cron(CronExpression.EVERY_MINUTE)
   async handleCron() {
     try {
-      this.logger.debug('Called every minute');
+      // this.logger.debug('Called every minute');
       const matches: any = await this.matchesService.updatePastTimeMatches();
 
       matches.forEach((match: MatchDto) => {
