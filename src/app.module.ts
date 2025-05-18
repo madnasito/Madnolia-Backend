@@ -43,6 +43,7 @@ import { PlatformsModule } from './modules/platforms/platforms.module';
     UsersModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public/browser'),
+      exclude: ['/api*'], // Excludes all routes starting with /api
     }),
     JwtModule.registerAsync({
       global: true,
