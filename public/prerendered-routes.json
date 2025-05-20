@@ -1,6 +1,7 @@
 {
   "routes": {
     "/": {},
+    "/.well-known/assetlinks.json": {},
     "/about": {},
     "/download": {},
     "/match": {},
