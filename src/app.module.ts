@@ -21,6 +21,7 @@ import { MailModule } from './modules/mail/mail.module';
 import { FriendshipModule } from './modules/friendship/friendship.module';
 import { SuperModule } from './modules/super/super.module';
 import { PlatformsModule } from './modules/platforms/platforms.module';
+import { ReportsModule } from './modules/reports/reports.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -67,6 +68,7 @@ import { PlatformsModule } from './modules/platforms/platforms.module';
     FriendshipModule,
     SuperModule,
     PlatformsModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [
