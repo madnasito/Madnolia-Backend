@@ -93,27 +93,61 @@ export class UsersService {
   getInfo = async (user: Types.ObjectId) =>
     (await this.userModel.findOne({ _id: user, status: true })).toJSON();
 
-  getUserInfo = async (user1: Types.ObjectId, user2: Types.ObjectId) => {
+  getUserInfo = async (
+    targetUserId: Types.ObjectId,
+    currentUserId: Types.ObjectId,
+  ) => {
+    // Obtener información del usuario objetivo
+    const targetUser = await this.userModel.findOne({
+      _id: targetUserId,
+      status: true,
+    });
+    if (!targetUser) {
+      throw new Error('User not found');
+    }
+
+    // Verificar si son amigos
     const friendship = await this.frienshipService.findFriendshipByUsers(
-      user1,
-      user2,
+      currentUserId,
+      targetUserId,
     );
 
-    const { _id, name, username, thumb } = (
-      await this.userModel.findOne({ _id: user1, status: true })
-    ).toJSON();
+    // Obtener solicitudes de conexión entre los usuarios
+    const connectionRequests =
+      await this.connectionRequestService.findRequestsByUser(targetUserId);
 
-    const connection =
-      friendship == null || friendship.status == FriendshipStatus.BROKE
-        ? FriendshipStatus.BROKE
-        : FriendshipStatus.ALIVE;
+    // Determinar el estado de la conexión
+    let connectionStatus = ConnectionStatus.NONE;
+
+    if (friendship && friendship.status === FriendshipStatus.ALIVE) {
+      connectionStatus = ConnectionStatus.PARTNER;
+    } else {
+      // Verificar solicitudes de conexión
+      const requestSent = connectionRequests.some(
+        (request) =>
+          request.sender.equals(currentUserId) &&
+          request.receiver.equals(targetUserId),
+      );
+
+      const requestReceived = connectionRequests.some(
+        (request) =>
+          request.sender.equals(targetUserId) &&
+          request.receiver.equals(currentUserId),
+      );
+
+      if (requestSent) {
+        connectionStatus = ConnectionStatus.REQUEST_SENT;
+      } else if (requestReceived) {
+        connectionStatus = ConnectionStatus.REQUEST_RECEIVED;
+      }
+    }
 
     return {
-      _id,
-      name,
-      username,
-      thumb,
-      connection,
+      _id: targetUser._id,
+      name: targetUser.name,
+      username: targetUser.username,
+      thumb: targetUser.thumb,
+      connection: connectionStatus,
     };
   };
 
