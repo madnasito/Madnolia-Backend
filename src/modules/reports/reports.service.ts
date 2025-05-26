@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateReportDto } from './dtos/create-report.dto';
@@ -17,6 +17,17 @@ export class ReportsService {
       ...body,
       user,
     };
+
+    const reportDb = await this.reportModel.findOne({
+      user,
+      to: body.to,
+      $or: [
+        { status: ReportStatus.OPEN },
+        { status: ReportStatus.UNRED_REVIEW },
+      ],
+    });
+
+    if (reportDb) throw new ConflictException('REPORT_EXISTS');
     return this.reportModel.create(newReport);
   }
 
