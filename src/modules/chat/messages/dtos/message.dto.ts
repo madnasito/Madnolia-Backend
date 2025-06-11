@@ -4,14 +4,17 @@ import { Types } from 'mongoose';
 
 export class MessageDto {
   @IsMongoId()
-  to: Types.ObjectId;
+  conversation: Types.ObjectId;
 
   @IsString()
   text: string;
 
   @IsMongoId()
-  user: Types.ObjectId;
+  creator: Types.ObjectId;
 
   @IsEnum(MessageType)
   type: MessageType;
+
+  // @IsEnum(MessageStatus)
+  // status: MessageStatus;
 }

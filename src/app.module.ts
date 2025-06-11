@@ -37,6 +37,9 @@ import { ReportsModule } from './modules/reports/reports.module';
           socketTimeoutMS: 45000, // 45 seconds
           retryAttempts: 3, // Retry up to 3 times
           retryDelay: 1000,
+          directConnection: true,
+          replicaSet: 'rs0',
+          readPreference: 'primary',
         };
       },
     }),

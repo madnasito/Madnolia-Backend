@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { MessageType } from '../enums/message-type.enum';
+// import { User } from 'src/modules/users/schemas/user.schema';
 
 export type MessageDocument = HydratedDocument<Message>;
 
@@ -8,16 +9,10 @@ export type MessageDocument = HydratedDocument<Message>;
 export class Message {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    required: true,
-  })
-  to: Types.ObjectId;
-
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   })
-  user: Types.ObjectId;
+  creator: Types.ObjectId;
 
   @Prop({
     required: true,
@@ -28,6 +23,12 @@ export class Message {
     default: new Date(),
   })
   date: Date;
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Message',
+  })
+  parentMessage?: Types.ObjectId; // Para mensajes que son respuestas
 
   @Prop({ required: true })
   type: MessageType;

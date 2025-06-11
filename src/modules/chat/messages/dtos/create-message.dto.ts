@@ -4,7 +4,7 @@ import { Types } from 'mongoose';
 
 export class CreateMessageDto {
   @IsMongoId()
-  to: Types.ObjectId;
+  conversation: Types.ObjectId;
 
   @IsString()
   text: string;

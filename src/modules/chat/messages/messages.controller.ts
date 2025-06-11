@@ -18,6 +18,7 @@ export class MessagesController {
   @Get('')
   @UseGuards(UserGuard)
   async getChats(@Request() req: any) {
+    // return false;
     return this.messagesService.getUserChats(req.user.id);
   }
 

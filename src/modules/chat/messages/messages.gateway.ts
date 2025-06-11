@@ -26,6 +26,8 @@ import { Users } from '../../users/classes/user';
 import { JwtService } from '@nestjs/jwt';
 import { FriendshipService } from 'src/modules/friendship/friendship.service';
 import { MatchesService } from 'src/modules/matches/matches.service';
+import { UpdateRecipientStatusDTO } from './dtos/update-recipient-status.dto';
+import { MessageType } from './enums/message-type.enum';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -116,34 +118,78 @@ export class MessagesGateway
       this.logger.debug(`Message received from client id: ${client.id}`);
 
       const message: MessageDto = {
-        to: payload.to,
-        user: request.user,
+        conversation: payload.conversation,
+        creator: request.user,
         text: payload.text,
         type: payload.type,
       };
-      const messageSaved = await this.messagesService.create(message);
-      if (!messageSaved) throw new WsException('NO_MESSAGE');
+      const messageRecipients = await this.messagesService.create(message);
+      if (!messageRecipients) throw new WsException('NO_MESSAGE');
 
-      const { text, _id, date } = messageSaved;
-      // const user = this.users.getUserById(request.user);
-
-      // Payload to emit to user
-      const payloadEvent = {
-        _id,
-        text,
-        date,
-        to: payload.to,
-        user: request.user,
-        type: payload.type,
-      };
-
-      this.logger.debug(`${this.users.getUser(client.id).room}`);
-
-      client.to(messageSaved.to.toString()).emit('message', payloadEvent);
-
-      client.emit('message', payloadEvent);
+      if (payload.type == MessageType.USER) {
+        const data = messageRecipients.find(
+          (message) => message.user != request.user,
+        );
+        client
+          .to(messageRecipients[0].conversation.toString())
+          .emit('message', data);
+        client.emit(
+          'message',
+          messageRecipients.find((message) => message.user == request.user),
+        );
+      } else {
+        const messageRecipient = messageRecipients[0];
+        client
+          .to(messageRecipient.conversation.toString())
+          .emit('message', messageRecipient);
+        client.emit('message', messageRecipient);
+      }
     } catch (error) {
       console.log(error);
+      throw new WsException(error);
+    }
+  }
+
+  @UseGuards(UserSocketGuard)
+  @SubscribeMessage('update_recipient_status')
+  async updateRecipientStatus(
+    @Request() request: any,
+    @MessageBody() payload: UpdateRecipientStatusDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const updatedMessageRecipients =
+        await this.messagesService.updateRecipientStatus(request.user, payload);
+
+      // Find the recipient for other users
+      const recipientForOthers = updatedMessageRecipients.find(
+        (message) => message.user.toString() !== request.user,
+      );
+
+      // Find the recipient for the current user
+      const recipientForUser = updatedMessageRecipients.find(
+        (message) => message.user.toString() === request.user,
+      );
+
+      // Emit to room (other users in conversation)
+      if (recipientForOthers) {
+        client
+          .to(recipientForOthers.conversation.toString())
+          .emit('message_recipient_update', {
+            id: recipientForOthers._id,
+            status: recipientForOthers.status,
+          });
+      }
+
+      // Emit to current user
+      if (recipientForUser) {
+        client.emit('message_recipient_update', {
+          id: recipientForUser._id,
+          status: recipientForUser.status,
+        });
+      }
+    } catch (error) {
+      Logger.error(error);
       throw new WsException(error);
     }
   }
@@ -156,7 +202,7 @@ export class MessagesGateway
       this.users.getUser(client.id).room = '';
       return true;
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw new WsException(error);
     }
   }

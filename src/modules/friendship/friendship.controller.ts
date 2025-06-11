@@ -15,7 +15,7 @@ export class FriendshipController {
   constructor(private readonly friendshipService: FriendshipService) {}
   @Get('with')
   @UseGuards(UserGuard)
-  async getFriendship(
+  async getFriendshipByUser(
     @Request() req: any,
     @Query('user') user: Types.ObjectId,
   ) {
@@ -24,6 +24,21 @@ export class FriendshipController {
       user,
     );
     if (!friendshipDb) throw new NotFoundException();
+    return friendshipDb;
+  }
+
+  @Get('get')
+  @UseGuards(UserGuard)
+  async getFriendshipById(
+    @Request() req: any,
+    @Query('id') id: Types.ObjectId,
+  ) {
+    const friendshipDb = await this.friendshipService.fincFriendshipById(id);
+    if (!friendshipDb) throw new NotFoundException();
+
+    if (friendshipDb.user1 != req.user.id && friendshipDb.user2.id != req.user)
+      throw new NotFoundException();
+
     return friendshipDb;
   }
 }

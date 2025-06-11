@@ -15,13 +15,14 @@ import { UserGuard } from 'src/common/guards/user.guard';
 import { MatchesService } from './matches.service';
 import { UpdateMatchDto } from './dtos/update-match.dto';
 import { PlatformParent } from '../platforms/enums/platform-parent.enum';
+import { Types } from 'mongoose';
 
 @Controller('match')
 export class MatchesController {
   constructor(private matchesService: MatchesService) {}
 
   @Get('info/:id')
-  async getMatch(@Param('id') id: string) {
+  async getMatch(@Param('id') id: Types.ObjectId) {
     return this.matchesService.getMatch(id);
   }
 

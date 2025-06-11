@@ -68,7 +68,7 @@ export class MatchesService {
     return matchDb;
   };
 
-  getMatch = async (id: string) => {
+  getMatch = async (id: Types.ObjectId) => {
     if (!mongoose.Types.ObjectId.isValid(id))
       throw new NotFoundException('NO_MATCH_FOUND');
     return this.matchModel.findById(id);
@@ -150,6 +150,19 @@ export class MatchesService {
       { $addToSet: { joined: user } },
       { new: true },
     );
+  };
+
+  verifyUserInMatch = async (
+    matchId: Types.ObjectId,
+    userId: Types.ObjectId,
+  ) => {
+    return this.matchModel.findOne({
+      _id: matchId,
+      $or: [
+        { user: userId }, // El usuario es el creador del match
+        { joined: userId }, // El usuario está en el array de joined
+      ],
+    });
   };
 
   getPlayerMatches = async (user: string, skip: number = 0) =>

@@ -32,6 +32,7 @@ export class SuperService {
       await this.notificationsService.deleteUserNotifications(user);
       await this.matchesService.deleteUserFromMatches(user);
       await this.messagesService.deleteAllUserMessages(user);
+      await this.messagesService.deleteAllUserMessagesRecipients(user);
       await session.commitTransaction();
     } catch (error) {
       Logger.error(error);

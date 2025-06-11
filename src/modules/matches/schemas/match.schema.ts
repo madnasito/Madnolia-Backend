@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { Game } from 'src/modules/games/schemas/game.schema';
 import { Group } from 'src/modules/groups/schema/group.schema';
-import { User } from 'src/modules/users/schemas/user.schema';
 import { MatchStatus } from '../enums/status.enum';
 
 export type MatchDocument = HydratedDocument<Match>;
@@ -70,7 +69,7 @@ export class Match {
     ref: 'User',
     default: [],
   })
-  joined: User[];
+  joined: Types.ObjectId[];
 
   @Prop({
     default: false,
