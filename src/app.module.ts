@@ -37,8 +37,8 @@ import { ReportsModule } from './modules/reports/reports.module';
           socketTimeoutMS: 45000, // 45 seconds
           retryAttempts: 3, // Retry up to 3 times
           retryDelay: 1000,
-          directConnection: true,
-          replicaSet: 'rs0',
+          // directConnection: true,
+          replicaSet: config.get<string>('MONGODB_REPLICA_SET'),
           readPreference: 'primary',
         };
       },
