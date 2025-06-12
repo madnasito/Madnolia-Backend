@@ -42,6 +42,16 @@ export class UserController {
     return this.usersService.searchUser(req.user.id, username);
   }
 
+  @UseGuards(UserGuard)
+  @Get('search-to-invite/:username')
+  async searchToInvite(
+    @Request() req: any,
+    @Param('username') username: string,
+  ): Promise<any> {
+    // Especifica el tipo de retorno, si es posible
+    return this.usersService.searchToInviteUser(req.user.id, username);
+  }
+
   @Get('user-exists/:username/:email')
   async userExists(
     @Param('username') username: string,

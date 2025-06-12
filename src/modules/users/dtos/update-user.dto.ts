@@ -2,13 +2,13 @@ import {
   IsAlphanumeric,
   IsArray,
   IsEmail,
-  IsIn,
-  IsInt,
+  IsEnum,
   IsOptional,
   IsString,
   Matches,
   MaxLength,
 } from 'class-validator';
+import { Availability } from '../enums/availability.enum';
 
 export class UpdateUserDto {
   @IsAlphanumeric()
@@ -36,8 +36,7 @@ export class UpdateUserDto {
   @IsOptional()
   thumb: string;
 
-  @IsInt()
+  @IsEnum(Availability)
   @IsOptional()
-  @IsIn([0, 1, 2])
-  availability: number;
+  availability: Availability;
 }

@@ -247,6 +247,89 @@ export class UsersService {
     return results.slice(skip, skip + limit);
   }
 
+  async searchToInviteUser(
+    userId: Types.ObjectId,
+    query: string,
+    page: number = 1,
+    limit: number = 5,
+  ): Promise<any> {
+    const regex = new RegExp(query, 'i');
+    const skip = (page - 1) * limit;
+
+    const userInfo = await this.userModel.findOne({ _id: userId });
+
+    const partners = (
+      await this.frienshipService.findFriendshipsByUser(userId)
+    ).map((e: Friendship) => (e.user1 != userInfo.id ? e.user1 : e.user2));
+
+    const userRequests =
+      await this.connectionRequestService.findRequestsByUser(userId);
+
+    const requestsReceived = userRequests
+      .filter((request) => request.receiver.equals(userInfo._id))
+      .map((request) => request.sender);
+
+    const requestsSended = userRequests
+      .filter((request) => request.sender.equals(userInfo._id))
+      .map((request) => request.receiver);
+
+    const foundUsers = await this.userModel
+      .find({
+        $or: [{ username: regex }, { name: regex }],
+        $nor: [{ _id: userId }],
+        status: true,
+      })
+      .select({ name: 1, username: 1, _id: 1, thumb: 1 })
+      .lean()
+      .skip(skip)
+      .limit(limit)
+      .exec();
+
+    const results = foundUsers.map((foundUser) => {
+      const connectionUser: any = foundUser;
+      connectionUser.connection = ConnectionStatus.NONE;
+
+      if (
+        partners.some((partnerId: Types.ObjectId) => partnerId == foundUser._id)
+      ) {
+        connectionUser.connection = ConnectionStatus.PARTNER;
+      } else if (
+        requestsSended.some((senderId: Types.ObjectId) =>
+          senderId.equals(foundUser._id),
+        )
+      ) {
+        connectionUser.connection = ConnectionStatus.REQUEST_SENT;
+      } else if (
+        requestsReceived.some((receiverId: Types.ObjectId) =>
+          receiverId.equals(foundUser._id),
+        )
+      ) {
+        connectionUser.connection = ConnectionStatus.REQUEST_RECEIVED;
+      }
+
+      return connectionUser;
+    });
+
+    // Ordenar los resultados: partners primero
+    results.sort((a, b) => {
+      if (
+        a.connection === ConnectionStatus.PARTNER &&
+        b.connection !== ConnectionStatus.PARTNER
+      ) {
+        return -1; // 'a' va antes que 'b'
+      } else if (
+        a.connection !== ConnectionStatus.PARTNER &&
+        b.connection === ConnectionStatus.PARTNER
+      ) {
+        return 1; // 'b' va antes que 'a'
+      }
+      return 0; // Mantener el orden relativo si ambos tienen el mismo estado
+    });
+
+    // Aplicar paginación después de ordenar
+    return results.slice(skip, skip + limit);
+  }
+
   resetNotifications = async (user: string) =>
     this.userModel.findOneAndUpdate(
       { _id: user },
