@@ -153,8 +153,35 @@ export class UsersService {
 
   // getInvitations = async (user: string) => this.userModel.populate('')
 
-  upadte = async (user: string, attrs: Partial<User>): Promise<User | null> =>
-    this.userModel.findOneAndUpdate({ _id: user }, attrs, { new: true });
+  // En tu UsersService
+  async update(userId: string, attrs: Partial<User>): Promise<User> {
+    // 1. Filtrar atributos undefined
+    const updateData = Object.keys(attrs).reduce((acc, key) => {
+      if (attrs[key] !== undefined) acc[key] = attrs[key];
+      return acc;
+    }, {});
+
+    // 2. Verificar si hay datos para actualizar
+    if (Object.keys(updateData).length === 0) {
+      throw new BadRequestException('No hay datos para actualizar');
+    }
+
+    // 3. Actualizar y retornar el documento
+    const updatedUser = await this.userModel
+      .findOneAndUpdate(
+        { _id: userId },
+        { $set: updateData },
+        { new: true, runValidators: true },
+      )
+      .lean()
+      .exec();
+
+    if (!updatedUser) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    return updatedUser;
+  }
 
   userExists = async (username: string, email: string) => {
     const usernameDb = await this.userModel.findOne({ username });

@@ -81,7 +81,7 @@ export class UserController {
   @Put('update')
   @UseGuards(UserGuard)
   async update(@Request() req: any, @Body() body: UpdateUserDto) {
-    return this.usersService.upadte(req.user.id, body);
+    return this.usersService.update(req.user.id, body);
   }
 
   @Post('update-img')
@@ -123,7 +123,7 @@ export class UserController {
         resp.data.files.status === 'Success' ||
         resp.data.files.status === 'Duplicate'
       ) {
-        await this.usersService.upadte(req.user.id, {
+        await this.usersService.update(req.user.id, {
           thumb: resp.data.files.thumbnail_url,
           img: resp.data.files.url,
         });
