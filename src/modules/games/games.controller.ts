@@ -9,4 +9,9 @@ export class GamesController {
   getGame(@Param('game') game: string) {
     return this.gamesService.findBySlug(game);
   }
+
+  @Get('/id/:game')
+  getGameById(@Param('game') game: string) {
+    return this.gamesService.findById(game);
+  }
 }

@@ -70,9 +70,17 @@ export class MatchesController {
   joined(@Request() request: any) {
     return this.matchesService.getMatchesWithUserJoined(request.user.id);
   }
-  @Get('platform/:platform')
-  async getMatchesByPlatform(@Param('platform') platform: string) {
-    return this.matchesService.getMatchesByPlatform(parseInt(platform));
+  @Get('platform')
+  async getMatchesByPlatform(
+    @Query('platform') platform: string,
+    @Query('skip') skip: string,
+    @Query('limit') limit: string,
+  ) {
+    return this.matchesService.getMatchesByPlatform(
+      parseInt(platform),
+      parseInt(skip),
+      parseInt(limit),
+    );
   }
 
   @Get('by-platform-and-game/:platform/:game')
