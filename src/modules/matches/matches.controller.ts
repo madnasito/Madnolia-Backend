@@ -27,8 +27,16 @@ export class MatchesController {
   }
 
   @Get('get-by')
-  async getByPlatformDaddy(@Query('parent') parent: PlatformParent) {
-    return this.matchesService.getMatchesByPlatformParent(parent);
+  async getByPlatformDaddy(
+    @Query('parent') parent: PlatformParent,
+    @Query('skip') skip: string,
+    @Query('limit') limit: string,
+  ) {
+    return this.matchesService.getMatchesByPlatformParent(
+      parent,
+      parseInt(skip),
+      parseInt(limit),
+    );
   }
 
   @Get('with-game/:id')

@@ -187,7 +187,10 @@ export class MatchesService {
       {
         $match: {
           platform,
-          status: { $ne: MatchStatus.FINISHED },
+          $or: [
+            { status: MatchStatus.RUNNING },
+            { status: MatchStatus.WAITING },
+          ],
         },
       },
       {
@@ -213,10 +216,11 @@ export class MatchesService {
       {
         $sort: {
           count: -1,
+          name: -1,
         },
       },
       {
-        $skip: skip,
+        $skip: skip * limit,
       },
       {
         $limit: limit, // Add the limit stage
@@ -226,13 +230,21 @@ export class MatchesService {
     return results;
   };
 
-  getMatchesByPlatformParent = async (parent: PlatformParent) => {
+  getMatchesByPlatformParent = async (
+    parent: PlatformParent,
+    skip: number,
+    limit: number,
+  ) => {
     const platforms = await this.platformsService.getByParent(parent);
 
     // Fetch all platform matches in parallel
     const platformMatches = await Promise.all(
       platforms.map(async (platform) => {
-        const matches = await this.getMatchesByPlatform(platform.apiId, 0, 6);
+        const matches = await this.getMatchesByPlatform(
+          platform.apiId,
+          skip,
+          limit,
+        );
         return {
           name: platform.name,
           slug: platform.slug,
