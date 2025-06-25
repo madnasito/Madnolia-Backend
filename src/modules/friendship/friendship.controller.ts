@@ -36,7 +36,7 @@ export class FriendshipController {
     const friendshipDb = await this.friendshipService.fincFriendshipById(id);
     if (!friendshipDb) throw new NotFoundException();
 
-    if (friendshipDb.user1 != req.user.id && friendshipDb.user2.id != req.user)
+    if (friendshipDb.user1 != req.user.id && friendshipDb.user2 != req.user.id)
       throw new NotFoundException();
 
     return friendshipDb;
