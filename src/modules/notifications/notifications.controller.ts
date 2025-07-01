@@ -1,6 +1,14 @@
-import { Controller, Get, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseGuards,
+  Request,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { NotificationsService } from './notifications.service';
+import { Types } from 'mongoose';
 
 @Controller('notifications')
 export class NotificationsController {
@@ -16,6 +24,15 @@ export class NotificationsController {
   getUnreadNotificationsCount(@Request() request: any) {
     return this.notificationsService.getUserUnreadNotificationsCount(
       request.user.id,
+    );
+  }
+
+  @UseGuards(UserGuard)
+  @Delete('delete')
+  deleteNotification(@Request() request: any, @Query('id') id: Types.ObjectId) {
+    return this.notificationsService.deleteUserNotification(
+      request.user.id,
+      id,
     );
   }
 }
