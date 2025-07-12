@@ -16,6 +16,7 @@ import { MatchesService } from './matches.service';
 import { UpdateMatchDto } from './dtos/update-match.dto';
 import { PlatformParent } from '../platforms/enums/platform-parent.enum';
 import { Types } from 'mongoose';
+import { PlayerMatchesFiltersDto } from './dtos/player-matches-filters.dto';
 
 @Controller('match')
 export class MatchesController {
@@ -51,8 +52,11 @@ export class MatchesController {
 
   @UseGuards(UserGuard)
   @Get('player-matches')
-  async getPlayerMatches(@Request() request: any) {
-    return this.matchesService.getPlayerMatches(request.user.id);
+  async getPlayerMatches(
+    @Request() request: any,
+    @Body() body: PlayerMatchesFiltersDto,
+  ) {
+    return this.matchesService.getPlayerMatches(request.user.id, body);
   }
 
   @UseGuards(UserGuard)

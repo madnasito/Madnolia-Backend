@@ -74,7 +74,7 @@ export class MessagesGateway
       ).map((e) => e.id);
 
       const userMatchesIds: string[] = (
-        await this.matchesService.getMatchesJoinedOrCreatedByUser(
+        await this.matchesService.getActiveMatchesJoinedOrCreatedByUser(
           tokenPayload.id,
         )
       ).map((match) => match.id);

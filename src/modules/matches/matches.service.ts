@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Match } from './schemas/match.schema';
-import mongoose, { Model, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { GamesService } from 'src/modules/games/games.service';
 import { GameInterface } from './interfaces/game.interface';
 import { CreateMatchDto } from './dtos/create-match.dto';
@@ -18,6 +18,10 @@ import { CreateNotificationDto } from '../notifications/dtos/create-notification
 import { NotificationType } from '../notifications/enums/notification-type.enum';
 import { PlatformParent } from '../platforms/enums/platform-parent.enum';
 import { PlatformsService } from '../platforms/platforms.service';
+import {
+  MatchesTypeFilter,
+  PlayerMatchesFiltersDto,
+} from './dtos/player-matches-filters.dto';
 
 @Injectable()
 export class MatchesService {
@@ -69,13 +73,13 @@ export class MatchesService {
   };
 
   getMatch = async (id: Types.ObjectId) => {
-    if (!mongoose.Types.ObjectId.isValid(id))
+    if (!Types.ObjectId.isValid(id))
       throw new NotFoundException('NO_MATCH_FOUND');
     return this.matchModel.findById(id);
   };
 
   getMatchWithGame = async (id: string) => {
-    if (!mongoose.Types.ObjectId.isValid(id))
+    if (!Types.ObjectId.isValid(id))
       throw new ConflictException('NO_GAME_FOUND');
     return this.matchModel.findOne(
       { _id: id },
@@ -85,7 +89,7 @@ export class MatchesService {
   };
 
   getFullMatch = async (id: string) => {
-    if (!mongoose.Types.ObjectId.isValid(id))
+    if (!Types.ObjectId.isValid(id))
       throw new NotFoundException('NO_MATCH_FOUND');
 
     const match = await this.matchModel.findOne(
@@ -124,7 +128,7 @@ export class MatchesService {
   };
 
   delete = async (id: string, user: string) => {
-    if (!mongoose.Types.ObjectId.isValid(id))
+    if (!Types.ObjectId.isValid(id))
       throw new NotFoundException('NO_MATCH_FOUND');
 
     const matchDeleted = await this.matchModel.findOneAndUpdate(
@@ -139,10 +143,7 @@ export class MatchesService {
   };
 
   addUserToMatch = (id: string, user: string) => {
-    if (
-      !mongoose.Types.ObjectId.isValid(id) ||
-      !mongoose.Types.ObjectId.isValid(user)
-    )
+    if (!Types.ObjectId.isValid(id) || !Types.ObjectId.isValid(user))
       throw new NotFoundException('USER_NOT_FOUND');
 
     return this.matchModel.findByIdAndUpdate(
@@ -165,11 +166,50 @@ export class MatchesService {
     });
   };
 
-  getPlayerMatches = async (user: string, skip: number = 0) =>
-    this.matchModel
-      .find({ user }, {}, { populate: { path: 'game' } })
-      .sort({ _id: -1 })
-      .skip(skip);
+  getAllPlayerMatches = async (
+    user: Types.ObjectId,
+    payload: PlayerMatchesFiltersDto,
+  ) => {
+    const filter: any = { $or: [{ user }, { joined: user }] };
+
+    if (payload.platform) {
+      filter.platform = payload.platform;
+    } else {
+      filter.platform = { $ne: null }; // Only include if platform is not null
+    }
+
+    return this.matchModel
+      .find(filter, {}, { populate: { path: 'game' } })
+      .sort({ _id: payload.sort })
+      .skip(payload.skip);
+    // eslint-disable-next-line prettier/prettier
+  };
+
+  getPlayerMatches = async (
+    user: Types.ObjectId,
+    payload: PlayerMatchesFiltersDto,
+  ) => {
+    switch (payload.type) {
+      case MatchesTypeFilter.ALL:
+        return this.getAllPlayerMatches(user, payload);
+      case MatchesTypeFilter.CREATED:
+        return this.getMatchesCreatedByPlayer(user, payload);
+      case MatchesTypeFilter.JOINED:
+        return this.getMatchesWithUserJoined(user);
+    }
+  };
+
+  getMatchesCreatedByPlayer = (
+    user: Types.ObjectId,
+    payload: PlayerMatchesFiltersDto,
+  ) =>
+    this.matchModel.find(
+      {
+        user,
+      },
+      {},
+      { sort: payload.sort, skip: payload.skip, populate: { path: 'game' } },
+    );
 
   getPlayerInvitations = async (user: string, skip: number = 0) =>
     this.matchModel.find(
@@ -258,14 +298,14 @@ export class MatchesService {
     return platformMatches.sort((a, b) => b.matches.length - a.matches.length);
   };
 
-  getMatchesWithUserJoined = (userId: string) =>
+  getMatchesWithUserJoined = (userId: Types.ObjectId) =>
     this.matchModel.find(
       { joined: userId },
       {},
       { populate: { path: 'game' }, sort: { _id: -1 } },
     );
 
-  getMatchesJoinedOrCreatedByUser = (userId: Types.ObjectId) =>
+  getActiveMatchesJoinedOrCreatedByUser = (userId: Types.ObjectId) =>
     this.matchModel.find(
       {
         $or: [
