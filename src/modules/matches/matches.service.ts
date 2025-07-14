@@ -181,8 +181,8 @@ export class MatchesService {
     return this.matchModel
       .find(filter, {}, { populate: { path: 'game' } })
       .sort({ _id: payload.sort })
+      .limit(10)
       .skip(payload.skip);
-    // eslint-disable-next-line prettier/prettier
   };
 
   getPlayerMatches = async (
@@ -208,7 +208,12 @@ export class MatchesService {
         user,
       },
       {},
-      { sort: payload.sort, skip: payload.skip, populate: { path: 'game' } },
+      {
+        sort: payload.sort,
+        skip: payload.skip,
+        populate: { path: 'game' },
+        limit: 10,
+      },
     );
 
   getPlayerInvitations = async (user: string, skip: number = 0) =>
@@ -302,7 +307,7 @@ export class MatchesService {
     this.matchModel.find(
       { joined: userId },
       {},
-      { populate: { path: 'game' }, sort: { _id: -1 } },
+      { populate: { path: 'game' }, sort: { _id: -1 }, limit: 10 },
     );
 
   getActiveMatchesJoinedOrCreatedByUser = (userId: Types.ObjectId) =>
