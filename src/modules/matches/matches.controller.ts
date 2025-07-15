@@ -77,11 +77,6 @@ export class MatchesController {
     );
   }
 
-  @UseGuards(UserGuard)
-  @Get('joined')
-  joined(@Request() request: any) {
-    return this.matchesService.getMatchesWithUserJoined(request.user.id);
-  }
   @Get('platform')
   async getMatchesByPlatform(
     @Query('platform') platform: string,

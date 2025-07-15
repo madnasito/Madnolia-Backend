@@ -195,7 +195,7 @@ export class MatchesService {
       case MatchesTypeFilter.CREATED:
         return this.getMatchesCreatedByPlayer(user, payload);
       case MatchesTypeFilter.JOINED:
-        return this.getMatchesWithUserJoined(user);
+        return this.getMatchesWithUserJoined(user, payload);
     }
   };
 
@@ -209,7 +209,7 @@ export class MatchesService {
       },
       {},
       {
-        sort: payload.sort,
+        sort: { _id: payload.sort },
         skip: payload.skip,
         populate: { path: 'game' },
         limit: 10,
@@ -303,11 +303,19 @@ export class MatchesService {
     return platformMatches.sort((a, b) => b.matches.length - a.matches.length);
   };
 
-  getMatchesWithUserJoined = (userId: Types.ObjectId) =>
+  getMatchesWithUserJoined = (
+    userId: Types.ObjectId,
+    payload: PlayerMatchesFiltersDto,
+  ) =>
     this.matchModel.find(
       { joined: userId },
       {},
-      { populate: { path: 'game' }, sort: { _id: -1 }, limit: 10 },
+      {
+        populate: { path: 'game' },
+        sort: { _id: payload.sort },
+        limit: 10,
+        skip: payload.skip,
+      },
     );
 
   getActiveMatchesJoinedOrCreatedByUser = (userId: Types.ObjectId) =>
