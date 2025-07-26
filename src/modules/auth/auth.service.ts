@@ -28,7 +28,9 @@ export class AuthService {
   };
 
   signIn = async (signInDto: SignInDto) => {
-    const user = await this.usersService.fincOneByUsername(signInDto.username);
+    const user = await this.usersService.fincOneByUsername(
+      signInDto.username.toLocaleLowerCase(),
+    );
 
     if (!user) throw new NotFoundException('USER_NOT_FOUND');
 
