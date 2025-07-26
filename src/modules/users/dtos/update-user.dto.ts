@@ -1,5 +1,4 @@
 import {
-  IsAlphanumeric,
   IsArray,
   IsEmail,
   IsEnum,
@@ -11,8 +10,9 @@ import {
 import { Availability } from '../enums/availability.enum';
 
 export class UpdateUserDto {
-  @IsAlphanumeric()
   @IsOptional()
+  @IsString()
+  @MaxLength(20)
   name: string;
 
   @IsOptional()
