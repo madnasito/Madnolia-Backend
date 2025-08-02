@@ -35,9 +35,8 @@ export class UsersService {
       throw new BadRequestException('EMAIL_IN_USE');
     }
 
-    const userDb = await this.fincOneByUsername(
-      signUpDto.username.toLocaleLowerCase().trim(),
-    );
+    signUpDto.username = signUpDto.username.toLowerCase().trim();
+    const userDb = await this.fincOneByUsername(signUpDto.username);
     if (userDb) {
       throw new BadRequestException('USERNAME_IN_USE');
     }
