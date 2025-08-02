@@ -36,7 +36,7 @@ export class UsersService {
     }
 
     const userDb = await this.fincOneByUsername(
-      signUpDto.username.toLocaleLowerCase(),
+      signUpDto.username.toLocaleLowerCase().trim(),
     );
     if (userDb) {
       throw new BadRequestException('USERNAME_IN_USE');
@@ -56,6 +56,7 @@ export class UsersService {
   };
 
   fincOneByUsername = async (username: string) => {
+    username = username.toLowerCase().trim();
     const user = await this.userModel.findOne({ username });
     return user;
   };
