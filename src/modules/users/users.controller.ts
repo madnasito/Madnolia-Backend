@@ -97,7 +97,7 @@ export class UserController {
     img: Express.Multer.File,
   ) {
     try {
-      const validExtension = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+      const validExtension = ['jpg', 'png', 'webp', 'gif'];
       const extension = img.mimetype.split('/')[1];
       if (!validExtension.includes(extension)) {
         throw new HttpException('NOT_VALID_EXTENSION', HttpStatus.BAD_REQUEST);
@@ -106,7 +106,10 @@ export class UserController {
       const form = new FormData();
       const apiKey = this.config.get<string>('IMGBB_KEY');
 
-      form.append('file', new Blob([img.buffer], { type: img.mimetype }));
+      form.append(
+        'file',
+        new Blob([new Uint8Array(img.buffer)], { type: img.mimetype }),
+      );
       form.append('apikey', apiKey);
 
       const resp = await axios.post(
