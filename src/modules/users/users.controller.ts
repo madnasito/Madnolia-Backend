@@ -91,13 +91,13 @@ export class UserController {
     @Request() req: any,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 1000 * 1024 })],
+        validators: [new MaxFileSizeValidator({ maxSize: 1000 * 2048 })],
       }),
     )
     img: Express.Multer.File,
   ) {
     try {
-      const validExtension = ['jpg', 'png', 'webp', 'gif'];
+      const validExtension = ['jpg', 'png', 'jpeg', 'webp', 'gif'];
       const extension = img.mimetype.split('/')[1];
       if (!validExtension.includes(extension)) {
         throw new HttpException('NOT_VALID_EXTENSION', HttpStatus.BAD_REQUEST);
@@ -106,7 +106,13 @@ export class UserController {
       const form = new FormData();
       const apiKey = this.config.get<string>('IMGBB_KEY');
 
-      form.append('file', new Blob([img.buffer], { type: img.mimetype }));
+      // ...existing code...
+      form.append(
+        'file',
+        new Blob([new Uint8Array(img.buffer)], { type: img.mimetype }),
+        img.originalname,
+      );
+
       form.append('apikey', apiKey);
 
       const resp = await axios.post(
