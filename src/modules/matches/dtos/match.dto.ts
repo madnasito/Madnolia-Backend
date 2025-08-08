@@ -9,7 +9,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { ObjectId } from 'mongoose';
+import { ObjectId, Types } from 'mongoose';
 
 export class MatchDto {
   @IsOptional()
@@ -25,7 +25,7 @@ export class MatchDto {
   @IsNotEmpty()
   @IsDefined()
   @IsMongoId()
-  user: string;
+  user: Types.ObjectId;
 
   @IsInt()
   platform: number;
@@ -40,7 +40,7 @@ export class MatchDto {
   inviteds: Array<string>;
 
   @IsArray()
-  joined: Array<string>;
+  joined: Array<Types.ObjectId>;
 
   @IsBoolean()
   tournament: boolean;

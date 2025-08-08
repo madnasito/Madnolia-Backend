@@ -26,7 +26,7 @@ export class GamesService {
 
     const rawGame: RawgGame = await this.getRawgGame(id);
 
-    if (!rawGame) throw new BadGatewayException('error.loading_game');
+    if (!rawGame) throw new BadGatewayException('LOADING_GAME');
 
     const newGame = {
       name: rawGame.name,

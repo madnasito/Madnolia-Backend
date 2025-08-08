@@ -1,9 +1,10 @@
 import { IsMongoId, IsNotEmpty } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class UserGroupDto {
   @IsNotEmpty()
   @IsMongoId()
-  user: string;
+  user: Types.ObjectId;
 
   @IsNotEmpty()
   @IsMongoId()

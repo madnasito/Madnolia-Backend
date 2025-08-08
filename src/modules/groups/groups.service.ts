@@ -64,7 +64,7 @@ export class GroupsService {
 
     if (!groupDb) throw new NotFoundException('GROUP_NOT_FOUND');
 
-    await this.usersService.fincOneById(userGroupDto.user);
+    await this.usersService.findOneById(userGroupDto.user);
 
     if (
       groupDb.joinRequestApproval == JoinRequestApproval.ADMIN &&

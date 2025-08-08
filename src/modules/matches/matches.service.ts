@@ -22,6 +22,8 @@ import {
   MatchesTypeFilter,
   PlayerMatchesFiltersDto,
 } from './dtos/player-matches-filters.dto';
+import { UsersService } from '../users/users.service';
+import { MatchesByPlatforms } from './interfaces/matches-by-platforms';
 
 @Injectable()
 export class MatchesService {
@@ -30,6 +32,7 @@ export class MatchesService {
     private readonly gamesService: GamesService,
     private readonly notificationsService: NotificationsService,
     private readonly platformsService: PlatformsService,
+    private readonly usersService: UsersService,
   ) {}
 
   create = async (createMatchDto: CreateMatchDto, user: string) => {
@@ -227,7 +230,7 @@ export class MatchesService {
     platform: number,
     skip: number = 0,
     limit: number = 30, // Default limit of 10 documents
-  ) => {
+  ): Promise<MatchesByPlatforms[]> => {
     const results = await this.matchModel.aggregate([
       {
         $match: {
@@ -416,5 +419,22 @@ export class MatchesService {
       Logger.error(error);
     } finally {
     }
+  };
+
+  getUserMatchesByPlatform = async (id: Types.ObjectId) => {
+    const user = await this.usersService.findOneById(id);
+
+    const platformMatches = await Promise.all(
+      user.platforms.map(async (platform) => {
+        return {
+          platform,
+          games: await this.getMatchesByPlatform(platform),
+        };
+      }),
+    );
+
+    platformMatches.sort((a, b) => b.games.length - a.games.length);
+
+    return platformMatches;
   };
 }

@@ -60,6 +60,12 @@ export class MatchesController {
   }
 
   @UseGuards(UserGuard)
+  @Get('player-games-platforms')
+  async getPlayerGamesPlatforms(@Request() request: any) {
+    return this.matchesService.getUserMatchesByPlatform(request.user.id);
+  }
+
+  @UseGuards(UserGuard)
   @Get('invitations')
   async getPlayerInvitations(@Request() request: any) {
     return this.matchesService.getPlayerInvitations(request.user.id);

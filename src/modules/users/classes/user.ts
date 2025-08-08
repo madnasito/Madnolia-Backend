@@ -1,4 +1,5 @@
 import { Injectable, Scope } from '@nestjs/common';
+import { Types } from 'mongoose';
 import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable({ scope: Scope.DEFAULT })
@@ -9,8 +10,8 @@ export class Users {
     this.users = [];
   }
 
-  addUser = async (userId: string, socketId: string) => {
-    const user = await this.usersService.fincOneById(userId);
+  addUser = async (userId: Types.ObjectId, socketId: string) => {
+    const user = await this.usersService.findOneById(userId);
 
     if (!user) {
       return;
@@ -26,7 +27,7 @@ export class Users {
   getUser = (id: string) =>
     this.users.filter((user) => user.socketId === id)[0];
 
-  getUserById = (id: string) =>
+  getUserById = (id: Types.ObjectId) =>
     this.users.find((user) => user._id.toString() === id);
 
   getUserByUsername = (username: string) =>

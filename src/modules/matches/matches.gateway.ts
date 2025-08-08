@@ -58,7 +58,7 @@ export class MatchesGateway
     };
 
     match.inviteds.forEach((element) => {
-      const invitedUser = this.users.getUserById(element.toString());
+      const invitedUser = this.users.getUserById(element);
       if (invitedUser) {
         client.to(invitedUser.socketId).emit('invitation', eventPayload);
         this.logger.debug(invitedUser);
@@ -118,12 +118,12 @@ export class MatchesGateway
         };
 
         // Event to hoster
-        const hoster = this.users.getUserById(match.user.toString());
+        const hoster = this.users.getUserById(match.user);
         if (hoster) this.io.to(hoster.socketId).emit('match_ready', payload);
 
         // Event to joined users
         match.joined.forEach((user) => {
-          const socketUser = this.users.getUserById(user.toString());
+          const socketUser = this.users.getUserById(user);
           if (socketUser) {
             this.io.to(socketUser.socketId).emit('match_ready', payload);
             this.logger.debug(`Notification to ${socketUser.username}`);

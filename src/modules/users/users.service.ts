@@ -65,7 +65,7 @@ export class UsersService {
     return user;
   };
 
-  fincOneById = async (id: string) => {
+  findOneById = async (id: Types.ObjectId) => {
     if (!mongoose.Types.ObjectId.isValid(id))
       throw new NotFoundException('USER_NOT_FOUND');
 

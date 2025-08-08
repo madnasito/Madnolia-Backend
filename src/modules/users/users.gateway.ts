@@ -28,12 +28,12 @@ export class UsersGateway {
   @UseGuards(UserSocketGuard)
   @SubscribeMessage('request_connection')
   async requestNewConnection(
-    @MessageBody() requestedUser: string,
+    @MessageBody() requestedUser: Types.ObjectId,
     @ConnectedSocket() client: Socket,
     @Request() request: any,
   ) {
-    const requested = await this.usersService.fincOneById(requestedUser);
-    const { name, thumb, id } = await this.usersService.fincOneById(
+    const requested = await this.usersService.findOneById(requestedUser);
+    const { name, thumb, id } = await this.usersService.findOneById(
       request.user,
     );
     if (!requested) throw new WsException('USER_NOT_FOUND');
