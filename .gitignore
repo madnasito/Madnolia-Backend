@@ -3,6 +3,9 @@
 .env.test
 .cpanel.yml
 
+# Firebase credentials
+firebase-service-account.json
+
 # compiled output
 /dist
 /node_modules

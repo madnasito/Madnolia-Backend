@@ -22,6 +22,7 @@ import { FriendshipModule } from './modules/friendship/friendship.module';
 import { SuperModule } from './modules/super/super.module';
 import { PlatformsModule } from './modules/platforms/platforms.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { FirebaseModule } from './modules/firebase/firebase.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -72,6 +73,8 @@ import { ReportsModule } from './modules/reports/reports.module';
     SuperModule,
     PlatformsModule,
     ReportsModule,
+    // PushNotificationsModule, // Comentado porque ya existe FirebaseModule
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [
@@ -82,6 +85,7 @@ import { ReportsModule } from './modules/reports/reports.module';
         whitelist: true,
       }),
     },
+    // firebaseProvider, // Movido al FirebaseModule
   ],
 })
 export class AppModule {}
