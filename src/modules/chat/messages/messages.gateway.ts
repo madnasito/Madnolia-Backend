@@ -59,7 +59,9 @@ export class MessagesGateway
     try {
       const { size } = this.io.sockets;
 
-      const { token } = client.handshake.headers;
+      const { token } = client.handshake.auth;
+
+      const { fcm_token } = client.handshake.headers;
 
       if (token === undefined || token === null || token === '') {
         client.disconnect(true);
@@ -67,7 +69,7 @@ export class MessagesGateway
       }
 
       const tokenPayload = await this.jwtService.verifyAsync(token as string);
-      await this.users.addUser(tokenPayload.id, client.id);
+      await this.users.addUser(tokenPayload.id, client.id, fcm_token as string);
 
       const friendshipsIds = (
         await this.friendshipService.findFriendshipsByUser(tokenPayload.id)
@@ -99,7 +101,7 @@ export class MessagesGateway
   @SubscribeMessage('init_chat')
   handleEvent(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
     try {
-      this.users.getUser(client.id).room = data;
+      this.users.getUserBySocketId(client.id).room = data;
       client.join(data);
       return true;
     } catch (error) {
@@ -199,7 +201,7 @@ export class MessagesGateway
   handleDisconnectChat(@ConnectedSocket() client: Socket) {
     try {
       this.logger.debug(`Leaved the room: ${client.id}`);
-      this.users.getUser(client.id).room = '';
+      this.users.getUserBySocketId(client.id).room = '';
       return true;
     } catch (error) {
       Logger.error(error);
