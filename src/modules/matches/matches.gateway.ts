@@ -58,13 +58,11 @@ export class MatchesGateway
     };
 
     match.inviteds.forEach((element) => {
-      const invitedUser = this.users.getUserById(element);
-      if (invitedUser) {
-        invitedUser.socketsIds.forEach((socketId) => {
-          client.to(socketId).emit('invitation', eventPayload);
+      const socketsIds = this.users.getUserSocketsById(element);
+      if (socketsIds.length > 0) {
+        socketsIds.forEach((socketId) => {
           client.to(socketId).emit('invitation', eventPayload);
         });
-        this.logger.debug(invitedUser);
       }
     });
 
@@ -121,22 +119,48 @@ export class MatchesGateway
         };
 
         // Event to hoster
-        const hoster = this.users.getUserById(match.user);
-        if (hoster && hoster.socketsIds.length > 0)
-          hoster.socketsIds.forEach((socketId) =>
-            this.io.to(socketId).emit('match_ready', payload),
-          );
+        this.logger.debug(`Looking for hoster with ID: ${match.user}`);
+        this.logger.debug(
+          `Connected users: ${this.users
+            .getUsers()
+            .map((u) => u._id)
+            .join(', ')}`,
+        );
+
+        const hoster = this.users.getUserSocketsById(match.user);
+        this.logger.debug(`Hoster sockets found: ${hoster.length}`);
+
+        let users = this.users.getUsersSockets(match.joined);
+        this.logger.debug(`Joined users sockets found: ${users.length}`);
+
+        users = users.concat(hoster);
+
+        Logger.debug(hoster);
+        Logger.debug(users);
+
+        users.forEach((socketId) =>
+          this.io.to(socketId).emit('match_ready', payload),
+        );
+
+        // this.io.to(match._id.toString()).emit('match_ready', payload);
+
+        // const socketsIds = this.users.getUsersSockets(match.joined);
+
+        // if (hoster && hoster.socketsIds.length > 0)
+        //   hoster.socketsIds.forEach((socketId) =>
+        //     this.io.to(socketId).emit('match_ready', payload),
+        //   );
 
         // Event to joined users
-        match.joined.forEach((user) => {
-          const socketUser = this.users.getUserById(user);
-          if (socketUser && socketUser.socketsIds.length > 0) {
-            socketUser.socketsIds.forEach((socketId) =>
-              this.io.to(socketId).emit('match_ready', payload),
-            );
-            this.logger.debug(`Notification to ${socketUser.username}`);
-          }
-        });
+        // match.joined.forEach((user) => {
+        //   const socketUser = this.users.getUserById(user);
+        //   if (socketUser && socketUser.socketsIds.length > 0) {
+        //     socketUser.socketsIds.forEach((socketId) =>
+        //       this.io.to(socketId).emit('match_ready', payload),
+        //     );
+        //     this.logger.debug(`Notification to ${socketUser.username}`);
+        //   }
+        // });
       });
     } catch (error) {
       this.logger.debug(error);

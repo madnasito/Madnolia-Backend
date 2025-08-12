@@ -1,6 +1,7 @@
 import { Injectable, Scope } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { UsersService } from 'src/modules/users/users.service';
+import { User } from '../interfaces/user.interface';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class Users {
@@ -18,11 +19,13 @@ export class Users {
     const existingUser = this.getUserById(userId);
 
     if (existingUser) {
-      existingUser.socketsIds.push(socketId);
+      const device = existingUser.devices.find((e) => e.fcmToken == fcmToken);
 
-      // in case the user not includes the fcmToken
-      if (!existingUser.fcmTokens.includes(fcmToken))
-        existingUser.fcmTokens.push(fcmToken);
+      if (device) {
+        device.socketId = socketId;
+      } else {
+        existingUser.devices.push({ fcmToken, socketId });
+      }
 
       return this.users;
     }
@@ -41,21 +44,35 @@ export class Users {
       thumb,
       _id,
       room: '',
-      socketsIds: [socketId],
-      fcmTokens: [fcmToken],
+      devices: [{ fcmToken, socketId }],
     });
 
     return this.users;
   };
 
   getUserBySocketId = (id: string) =>
-    this.users.find((user) => user.socketsIds.includes(id));
+    this.users.find((user) => user.devices.find((e) => e.socketId == id));
 
   getUserById = (id: Types.ObjectId) =>
-    this.users.find((user) => user._id === id);
+    this.users.find((user) => user._id.equals(id));
+
+  getUsersByIds = (ids: Types.ObjectId[]) =>
+    this.users.filter((user) => ids.some((id) => user._id.equals(id)));
 
   getUserByUsername = (username: string) =>
     this.users.find((user) => user.username === username);
+
+  getUserSocketsById(id: Types.ObjectId): string[] {
+    const user = this.getUserById(id);
+    if (!user) return [];
+    return user.devices.map((device) => device.socketId);
+  }
+
+  getUsersSockets(ids: Types.ObjectId[]) {
+    const users = this.getUsersByIds(ids);
+
+    return users.map((user) => user.devices.map((device) => device.socketId));
+  }
 
   getUsers = () => this.users;
 
@@ -67,9 +84,21 @@ export class Users {
     if (!user) {
       return;
     }
-    user.socketsIds = user.socketsIds.filter((id) => id !== socketId);
 
-    if (user.socketsIds.length === 0 && user.fcmTokens.length === 0) {
+    const device = user.devices.find((device) => device.socketId == socketId);
+
+    device.socketId = '';
+
+    // deleting the element if it empty
+    if (device.fcmToken == '' && device.socketId == '')
+      user.devices = user.devices.filter(
+        (e) => e.fcmToken != '' && e.socketId != '',
+      );
+    // user.devices = user.devices.filter(
+    //   (device) => device.socketId !== socketId,
+    // );
+
+    if (user.devices.length === 0) {
       this.deleteUser(user._id);
     }
     return user;
@@ -82,14 +111,4 @@ export class Users {
 
     return deletedUser;
   };
-}
-
-interface User {
-  name: string;
-  username: string;
-  thumb: string;
-  _id: Types.ObjectId;
-  socketsIds: string[];
-  fcmTokens: string[];
-  room: string;
 }

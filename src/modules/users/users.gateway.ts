@@ -54,12 +54,12 @@ export class UsersGateway {
     await this.notificationsService.create(newNotification);
     client.emit('new_request_connection', requestDb);
 
-    const requestedUserSocket = this.users.getUserById(requestedUser);
-    if (requestedUserSocket) {
-      requestedUserSocket.socketsIds.forEach((socketId) => {
-        client.to(socketId).emit('new_request_connection', requestDb);
-      });
-    }
+    const requestedUserSockets = this.users.getUserSocketsById(requestedUser);
+
+    requestedUserSockets.forEach((socketId) => {
+      client.to(socketId).emit('new_request_connection', requestDb);
+    });
+
     return requestDb;
   }
 

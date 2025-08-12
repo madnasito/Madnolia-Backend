@@ -28,6 +28,8 @@ import { FriendshipService } from 'src/modules/friendship/friendship.service';
 import { MatchesService } from 'src/modules/matches/matches.service';
 import { UpdateRecipientStatusDTO } from './dtos/update-recipient-status.dto';
 import { MessageType } from './enums/message-type.enum';
+import { FirebaseCloudMessagingService } from 'src/modules/firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
+// import { SendNotificationDto } from 'src/modules/firebase/dtos/send-notification.dto';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -44,6 +46,7 @@ export class MessagesGateway
     private readonly friendshipService: FriendshipService,
     private readonly matchesService: MatchesService,
     private users: Users,
+    private firebaseCloudMessagingService: FirebaseCloudMessagingService,
   ) {}
 
   @WebSocketServer() io: Namespace;
@@ -57,7 +60,6 @@ export class MessagesGateway
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handleConnection(client: Socket, ...args: any[]) {
     try {
-      console.log(client);
       const { size } = this.io.sockets;
 
       console.table(client.handshake.auth);
@@ -136,6 +138,22 @@ export class MessagesGateway
         const data = messageRecipients.find(
           (message) => message.user != request.user,
         );
+
+        // const userFCM = this.users.getUserById(data.user);
+
+        // if (userFCM && userFCM.socketsIds.length == 0) {
+        //   const notificationPayload: SendNotificationDto = {
+        //     body: data.text,
+        //     title: userFCM.name,
+        //     data: {},
+        //     token: userFCM.fcmTokens[0],
+        //     imageUrl: userFCM.thumb,
+        //   };
+        //   this.firebaseCloudMessagingService.sendNotification(
+        //     notificationPayload,
+        //   );
+        // }
+
         client
           .to(messageRecipients[0].conversation.toString())
           .emit('message', data);

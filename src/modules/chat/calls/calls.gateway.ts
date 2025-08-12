@@ -91,8 +91,8 @@ export class CallsGateway implements OnGatewayConnection {
 
     const user = this.users.getUserByUsername(callee_id);
 
-    user.socketsIds.forEach((socketId) => {
-      this.server.to(socketId).emit('new_call', {
+    user.devices.forEach((device) => {
+      this.server.to(device.socketId).emit('new_call', {
         caller_id: socket.id,
         sdp_offer: sdp_offer,
       });
@@ -119,10 +119,19 @@ export class CallsGateway implements OnGatewayConnection {
   ) {
     const { calleeId, iceCandidate } = data;
     const user = this.users.getUserByUsername(calleeId);
-    this.server.to(user ? user.socketsIds : calleeId).emit('ice_candidate', {
-      sender: socket.id,
-      iceCandidate: iceCandidate,
-    });
+    if (user && user.devices) {
+      user.devices.forEach((device) => {
+        this.server.to(device.socketId).emit('ice_candidate', {
+          sender: socket.id,
+          iceCandidate: iceCandidate,
+        });
+      });
+    } else {
+      this.server.to(calleeId).emit('ice_candidate', {
+        sender: socket.id,
+        iceCandidate: iceCandidate,
+      });
+    }
   }
 
   private addUserToRoom(roomId: string, userId: string) {
