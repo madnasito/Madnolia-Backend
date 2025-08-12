@@ -60,7 +60,10 @@ export class MatchesGateway
     match.inviteds.forEach((element) => {
       const invitedUser = this.users.getUserById(element);
       if (invitedUser) {
-        client.to(invitedUser.socketId).emit('invitation', eventPayload);
+        invitedUser.socketsIds.forEach((socketId) => {
+          client.to(socketId).emit('invitation', eventPayload);
+          client.to(socketId).emit('invitation', eventPayload);
+        });
         this.logger.debug(invitedUser);
       }
     });
@@ -74,11 +77,11 @@ export class MatchesGateway
     try {
       this.logger.debug(`Client id: ${client.id} tries to join`);
 
-      const user = this.users.getUser(client.id);
+      const user = this.users.getUserBySocketId(client.id);
       this.logger.debug(user);
       const matchUpdated = await this.matchesService.addUserToMatch(
         payload,
-        user._id,
+        user._id.toString(),
       );
 
       this.logger.debug(matchUpdated);
@@ -119,13 +122,18 @@ export class MatchesGateway
 
         // Event to hoster
         const hoster = this.users.getUserById(match.user);
-        if (hoster) this.io.to(hoster.socketId).emit('match_ready', payload);
+        if (hoster && hoster.socketsIds.length > 0)
+          hoster.socketsIds.forEach((socketId) =>
+            this.io.to(socketId).emit('match_ready', payload),
+          );
 
         // Event to joined users
         match.joined.forEach((user) => {
           const socketUser = this.users.getUserById(user);
-          if (socketUser) {
-            this.io.to(socketUser.socketId).emit('match_ready', payload);
+          if (socketUser && socketUser.socketsIds.length > 0) {
+            socketUser.socketsIds.forEach((socketId) =>
+              this.io.to(socketId).emit('match_ready', payload),
+            );
             this.logger.debug(`Notification to ${socketUser.username}`);
           }
         });

@@ -39,7 +39,7 @@ export class SuperService {
       await session.abortTransaction();
     } finally {
       await session.endSession();
-      this.users.deleteUser(user.toString());
+      this.users.deleteUser(user);
       return { ok: true };
     }
   }

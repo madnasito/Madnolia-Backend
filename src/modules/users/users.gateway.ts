@@ -55,10 +55,11 @@ export class UsersGateway {
     client.emit('new_request_connection', requestDb);
 
     const requestedUserSocket = this.users.getUserById(requestedUser);
-    if (requestedUserSocket)
-      client
-        .to(requestedUserSocket.socketId)
-        .emit('new_request_connection', requestDb);
+    if (requestedUserSocket) {
+      requestedUserSocket.socketsIds.forEach((socketId) => {
+        client.to(socketId).emit('new_request_connection', requestDb);
+      });
+    }
     return requestDb;
   }
 

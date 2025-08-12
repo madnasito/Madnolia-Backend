@@ -54,6 +54,9 @@ export class Users {
   getUserById = (id: Types.ObjectId) =>
     this.users.find((user) => user._id === id);
 
+  getUserByUsername = (username: string) =>
+    this.users.find((user) => user.username === username);
+
   getUsers = () => this.users;
 
   getUsersByRoom = (room: string) =>

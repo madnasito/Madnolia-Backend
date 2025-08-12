@@ -57,11 +57,15 @@ export class MessagesGateway
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handleConnection(client: Socket, ...args: any[]) {
     try {
+      console.log(client);
       const { size } = this.io.sockets;
 
-      const { token } = client.handshake.auth;
+      console.table(client.handshake.auth);
+      let { token } = client.handshake.auth;
 
       const { fcm_token } = client.handshake.headers;
+
+      if (!token) token = client.handshake.headers['token'];
 
       if (token === undefined || token === null || token === '') {
         client.disconnect(true);
@@ -93,7 +97,7 @@ export class MessagesGateway
   }
 
   handleDisconnect(client: any) {
-    this.users.deleteUser(client.id);
+    this.users.deleteUserSocketId(client.id);
     this.logger.debug(`Cliend id:${client.id} disconnected`);
   }
 

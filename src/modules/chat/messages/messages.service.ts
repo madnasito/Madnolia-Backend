@@ -18,7 +18,6 @@ import { MessageRecipientDTO } from './dtos/message-recipient.dto';
 import { MessageStatus } from './enums/message-status.enum';
 import { UpdateRecipientStatusDTO } from './dtos/update-recipient-status.dto';
 import { FirebaseCloudMessagingService } from 'src/modules/firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
-import { SendNotificationDto } from 'src/modules/firebase/dtos/send-notification.dto';
 
 @Injectable()
 export class MessagesService {
@@ -48,18 +47,6 @@ export class MessagesService {
       );
 
       await session.commitTransaction();
-
-      const notificationPayload: SendNotificationDto = {
-        title: createMessageDto.text,
-        body: createMessageDto.text,
-        data: {
-          conversation: createMessageDto.conversation.toString(),
-          creator: createMessageDto.creator.toString(),
-        },
-        token: '',
-      };
-
-      this.firebaseCloudMessagingService.sendNotification(notificationPayload);
 
       return createdRecipients.map((createdRecipient) => {
         return {
