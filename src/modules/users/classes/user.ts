@@ -87,7 +87,10 @@ export class Users {
     if (!user || user.devices.length == 0) return []; // Handle missing user or devices
 
     return user.devices
-      .filter((device) => device.fcmToken && !device.socketId)
+      .filter(
+        (device) =>
+          device.fcmToken && !device.socketId && device.fcmToken != '',
+      )
       .map((device) => device.fcmToken);
   }
 
@@ -106,6 +109,8 @@ export class Users {
     const user = this.getUserBySocketId(socketId);
 
     user.devices = user.devices.filter((device) => device.socketId != socketId);
+
+    if (user.devices.length == 0) this.deleteUser(user._id);
   };
 
   deleteUserSocketId = (socketId: string) => {

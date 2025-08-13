@@ -29,6 +29,7 @@ import { MatchesService } from 'src/modules/matches/matches.service';
 import { UpdateRecipientStatusDTO } from './dtos/update-recipient-status.dto';
 import { MessageType } from './enums/message-type.enum';
 import { FirebaseCloudMessagingService } from 'src/modules/firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
+import { SendNotificationDto } from 'src/modules/firebase/dtos/send-notification.dto';
 // import { SendNotificationDto } from 'src/modules/firebase/dtos/send-notification.dto';
 
 @UsePipes(new ValidationPipe())
@@ -139,20 +140,34 @@ export class MessagesGateway
           (message) => message.user != request.user,
         );
 
-        // const userFCM = this.users.getUserById(data.user);
+        const creator = this.users.getUserById(data.creator);
 
-        // if (userFCM && userFCM.socketsIds.length == 0) {
-        //   const notificationPayload: SendNotificationDto = {
-        //     body: data.text,
-        //     title: userFCM.name,
-        //     data: {},
-        //     token: userFCM.fcmTokens[0],
-        //     imageUrl: userFCM.thumb,
-        //   };
-        //   this.firebaseCloudMessagingService.sendNotification(
-        //     notificationPayload,
-        //   );
-        // }
+        const userData = this.users.getUserById(data.user);
+
+        if (userData) {
+          try {
+            const userFcms = this.users.getUserFcmTokensNoSocketById(
+              userData._id,
+            );
+
+            console.log(userFcms);
+
+            if (userFcms.length > 0) {
+              const notificationPayload: SendNotificationDto = {
+                body: data.text,
+                title: creator.name,
+                data: {},
+                tokens: userFcms,
+                imageUrl: creator.thumb,
+              };
+              this.firebaseCloudMessagingService.sendToMultipleTokens(
+                notificationPayload,
+              );
+            }
+          } catch (error) {
+            this.logger.error(error);
+          }
+        }
 
         client
           .to(messageRecipients[0].conversation.toString())

@@ -158,4 +158,10 @@ export class UsersGateway {
       throw new WsException('ERROR_REMOVING_PARTNER');
     }
   }
+
+  @UseGuards(UserSocketGuard)
+  @SubscribeMessage('logout_device')
+  async logoutDevice(@ConnectedSocket() client: Socket) {
+    this.users.logoutDevice(client.id);
+  }
 }

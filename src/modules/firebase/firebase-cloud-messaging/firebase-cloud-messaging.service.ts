@@ -38,7 +38,7 @@ export class FirebaseCloudMessagingService {
       if (!this.firebaseApp) throw new Error('FIREBASE_NOT_INITIALIZED');
 
       if (!payload.tokens || payload.tokens.length === 0)
-        throw new Error('FCM_NO_TOKENS');
+        throw Error('FCM_NO_TOKENS');
 
       const message: MulticastMessage = {
         tokens: payload.tokens, // Use tokens for multiple devices
@@ -55,8 +55,8 @@ export class FirebaseCloudMessagingService {
         .sendEachForMulticast(message);
       return response;
     } catch (error) {
-      this.logger.error('Error sending notification to multiple tokens', error);
-      throw new Error('FCM_ERROR');
+      this.logger.error(error);
+      throw Error('FCM_ERROR');
     }
   }
 
