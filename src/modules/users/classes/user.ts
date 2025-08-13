@@ -71,13 +71,42 @@ export class Users {
   getUsersSockets(ids: Types.ObjectId[]) {
     const users = this.getUsersByIds(ids);
 
-    return users.map((user) => user.devices.map((device) => device.socketId));
+    return users.flatMap((user) =>
+      user.devices.map((device) => device.socketId),
+    );
+  }
+
+  getUserFcmTokensById(id: Types.ObjectId) {
+    const user = this.getUserById(id);
+
+    return user.devices.map((device) => device.fcmToken);
+  }
+
+  getUserFcmTokensNoSocketById(id: Types.ObjectId): string[] {
+    const user = this.getUserById(id);
+    if (!user || user.devices.length == 0) return []; // Handle missing user or devices
+
+    return user.devices
+      .filter((device) => device.fcmToken && !device.socketId)
+      .map((device) => device.fcmToken);
+  }
+
+  getUsersFcmTokensWithoutSocketById(ids: Types.ObjectId[]): string[] {
+    const users = this.getUsersByIds(ids);
+
+    return users.flatMap((user) => this.getUserFcmTokensNoSocketById(user._id));
   }
 
   getUsers = () => this.users;
 
   getUsersByRoom = (room: string) =>
     this.users.filter((user) => user.room === room);
+
+  logoutDevice = (socketId: string) => {
+    const user = this.getUserBySocketId(socketId);
+
+    user.devices = user.devices.filter((device) => device.socketId != socketId);
+  };
 
   deleteUserSocketId = (socketId: string) => {
     const user = this.getUserBySocketId(socketId);
@@ -94,9 +123,6 @@ export class Users {
       user.devices = user.devices.filter(
         (e) => e.fcmToken != '' && e.socketId != '',
       );
-    // user.devices = user.devices.filter(
-    //   (device) => device.socketId !== socketId,
-    // );
 
     if (user.devices.length === 0) {
       this.deleteUser(user._id);

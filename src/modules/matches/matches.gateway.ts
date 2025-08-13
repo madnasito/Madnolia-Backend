@@ -130,17 +130,26 @@ export class MatchesGateway
         const hoster = this.users.getUserSocketsById(match.user);
         this.logger.debug(`Hoster sockets found: ${hoster.length}`);
 
-        let users = this.users.getUsersSockets(match.joined);
-        this.logger.debug(`Joined users sockets found: ${users.length}`);
+        let usersSockets: string[] = this.users.getUsersSockets(match.joined);
+        this.logger.debug(`Joined users sockets found: ${usersSockets.length}`);
 
-        users = users.concat(hoster);
+        usersSockets = usersSockets.concat(hoster);
 
         Logger.debug(hoster);
-        Logger.debug(users);
+        Logger.debug(usersSockets);
 
-        users.forEach((socketId) =>
+        usersSockets.forEach((socketId) =>
           this.io.to(socketId).emit('match_ready', payload),
         );
+
+        const userIds = match.joined;
+
+        userIds.push(match.user);
+
+        const fcmTokens =
+          this.users.getUsersFcmTokensWithoutSocketById(userIds);
+
+        Logger.debug(fcmTokens);
 
         // this.io.to(match._id.toString()).emit('match_ready', payload);
 
