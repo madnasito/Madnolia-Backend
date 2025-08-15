@@ -150,15 +150,17 @@ export class MessagesGateway
               userData._id,
             );
 
-            console.log(userFcms);
-
             if (userFcms.length > 0) {
+              this.logger.debug(userFcms);
+              this.logger.debug('Sending user message');
               const notificationPayload: SendNotificationDto = {
                 body: data.text,
                 title: creator.name,
-                data: {},
+                data: {
+                  type: 'chat_message',
+                  data: JSON.stringify(data),
+                },
                 tokens: userFcms,
-                imageUrl: creator.thumb,
               };
               this.firebaseCloudMessagingService.sendToMultipleTokens(
                 notificationPayload,
@@ -178,6 +180,33 @@ export class MessagesGateway
         );
       } else {
         const messageRecipient = messageRecipients[0];
+
+        const players = await this.matchesService.getPlayersInMatch(
+          messageRecipient.conversation,
+        );
+
+        Logger.debug(players);
+
+        const fcmTokens =
+          this.users.getUsersFcmTokensWithoutSocketById(players);
+
+        this.logger.debug(fcmTokens);
+
+        if (fcmTokens.length > 0) {
+          const notificationPayload: SendNotificationDto = {
+            body: messageRecipient.text,
+            title: 'Match message',
+            data: {
+              type: 'chat_message',
+              data: JSON.stringify(messageRecipient),
+            },
+            tokens: fcmTokens,
+          };
+          this.firebaseCloudMessagingService.sendToMultipleTokens(
+            notificationPayload,
+          );
+        }
+
         client
           .to(messageRecipient.conversation.toString())
           .emit('message', messageRecipient);

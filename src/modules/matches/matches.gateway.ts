@@ -14,6 +14,8 @@ import { MatchesService } from './matches.service';
 import { Users } from 'src/modules/users/classes/user';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { MatchDto } from './dtos/match.dto';
+import { SendNotificationDto } from '../firebase/dtos/send-notification.dto';
+import { FirebaseCloudMessagingService } from '../firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
 
 @WebSocketGateway()
 export class MatchesGateway
@@ -24,6 +26,7 @@ export class MatchesGateway
   constructor(
     private matchesService: MatchesService,
     private users: Users,
+    private firebaseCloudMessagingService: FirebaseCloudMessagingService,
   ) {}
 
   @WebSocketServer() io: Namespace;
@@ -150,6 +153,27 @@ export class MatchesGateway
           this.users.getUsersFcmTokensWithoutSocketById(userIds);
 
         Logger.debug(fcmTokens);
+
+        try {
+          if (fcmTokens.length > 0) {
+            this.logger.debug('Push notification of match ready');
+
+            const notificationPayload: SendNotificationDto = {
+              title: match.title,
+              body: match.description,
+              data: {
+                type: 'match_ready',
+                data: JSON.stringify(payload),
+              },
+              tokens: fcmTokens,
+            };
+            this.firebaseCloudMessagingService.sendToMultipleTokens(
+              notificationPayload,
+            );
+          }
+        } catch (error) {
+          this.logger.error(error);
+        }
 
         // this.io.to(match._id.toString()).emit('match_ready', payload);
 

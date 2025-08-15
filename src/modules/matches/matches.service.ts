@@ -169,6 +169,16 @@ export class MatchesService {
     });
   };
 
+  getPlayersInMatch = async (id: Types.ObjectId): Promise<Types.ObjectId[]> => {
+    const match = await this.getMatch(id);
+
+    const players = match.joined;
+
+    players.push(match.user);
+
+    return players;
+  };
+
   getAllPlayerMatches = async (
     user: Types.ObjectId,
     payload: PlayerMatchesFiltersDto,

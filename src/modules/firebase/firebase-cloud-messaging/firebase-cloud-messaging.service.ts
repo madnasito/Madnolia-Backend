@@ -40,19 +40,31 @@ export class FirebaseCloudMessagingService {
       if (!payload.tokens || payload.tokens.length === 0)
         throw Error('FCM_NO_TOKENS');
 
+      // Do not use notification to avoid display notification handled by FCM lib
       const message: MulticastMessage = {
         tokens: payload.tokens, // Use tokens for multiple devices
-        notification: {
-          title: payload.title,
-          body: payload.body,
-          imageUrl: payload.imageUrl,
-        },
+        // notification: {
+        //   title: payload.title,
+        //   body: payload.body,
+        //   imageUrl: payload.imageUrl,
+        // },
         data: payload.data || {},
       };
 
       const response = await this.firebaseApp
         .messaging()
         .sendEachForMulticast(message);
+
+      // Log de tokens que fallaron
+      if (response.failureCount > 0) {
+        response.responses.forEach((resp, idx) => {
+          if (!resp.success) {
+            this.logger.error(
+              `Token falló ${payload.tokens[idx]}: ${resp.error?.message}`,
+            );
+          }
+        });
+      }
       return response;
     } catch (error) {
       this.logger.error(error);
