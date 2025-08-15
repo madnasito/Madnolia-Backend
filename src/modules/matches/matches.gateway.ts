@@ -14,6 +14,8 @@ import { MatchesService } from './matches.service';
 import { Users } from 'src/modules/users/classes/user';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { MatchDto } from './dtos/match.dto';
+import { SendNotificationDto } from '../firebase/dtos/send-notification.dto';
+import { FirebaseCloudMessagingService } from '../firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
 
 @WebSocketGateway()
 export class MatchesGateway
@@ -24,6 +26,7 @@ export class MatchesGateway
   constructor(
     private matchesService: MatchesService,
     private users: Users,
+    private firebaseCloudMessagingService: FirebaseCloudMessagingService,
   ) {}
 
   @WebSocketServer() io: Namespace;
@@ -58,10 +61,11 @@ export class MatchesGateway
     };
 
     match.inviteds.forEach((element) => {
-      const invitedUser = this.users.getUserById(element);
-      if (invitedUser) {
-        client.to(invitedUser.socketId).emit('invitation', eventPayload);
-        this.logger.debug(invitedUser);
+      const socketsIds = this.users.getUserSocketsById(element);
+      if (socketsIds.length > 0) {
+        socketsIds.forEach((socketId) => {
+          client.to(socketId).emit('invitation', eventPayload);
+        });
       }
     });
 
@@ -74,11 +78,11 @@ export class MatchesGateway
     try {
       this.logger.debug(`Client id: ${client.id} tries to join`);
 
-      const user = this.users.getUser(client.id);
+      const user = this.users.getUserBySocketId(client.id);
       this.logger.debug(user);
       const matchUpdated = await this.matchesService.addUserToMatch(
         payload,
-        user._id,
+        user._id.toString(),
       );
 
       this.logger.debug(matchUpdated);
@@ -118,17 +122,78 @@ export class MatchesGateway
         };
 
         // Event to hoster
-        const hoster = this.users.getUserById(match.user);
-        if (hoster) this.io.to(hoster.socketId).emit('match_ready', payload);
+        this.logger.debug(`Looking for hoster with ID: ${match.user}`);
+        this.logger.debug(
+          `Connected users: ${this.users
+            .getUsers()
+            .map((u) => u._id)
+            .join(', ')}`,
+        );
+
+        const hoster = this.users.getUserSocketsById(match.user);
+        this.logger.debug(`Hoster sockets found: ${hoster.length}`);
+
+        let usersSockets: string[] = this.users.getUsersSockets(match.joined);
+        this.logger.debug(`Joined users sockets found: ${usersSockets.length}`);
+
+        usersSockets = usersSockets.concat(hoster);
+
+        Logger.debug(hoster);
+        Logger.debug(usersSockets);
+
+        usersSockets.forEach((socketId) =>
+          this.io.to(socketId).emit('match_ready', payload),
+        );
+
+        const userIds = match.joined;
+
+        userIds.push(match.user);
+
+        const fcmTokens =
+          this.users.getUsersFcmTokensWithoutSocketById(userIds);
+
+        Logger.debug(fcmTokens);
+
+        try {
+          if (fcmTokens.length > 0) {
+            this.logger.debug('Push notification of match ready');
+
+            const notificationPayload: SendNotificationDto = {
+              title: match.title,
+              body: match.description,
+              data: {
+                type: 'match_ready',
+                data: JSON.stringify(payload),
+              },
+              tokens: fcmTokens,
+            };
+            this.firebaseCloudMessagingService.sendToMultipleTokens(
+              notificationPayload,
+            );
+          }
+        } catch (error) {
+          this.logger.error(error);
+        }
+
+        // this.io.to(match._id.toString()).emit('match_ready', payload);
+
+        // const socketsIds = this.users.getUsersSockets(match.joined);
+
+        // if (hoster && hoster.socketsIds.length > 0)
+        //   hoster.socketsIds.forEach((socketId) =>
+        //     this.io.to(socketId).emit('match_ready', payload),
+        //   );
 
         // Event to joined users
-        match.joined.forEach((user) => {
-          const socketUser = this.users.getUserById(user);
-          if (socketUser) {
-            this.io.to(socketUser.socketId).emit('match_ready', payload);
-            this.logger.debug(`Notification to ${socketUser.username}`);
-          }
-        });
+        // match.joined.forEach((user) => {
+        //   const socketUser = this.users.getUserById(user);
+        //   if (socketUser && socketUser.socketsIds.length > 0) {
+        //     socketUser.socketsIds.forEach((socketId) =>
+        //       this.io.to(socketId).emit('match_ready', payload),
+        //     );
+        //     this.logger.debug(`Notification to ${socketUser.username}`);
+        //   }
+        // });
       });
     } catch (error) {
       this.logger.debug(error);

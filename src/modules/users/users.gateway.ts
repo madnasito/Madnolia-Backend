@@ -54,11 +54,12 @@ export class UsersGateway {
     await this.notificationsService.create(newNotification);
     client.emit('new_request_connection', requestDb);
 
-    const requestedUserSocket = this.users.getUserById(requestedUser);
-    if (requestedUserSocket)
-      client
-        .to(requestedUserSocket.socketId)
-        .emit('new_request_connection', requestDb);
+    const requestedUserSockets = this.users.getUserSocketsById(requestedUser);
+
+    requestedUserSockets.forEach((socketId) => {
+      client.to(socketId).emit('new_request_connection', requestDb);
+    });
+
     return requestDb;
   }
 
@@ -156,5 +157,11 @@ export class UsersGateway {
       Logger.error(error);
       throw new WsException('ERROR_REMOVING_PARTNER');
     }
+  }
+
+  @UseGuards(UserSocketGuard)
+  @SubscribeMessage('logout_device')
+  async logoutDevice(@ConnectedSocket() client: Socket) {
+    this.users.logoutDevice(client.id);
   }
 }

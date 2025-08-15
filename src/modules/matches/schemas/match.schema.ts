@@ -26,7 +26,7 @@ export class Match {
   date: number;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    type: Types.ObjectId,
     ref: 'User',
     required: true,
   })
@@ -65,7 +65,7 @@ export class Match {
   duration: number;
 
   @Prop({
-    type: [mongoose.Schema.Types.ObjectId],
+    type: [Types.ObjectId],
     ref: 'User',
     default: [],
   })

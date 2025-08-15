@@ -13,6 +13,7 @@ import {
   MessageRecipient,
   MessageRecipientSchema,
 } from './schemas/messages-recipient.schema';
+import { FirebaseCloudMessagingModule } from 'src/modules/firebase/firebase-cloud-messaging/firebase-cloud-messaging.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import {
       },
     }),
     MatchesModule,
+    FirebaseCloudMessagingModule, // Ensure FirebaseCloudMessagingModule is imported
   ],
   providers: [MessagesService, MessagesGateway],
   exports: [MessagesService],

@@ -1,58 +1,54 @@
-
 import {
-    CanActivate,
-    ExecutionContext,
-    Injectable,
-    UnauthorizedException,
-  } from '@nestjs/common';
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { WsArgumentsHost } from '@nestjs/common/interfaces';
 import { ConfigService } from '@nestjs/config';
-  import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { WsException } from '@nestjs/websockets';
 //   import { jwtConstants } from './constants';
-  import { Request } from 'express';
 @Injectable()
-
 export class UserSocketGuard implements CanActivate {
-    constructor(
-      private jwtService: JwtService,
-      private config: ConfigService){}
+  constructor(
+    private jwtService: JwtService,
+    private config: ConfigService,
+  ) {}
 
-    async canActivate(context: ExecutionContext): Promise<boolean>{
-        const request = context.switchToWs();
-        
-        const token = this.extractTokenFromHeader(request)
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToWs();
 
-        if(!token){
-            throw new WsException("Invalid credentials")
-        }
-        try {
-          const secret = this.config.get<string>('JWT_SECRET');
-          const payload = await this.jwtService.verifyAsync(
-              token,
-              {
-                secret
-              }
-            );
-            // 💡 We're assigning the payload to the request object here
-            // so that we can access it in our route handlers
-            request.getClient().user = payload.id;
-        
-        } catch (error) {
-            throw new WsException("Unauthorized");
-        }
+    const token = this.extractTokenFromHeader(request);
 
-        return true;
+    if (!token) {
+      throw new WsException('Invalid credentials');
+    }
+    try {
+      const secret = this.config.get<string>('JWT_SECRET');
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret,
+      });
+      // 💡 We're assigning the payload to the request object here
+      // so that we can access it in our route handlers
+      request.getClient().user = payload.id;
+    } catch (error) {
+      Logger.error(error);
+      throw new WsException(UnauthorizedException);
     }
 
-    private extractTokenFromHeader(request: WsArgumentsHost): string | undefined {
-      
-        const {headers} = request.getClient().handshake
+    return true;
+  }
 
+  private extractTokenFromHeader(request: WsArgumentsHost): string | undefined {
+    const { auth } = request.getClient().handshake;
 
-        return headers.token
+    if (!auth.token) return request.getClient().handshake.headers['token'];
 
-        // const [type, token] = request.headers.authorization?.split(' ') ?? [];
-        // return type === 'Bearer' ? token : undefined;
-    }
+    return auth.token;
+
+    // const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    // return type === 'Bearer' ? token : undefined;
+  }
 }

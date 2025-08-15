@@ -17,6 +17,7 @@ import { MatchesService } from 'src/modules/matches/matches.service';
 import { MessageRecipientDTO } from './dtos/message-recipient.dto';
 import { MessageStatus } from './enums/message-status.enum';
 import { UpdateRecipientStatusDTO } from './dtos/update-recipient-status.dto';
+import { FirebaseCloudMessagingService } from 'src/modules/firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
 
 @Injectable()
 export class MessagesService {
@@ -27,6 +28,7 @@ export class MessagesService {
     private messageRecipientModel: Model<MessageRecipient>,
     private readonly friendshipService: FriendshipService,
     private readonly matchesService: MatchesService,
+    private readonly firebaseCloudMessagingService: FirebaseCloudMessagingService,
   ) {}
 
   async create(@MessageBody() createMessageDto: MessageDto) {
@@ -102,6 +104,7 @@ export class MessagesService {
     }
 
     const createdMessage = new this.messageModel(createMessageDto);
+
     return createdMessage.save({ session });
   }
 
@@ -269,81 +272,6 @@ export class MessagesService {
       throw new Error('Error al obtener chats del usuario');
     }
   }
-
-  // async getUserChats(userId: Types.ObjectId): Promise<any> {
-  //   try {
-
-  //     // 1. Obtener todos los MessageRecipient del usuario
-  //     const messageRecipients = await this.messageRecipientModel
-  //       .find({ user: userId })
-  //       .populate({
-  //         path: 'message',
-  //         populate: {
-  //           path: 'creator',
-  //           select: 'username thumb',
-  //         },
-  //       })
-  //       .populate('conversation')
-  //       .sort({ 'message.date': -1 })
-  //       .exec();
-
-  //     // 2. Agrupar por conversación y obtener el último mensaje
-  //     const conversationMap = new Map<string, any>();
-
-  //     messageRecipients.forEach((recipient) => {
-  //       const conversationId = recipient.conversation.toString();
-
-  //       if (!conversationMap.has(conversationId)) {
-  //         conversationMap.set(conversationId, {
-  //           _id: recipient.conversation,
-  //           lastMessage: {
-  //             text: recipient.message.text,
-  //             date: recipient.message.date,
-  //             creator: recipient.message.creator,
-  //             status: recipient.status,
-  //           },
-  //           messageStatus: recipient.status,
-  //         });
-  //       }
-  //     });
-
-  //     // 3. Convertir y ordenar conversaciones
-  //     const chats = Array.from(conversationMap.values()).sort((a, b) => {
-  //       return (
-  //         new Date(b.lastMessage.date).getTime() -
-  //         new Date(a.lastMessage.date).getTime()
-  //       );
-  //     });
-
-  //     // 4. Obtener información adicional de participantes
-  //     const enhancedChats = await Promise.all(
-  //       chats.map(async (chat) => {
-  //         // CORRECCIÓN: Usar el modelo de Conversation para buscar participantes
-  //         const conversationDetails = await this.messageRecipientModel
-  //           .findById(chat._id)
-  //           .populate('participants', 'username avatar')
-  //           .lean()
-  //           .exec();
-
-  //         // Encontrar el otro participante
-  //         const otherParticipant = conversationDetails?.user?.find(
-  //           (participant: any) => !participant._id.equals(userId),
-  //         );
-
-  //         return {
-  //           ...chat,
-  //           otherParticipant: otherParticipant || null,
-  //           conversationType: conversationDetails?.type || 'PRIVATE',
-  //         };
-  //       }),
-  //     );
-
-  //     return enhancedChats;
-  //   } catch (error) {
-  //     Logger.error(`Failed to get user chats: ${error}`);
-  //     throw new Error('Failed to retrieve chat list');
-  //   }
-  // }
 
   async getUserChatMessages(
     user1: Types.ObjectId,

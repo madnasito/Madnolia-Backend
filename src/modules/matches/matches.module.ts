@@ -8,6 +8,7 @@ import { MatchesGateway } from './matches.gateway';
 import { UsersModule } from '../users/users.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { PlatformsModule } from '../platforms/platforms.module';
+import { FirebaseModule } from '../firebase/firebase.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PlatformsModule } from '../platforms/platforms.module';
     NotificationsModule,
     UsersModule,
     PlatformsModule,
+    FirebaseModule,
   ],
   providers: [MatchesService, MatchesGateway],
   controllers: [MatchesController],

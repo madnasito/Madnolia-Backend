@@ -28,6 +28,9 @@ import { FriendshipService } from 'src/modules/friendship/friendship.service';
 import { MatchesService } from 'src/modules/matches/matches.service';
 import { UpdateRecipientStatusDTO } from './dtos/update-recipient-status.dto';
 import { MessageType } from './enums/message-type.enum';
+import { FirebaseCloudMessagingService } from 'src/modules/firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
+import { SendNotificationDto } from 'src/modules/firebase/dtos/send-notification.dto';
+// import { SendNotificationDto } from 'src/modules/firebase/dtos/send-notification.dto';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -44,6 +47,7 @@ export class MessagesGateway
     private readonly friendshipService: FriendshipService,
     private readonly matchesService: MatchesService,
     private users: Users,
+    private firebaseCloudMessagingService: FirebaseCloudMessagingService,
   ) {}
 
   @WebSocketServer() io: Namespace;
@@ -59,7 +63,12 @@ export class MessagesGateway
     try {
       const { size } = this.io.sockets;
 
-      const { token } = client.handshake.headers;
+      console.table(client.handshake.auth);
+      let { token } = client.handshake.auth;
+
+      const { fcm_token } = client.handshake.headers;
+
+      if (!token) token = client.handshake.headers['token'];
 
       if (token === undefined || token === null || token === '') {
         client.disconnect(true);
@@ -67,7 +76,7 @@ export class MessagesGateway
       }
 
       const tokenPayload = await this.jwtService.verifyAsync(token as string);
-      await this.users.addUser(tokenPayload.id, client.id);
+      await this.users.addUser(tokenPayload.id, client.id, fcm_token as string);
 
       const friendshipsIds = (
         await this.friendshipService.findFriendshipsByUser(tokenPayload.id)
@@ -91,7 +100,7 @@ export class MessagesGateway
   }
 
   handleDisconnect(client: any) {
-    this.users.deleteUser(client.id);
+    this.users.deleteUserSocketId(client.id);
     this.logger.debug(`Cliend id:${client.id} disconnected`);
   }
 
@@ -99,7 +108,7 @@ export class MessagesGateway
   @SubscribeMessage('init_chat')
   handleEvent(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
     try {
-      this.users.getUser(client.id).room = data;
+      this.users.getUserBySocketId(client.id).room = data;
       client.join(data);
       return true;
     } catch (error) {
@@ -130,6 +139,38 @@ export class MessagesGateway
         const data = messageRecipients.find(
           (message) => message.user != request.user,
         );
+
+        const creator = this.users.getUserById(data.creator);
+
+        const userData = this.users.getUserById(data.user);
+
+        if (userData) {
+          try {
+            const userFcms = this.users.getUserFcmTokensNoSocketById(
+              userData._id,
+            );
+
+            if (userFcms.length > 0) {
+              this.logger.debug(userFcms);
+              this.logger.debug('Sending user message');
+              const notificationPayload: SendNotificationDto = {
+                body: data.text,
+                title: creator.name,
+                data: {
+                  type: 'chat_message',
+                  data: JSON.stringify(data),
+                },
+                tokens: userFcms,
+              };
+              this.firebaseCloudMessagingService.sendToMultipleTokens(
+                notificationPayload,
+              );
+            }
+          } catch (error) {
+            this.logger.error(error);
+          }
+        }
+
         client
           .to(messageRecipients[0].conversation.toString())
           .emit('message', data);
@@ -139,6 +180,33 @@ export class MessagesGateway
         );
       } else {
         const messageRecipient = messageRecipients[0];
+
+        const players = await this.matchesService.getPlayersInMatch(
+          messageRecipient.conversation,
+        );
+
+        Logger.debug(players);
+
+        const fcmTokens =
+          this.users.getUsersFcmTokensWithoutSocketById(players);
+
+        this.logger.debug(fcmTokens);
+
+        if (fcmTokens.length > 0) {
+          const notificationPayload: SendNotificationDto = {
+            body: messageRecipient.text,
+            title: 'Match message',
+            data: {
+              type: 'chat_message',
+              data: JSON.stringify(messageRecipient),
+            },
+            tokens: fcmTokens,
+          };
+          this.firebaseCloudMessagingService.sendToMultipleTokens(
+            notificationPayload,
+          );
+        }
+
         client
           .to(messageRecipient.conversation.toString())
           .emit('message', messageRecipient);
@@ -199,7 +267,7 @@ export class MessagesGateway
   handleDisconnectChat(@ConnectedSocket() client: Socket) {
     try {
       this.logger.debug(`Leaved the room: ${client.id}`);
-      this.users.getUser(client.id).room = '';
+      this.users.getUserBySocketId(client.id).room = '';
       return true;
     } catch (error) {
       Logger.error(error);

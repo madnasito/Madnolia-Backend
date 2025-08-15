@@ -23,7 +23,7 @@ export class CallsGateway implements OnGatewayConnection {
   handleJoinRoom(client: Socket, payload: { callRoom: string }) {
     client.join(payload.callRoom);
     this.addUserToRoom(payload.callRoom, client.id);
-    const user = this.users.getUser(client.id);
+    const user = this.users.getUserBySocketId(client.id);
     console.log(`Client ${user.username} joined room ${payload.callRoom}`);
   }
 
@@ -91,9 +91,11 @@ export class CallsGateway implements OnGatewayConnection {
 
     const user = this.users.getUserByUsername(callee_id);
 
-    this.server.to(user.socketId).emit('new_call', {
-      caller_id: socket.id,
-      sdp_offer: sdp_offer,
+    user.devices.forEach((device) => {
+      this.server.to(device.socketId).emit('new_call', {
+        caller_id: socket.id,
+        sdp_offer: sdp_offer,
+      });
     });
   }
 
@@ -117,10 +119,19 @@ export class CallsGateway implements OnGatewayConnection {
   ) {
     const { calleeId, iceCandidate } = data;
     const user = this.users.getUserByUsername(calleeId);
-    this.server.to(user ? user.socketId : calleeId).emit('ice_candidate', {
-      sender: socket.id,
-      iceCandidate: iceCandidate,
-    });
+    if (user && user.devices) {
+      user.devices.forEach((device) => {
+        this.server.to(device.socketId).emit('ice_candidate', {
+          sender: socket.id,
+          iceCandidate: iceCandidate,
+        });
+      });
+    } else {
+      this.server.to(calleeId).emit('ice_candidate', {
+        sender: socket.id,
+        iceCandidate: iceCandidate,
+      });
+    }
   }
 
   private addUserToRoom(roomId: string, userId: string) {
