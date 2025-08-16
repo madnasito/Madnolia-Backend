@@ -60,16 +60,30 @@ export class MatchesGateway
       user: match.user,
     };
 
-    match.inviteds.forEach((element) => {
-      const socketsIds = this.users.getUserSocketsById(element);
-      if (socketsIds.length > 0) {
-        socketsIds.forEach((socketId) => {
-          client.to(socketId).emit('invitation', eventPayload);
-        });
-      }
-    });
+    const usersSockets = this.users.getUsersSockets(match.inviteds);
 
-    // client.emit('invitation', eventPayload)
+    usersSockets.forEach((socketId) =>
+      this.io.to(socketId).emit('invitation', eventPayload),
+    );
+
+    const fcmTokens = this.users.getUsersFcmTokensWithoutSocketById(
+      match.inviteds,
+    );
+
+    if (fcmTokens.length > 0) {
+      const notificationPayload: SendNotificationDto = {
+        body: match.description,
+        title: 'Invitation',
+        data: {
+          type: 'invitation',
+          data: JSON.stringify(eventPayload),
+        },
+        tokens: fcmTokens,
+      };
+      this.firebaseCloudMessagingService.sendToMultipleTokens(
+        notificationPayload,
+      );
+    }
   }
 
   @UseGuards(UserSocketGuard)
