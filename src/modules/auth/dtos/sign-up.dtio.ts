@@ -5,6 +5,7 @@ import {
   IsString,
   Matches,
   MaxLength,
+  MinLength,
 } from 'class-validator';
 
 export class SignUpDto {
@@ -25,6 +26,8 @@ export class SignUpDto {
 
   @IsNotEmpty()
   @IsString()
+  @MinLength(6)
+  @MaxLength(64)
   password: string;
 
   @IsNotEmpty()

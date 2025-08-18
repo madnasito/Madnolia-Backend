@@ -11,7 +11,12 @@ export class MailService {
     private readonly usersService: UsersService,
   ) {}
 
-  async sendEmail(subject: string, template: string, to: string) {
+  async sendEmail(
+    subject: string,
+    template: string,
+    to: string,
+    context?: any,
+  ) {
     try {
       const user = await this.usersService.findOneByEmail(to);
 
@@ -21,15 +26,16 @@ export class MailService {
 
       const emailsList: string[] = [to];
 
-      const context: ISendMailOptions['context'] = {
+      const mailContext: ISendMailOptions['context'] = {
         name: user.name,
+        ...context,
       };
 
       const sendMailParams: ISendMailOptions = {
         to: emailsList,
         subject,
         template,
-        context,
+        context: mailContext,
       };
       const response = await this.mailerService.sendMail(sendMailParams);
       this.logger.debug(
@@ -43,5 +49,14 @@ export class MailService {
       this.logger.error(error);
       throw new BadRequestException();
     }
+  }
+
+  async sendPasswordRecoveryEmail(email: string, token: string) {
+    return this.sendEmail(
+      'Password Recovery Instructions',
+      'recover-password-email', // This should match your template file name without extension
+      email,
+      { token },
+    );
   }
 }
