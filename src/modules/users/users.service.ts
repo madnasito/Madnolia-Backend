@@ -413,6 +413,17 @@ export class UsersService {
     });
   };
 
+  updatePassword = async (password: string, id: Types.ObjectId) => {
+    const user = this.findOneById(id);
+
+    if (!user) throw new NotFoundException();
+
+    const saltOrRounds = 10;
+    const hash = hashSync(password, saltOrRounds);
+
+    return this.userModel.findByIdAndUpdate(id, { password: hash });
+  };
+
   delete = async (user: Types.ObjectId) =>
     this.userModel.findByIdAndDelete(user);
 }

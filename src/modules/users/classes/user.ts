@@ -18,6 +18,13 @@ export class Users {
   ) => {
     const existingUser = this.getUserById(userId);
 
+    const fcmTokenUser = this.getUserByFcmToken(fcmToken);
+
+    if (fcmTokenUser)
+      if (userId != fcmTokenUser._id) {
+        this.deleteUserFcmToken(fcmToken);
+      }
+
     if (existingUser) {
       const device = existingUser.devices.find((e) => e.fcmToken == fcmToken);
 
@@ -49,6 +56,9 @@ export class Users {
 
     return this.users;
   };
+
+  getUserByFcmToken = (fcmToken: string) =>
+    this.users.find((user) => user.devices.find((e) => e.fcmToken == fcmToken));
 
   getUserBySocketId = (id: string) =>
     this.users.find((user) => user.devices.find((e) => e.socketId == id));
@@ -132,6 +142,20 @@ export class Users {
     if (user.devices.length === 0) {
       this.deleteUser(user._id);
     }
+    return user;
+  };
+
+  deleteUserFcmToken = (fcmToken: string) => {
+    const user = this.getUserByFcmToken(fcmToken);
+
+    if (!user) {
+      return;
+    }
+
+    user.devices = user.devices.filter((e) => e.fcmToken != fcmToken);
+
+    if (user.devices.length === 0) this.deleteUser(user._id);
+
     return user;
   };
 
