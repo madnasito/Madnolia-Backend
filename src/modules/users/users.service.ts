@@ -413,17 +413,33 @@ export class UsersService {
     });
   };
 
-  updatePassword = async (password: string, id: Types.ObjectId) => {
-    const user = this.findOneById(id);
+  async updatePassword(password: string, id: Types.ObjectId) {
+    const user = await this.findOneById(id);
 
-    if (!user) throw new NotFoundException();
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
 
-    const saltOrRounds = 10;
-    const hash = hashSync(password, saltOrRounds);
+    const saltRounds = 10;
+    const hash = hashSync(password, saltRounds);
 
-    return this.userModel.findByIdAndUpdate(id, { password: hash });
-  };
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(
+        id,
+        {
+          password: hash,
+          modifiedAt: new Date(),
+        },
+        { new: true, runValidators: true }, // Retorna el documento actualizado y valida
+      )
+      .exec();
 
+    if (!updatedUser) {
+      throw new NotFoundException(`User with ID ${id} could not be updated`);
+    }
+
+    return { ok: true };
+  }
   delete = async (user: Types.ObjectId) =>
     this.userModel.findByIdAndDelete(user);
 }
