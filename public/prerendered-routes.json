@@ -3,6 +3,8 @@
     "/": {},
     "/.well-known/assetlinks.json": {},
     "/about": {},
+    "/auth": {},
+    "/auth/recover-password": {},
     "/child-safety": {},
     "/download": {},
     "/match": {},
