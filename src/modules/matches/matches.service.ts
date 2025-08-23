@@ -193,7 +193,7 @@ export class MatchesService {
 
     return this.matchModel
       .find(filter, {}, { populate: { path: 'game' } })
-      .sort({ _id: payload.sort })
+      .sort({ date: payload.sort })
       .limit(10)
       .skip(payload.skip);
   };
@@ -222,7 +222,7 @@ export class MatchesService {
       },
       {},
       {
-        sort: { _id: payload.sort },
+        sort: { date: payload.sort },
         skip: payload.skip,
         populate: { path: 'game' },
         limit: 10,
@@ -325,7 +325,7 @@ export class MatchesService {
       {},
       {
         populate: { path: 'game' },
-        sort: { _id: payload.sort },
+        sort: { date: payload.sort },
         limit: 10,
         skip: payload.skip,
       },
