@@ -7,7 +7,7 @@ import {
   NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
-import { hashSync } from 'bcrypt';
+import { compare, hashSync } from 'bcrypt';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import axios from 'axios';
@@ -411,6 +411,18 @@ export class UsersService {
         .then((resp) => resolve(resp))
         .catch((err) => reject(err));
     });
+  };
+
+  verifyPassword = async (id: Types.ObjectId, password: string) => {
+    const user = await this.userModel.findById(id);
+
+    if (!user) throw new NotFoundException();
+
+    const isMatch = await compare(password, user.password);
+
+    if (!isMatch) throw new BadRequestException('WRONG_PASSWORD');
+
+    return true;
   };
 
   async updatePassword(password: string, id: Types.ObjectId) {

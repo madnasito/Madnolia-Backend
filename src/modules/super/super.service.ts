@@ -20,27 +20,29 @@ export class SuperService {
     private users: Users,
   ) {}
 
-  async deleteUser(user: mongoose.Types.ObjectId) {
+  async deleteUser(user: mongoose.Types.ObjectId, password: string) {
     // To-Do: Desactivate the user and check setting the deletedAt value with a new date
     // Verify with a cronjob if the user is deleted, this is for recover an user by a month
     // If it is not recovered during a month it will be deleted from db and all its documents
-    const session = await this.connection.startSession();
+    const session: mongoose.ClientSession =
+      await this.connection.startSession();
     session.startTransaction();
     try {
-      await this.usersService.delete(user);
+      await this.usersService.verifyPassword(user, password);
       await this.friendshipService.deleteUserFriendships(user);
       await this.notificationsService.deleteUserNotifications(user);
       await this.matchesService.deleteUserFromMatches(user);
       await this.messagesService.deleteAllUserMessages(user);
       await this.messagesService.deleteAllUserMessagesRecipients(user);
+      await this.usersService.delete(user);
       await session.commitTransaction();
+      await session.endSession();
+      return { ok: true };
     } catch (error) {
       Logger.error(error);
       await session.abortTransaction();
-    } finally {
       await session.endSession();
-      this.users.deleteUser(user);
-      return { ok: true };
+      throw error;
     }
   }
 }
