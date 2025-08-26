@@ -13,7 +13,7 @@ async function bootstrap() {
     origin: 'http://localhost:4200',
   });
 
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/v1', { exclude: ['sitemap.xml'] });
   await app.listen(port);
 }
 bootstrap();
