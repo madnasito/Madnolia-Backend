@@ -431,6 +431,13 @@ export class MatchesService {
     }
   };
 
+  findAllActive = () =>
+    this.matchModel
+      .find({
+        $or: [{ status: MatchStatus.WAITING }, { status: MatchStatus.RUNNING }],
+      })
+      .exec();
+
   getUserMatchesByPlatform = async (id: Types.ObjectId) => {
     const user = await this.usersService.findOneById(id);
 

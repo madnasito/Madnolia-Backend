@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { CreatePlatformDto } from './dtos/create-platform.dto';
+import { Controller, Get, Query } from '@nestjs/common';
+// import { CreatePlatformDto } from './dtos/create-platform.dto';
 import { PlatformsService } from './platforms.service';
 import { PlatformParent } from './enums/platform-parent.enum';
 
@@ -7,10 +7,10 @@ import { PlatformParent } from './enums/platform-parent.enum';
 export class PlatformsController {
   constructor(private readonly platformsService: PlatformsService) {}
 
-  @Post('create')
-  createPlatform(@Body() body: CreatePlatformDto) {
-    return this.platformsService.create(body);
-  }
+  // @Post('create')
+  // createPlatform(@Body() body: CreatePlatformDto) {
+  //   return this.platformsService.create(body);
+  // }
 
   @Get('get-by')
   getPlatformByParent(@Query('parent') parent: PlatformParent) {
