@@ -20,4 +20,6 @@ export class PlatformsService {
   getBySlug = (slug: string) => this.platformModel.findOne({ slug });
 
   getByParent = (parent: PlatformParent) => this.platformModel.find({ parent });
+
+  findAll = () => this.platformModel.find().exec();
 }

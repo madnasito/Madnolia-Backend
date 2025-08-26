@@ -23,6 +23,7 @@ import { SuperModule } from './modules/super/super.module';
 import { PlatformsModule } from './modules/platforms/platforms.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { FirebaseModule } from './modules/firebase/firebase.module';
+import { SitemapModule } from './modules/sitemap/sitemap.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -75,6 +76,7 @@ import { FirebaseModule } from './modules/firebase/firebase.module';
     ReportsModule,
     // PushNotificationsModule, // Comentado porque ya existe FirebaseModule
     FirebaseModule,
+    SitemapModule,
   ],
   controllers: [AppController],
   providers: [
