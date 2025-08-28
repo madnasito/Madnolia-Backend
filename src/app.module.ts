@@ -12,8 +12,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { APP_PIPE } from '@nestjs/core';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { join } from 'path';
-import { ServeStaticModule } from '@nestjs/serve-static';
 import { AppVersionModule } from './modules/app-version/app-version.module';
 import { GroupsModule } from './modules/groups/groups.module';
 import { ChatModule } from './modules/chat/chat.module';
@@ -47,10 +45,6 @@ import { SitemapModule } from './modules/sitemap/sitemap.module';
     }),
     ScheduleModule.forRoot(),
     UsersModule,
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public/browser'),
-      exclude: ['/api*'], // Excludes all routes starting with /api
-    }),
     JwtModule.registerAsync({
       global: true,
       inject: [ConfigService],
