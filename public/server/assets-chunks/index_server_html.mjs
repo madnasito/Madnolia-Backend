@@ -1,0 +1,30 @@
+export default `<!doctype html>
+<html data-bs-theme="dark" lang="en-US" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <title>Madnolia</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Madnolia",
+    "url": "https://madnolia.app",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://madnolia.app/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+</script>
+<script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5842948645365527" crossorigin="anonymous"></script>
+  
+<link rel="stylesheet" href="styles-IIZIQCKJ.css"></head>
+<body><script type="text/javascript" id="ng-event-dispatch-contract">(()=>{function p(t,n,r,o,e,i,f,m){return{eventType:t,event:n,targetElement:r,eic:o,timeStamp:e,eia:i,eirp:f,eiack:m}}function u(t){let n=[],r=e=>{n.push(e)};return{c:t,q:n,et:[],etc:[],d:r,h:e=>{r(p(e.type,e,e.target,t,Date.now()))}}}function s(t,n,r){for(let o=0;o<n.length;o++){let e=n[o];(r?t.etc:t.et).push(e),t.c.addEventListener(e,t.h,r)}}function c(t,n,r,o,e=window){let i=u(t);e._ejsas||(e._ejsas={}),e._ejsas[n]=i,s(i,r),s(i,o,!0)}window.__jsaction_bootstrap=c;})();
+</script>
+  <app-root></app-root>
+<link rel="modulepreload" href="chunk-FANIIJMQ.js"><script src="polyfills-7EJFMMCA.js" type="module"></script><script src="scripts-WL2QHKC5.js" defer=""></script><script src="main-NREFHO3A.js" type="module"></script></body>
+</html>
+`;
