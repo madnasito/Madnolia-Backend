@@ -45,10 +45,6 @@ import { SitemapModule } from './modules/sitemap/sitemap.module';
     }),
     ScheduleModule.forRoot(),
     UsersModule,
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', 'public/browser'),
-    //   exclude: ['/api*'], // Excludes all routes starting with /api
-    // }),
     JwtModule.registerAsync({
       global: true,
       inject: [ConfigService],
