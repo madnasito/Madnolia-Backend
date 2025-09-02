@@ -129,7 +129,13 @@ export class UserController {
         resp.data.files.status === 'Success' ||
         resp.data.files.status === 'Duplicate'
       ) {
+        const currentUser = await this.usersService.getInfo(req.user.id);
         await this.usersService.update(req.user.id, {
+          name: currentUser.name,
+          username: currentUser.username,
+          email: currentUser.email,
+          platforms: currentUser.platforms,
+          availability: currentUser.availability,
           thumb: resp.data.files.thumbnail_url,
           img: resp.data.files.url,
         });

@@ -18,6 +18,7 @@ import { ConnectionStatus } from './enums/connection-status.enum';
 import { FriendshipService } from '../friendship/friendship.service';
 import { FriendshipStatus } from '../friendship/enums/friendship-status.enum';
 import { Friendship } from '../friendship/schemas/friendship.schema';
+import { UpdateUserDto } from './dtos/update-user.dto';
 // import { SimpleUser } from './classes/simple-user';
 
 @Injectable()
@@ -156,30 +157,38 @@ export class UsersService {
   // getInvitations = async (user: string) => this.userModel.populate('')
 
   // En tu UsersService
-  async update(userId: string, attrs: Partial<User>): Promise<User> {
-    // 1. Filtrar atributos undefined
-    const updateData = Object.keys(attrs).reduce((acc, key) => {
-      if (attrs[key] !== undefined) acc[key] = attrs[key];
-      return acc;
-    }, {});
+  async update(userId: string, updateData: UpdateUserDto): Promise<User> {
+    const user = await this.userModel.findById(userId);
 
-    // 2. Verificar si hay datos para actualizar
-    if (Object.keys(updateData).length === 0) {
-      throw new BadRequestException('No hay datos para actualizar');
+    if (user.email != updateData.email) {
+      const dateLimit = new Date();
+      dateLimit.setDate(dateLimit.getDate() - 15); // Restar 15 días
+      if (user.emailModifiedAt && dateLimit < user.emailModifiedAt) {
+        throw new ConflictException('EMAIL_DATE_LIMIT');
+      }
+      const emailDb = await this.findOneByEmail(updateData.email);
+      if (emailDb) throw new ConflictException('EMAIL_IN_USE');
+
+      user.emailModifiedAt = new Date();
     }
-
     // 3. Actualizar y retornar el documento
     const updatedUser = await this.userModel
       .findOneAndUpdate(
         { _id: userId },
-        { $set: updateData },
+        {
+          $set: {
+            ...updateData,
+            modifiedAt: new Date(),
+            emailModifiedAt: user.emailModifiedAt,
+          },
+        },
         { new: true, runValidators: true },
       )
       .lean()
       .exec();
 
     if (!updatedUser) {
-      throw new NotFoundException('Usuario no encontrado');
+      throw new NotFoundException('USER_NOT_FOUND');
     }
 
     return updatedUser;
