@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { Availability } from '../enums/availability.enum';
+import { Platform } from 'src/common/enums/platforms.enum';
 
 export type UserDocument = HydratedDocument<User>;
 @Schema()
@@ -37,7 +38,7 @@ export class User {
   @Prop({
     required: true,
   })
-  platforms: Array<number>;
+  platforms: Array<Platform>;
 
   @Prop({
     default: 'https://beeimg.com/images/w13588287183.jpg',
@@ -70,6 +71,9 @@ export class User {
 
   @Prop({ type: Date })
   modifiedAt: Date;
+
+  @Prop({ type: Date })
+  emailModifiedAt: Date;
 
   @Prop({ type: Date })
   deletedAt: Date;

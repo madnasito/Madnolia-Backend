@@ -8,6 +8,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { Availability } from '../enums/availability.enum';
+import { Platform } from 'src/common/enums/platforms.enum';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -24,19 +25,19 @@ export class UpdateUserDto {
   @IsEmail()
   email: string;
 
+  @IsOptional()
   @IsArray()
-  @IsOptional()
-  platforms: Array<number>;
+  platforms: Array<Platform>;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   img: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   thumb: string;
 
-  @IsEnum(Availability)
   @IsOptional()
+  @IsEnum(Availability)
   availability: Availability;
 }
