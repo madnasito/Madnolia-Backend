@@ -160,7 +160,7 @@ export class UsersService {
   async update(userId: string, updateData: UpdateUserDto): Promise<User> {
     const user = await this.userModel.findById(userId);
 
-    if (user.email != updateData.email) {
+    if (user.email != updateData.email && updateData.email) {
       const dateLimit = new Date();
       dateLimit.setDate(dateLimit.getDate() - 15); // Restar 15 días
       if (user.emailModifiedAt && dateLimit < user.emailModifiedAt) {
