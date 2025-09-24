@@ -77,9 +77,9 @@ export class Match {
   private: boolean;
 
   @Prop({
-    default: false,
+    default: null,
   })
-  tournament: boolean;
+  tournament: string;
 
   @Prop({
     enum: MatchStatus,

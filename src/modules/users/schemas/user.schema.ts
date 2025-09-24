@@ -43,7 +43,7 @@ export class User {
   @Prop({
     default: 'https://beeimg.com/images/w13588287183.jpg',
   })
-  img: string;
+  image: string;
 
   @Prop({
     default: 'https://i.beeimg.com/images/thumb/w13588287183-xs.jpg',

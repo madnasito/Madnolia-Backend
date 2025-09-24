@@ -33,7 +33,7 @@ export class UserDto {
 
   @IsUrl()
   @Expose()
-  img: string;
+  image: string;
 
   @IsUrl()
   @Expose()

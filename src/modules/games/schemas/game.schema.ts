@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { Platform } from 'src/common/enums/platforms.enum';
 
 export type GameDocument = HydratedDocument<Game>;
 
@@ -26,8 +27,7 @@ export class Game {
   @Prop({
     required: true,
   })
-  platforms: [{ id: number; amount: number }];
-
+  platforms: Platform[];
   @Prop({
     // required: true
     default: '',

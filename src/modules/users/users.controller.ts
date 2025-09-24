@@ -86,7 +86,7 @@ export class UserController {
 
   @Post('update-img')
   @UseGuards(UserGuard)
-  @UseInterceptors(FileInterceptor('img'))
+  @UseInterceptors(FileInterceptor('image'))
   async uploadFile(
     @Request() req: any,
     @UploadedFile(
@@ -94,11 +94,11 @@ export class UserController {
         validators: [new MaxFileSizeValidator({ maxSize: 1000 * 2048 })],
       }),
     )
-    img: Express.Multer.File,
+    image: Express.Multer.File,
   ) {
     try {
       const validExtension = ['jpg', 'png', 'jpeg', 'webp', 'gif'];
-      const extension = img.mimetype.split('/')[1];
+      const extension = image.mimetype.split('/')[1];
       if (!validExtension.includes(extension)) {
         throw new HttpException('NOT_VALID_EXTENSION', HttpStatus.BAD_REQUEST);
       }
@@ -109,8 +109,8 @@ export class UserController {
       // ...existing code...
       form.append(
         'file',
-        new Blob([new Uint8Array(img.buffer)], { type: img.mimetype }),
-        img.originalname,
+        new Blob([new Uint8Array(image.buffer)], { type: image.mimetype }),
+        image.originalname,
       );
 
       form.append('apikey', apiKey);
@@ -137,11 +137,11 @@ export class UserController {
           platforms: currentUser.platforms,
           availability: currentUser.availability,
           thumb: resp.data.files.thumbnail_url,
-          img: resp.data.files.url,
+          image: resp.data.files.url,
         });
         return {
           thumb: resp.data.files.thumbnail_url,
-          img: resp.data.files.url,
+          image: resp.data.files.url,
         }; // Return a simple JSON response
       }
 
