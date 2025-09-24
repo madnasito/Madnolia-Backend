@@ -1,6 +1,5 @@
 import {
   IsArray,
-  IsBoolean,
   IsDefined,
   IsInt,
   IsMongoId,
@@ -41,8 +40,9 @@ export class NewMatchDto {
   @IsArray()
   inviteds: Array<string>;
 
-  @IsBoolean()
-  tournament: boolean;
+  @IsString()
+  @IsOptional()
+  tournament: string;
 
   @IsOptional()
   @IsMongoId()

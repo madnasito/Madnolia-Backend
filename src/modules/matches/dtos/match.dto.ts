@@ -1,6 +1,5 @@
 import {
   IsArray,
-  IsBoolean,
   IsDefined,
   IsInt,
   IsMongoId,
@@ -42,6 +41,7 @@ export class MatchDto {
   @IsArray()
   joined: Array<Types.ObjectId>;
 
-  @IsBoolean()
-  tournament: boolean;
+  @IsString()
+  @IsOptional()
+  tournament: string;
 }

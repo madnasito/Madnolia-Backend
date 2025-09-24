@@ -46,7 +46,7 @@ export class MatchesService {
       inviteds: createMatchDto.inviteds,
       platform: createMatchDto.platform,
       title: createMatchDto.title != '' ? createMatchDto.title : 'Casual',
-      tournament: false,
+      tournament: null,
       description: createMatchDto.description,
       user: user,
       group: createMatchDto.group,

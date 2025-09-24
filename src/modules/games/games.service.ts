@@ -32,7 +32,7 @@ export class GamesService {
       name: rawGame.name,
       slug: rawGame.slug,
       gameId: rawGame.id,
-      platforms: [],
+      platforms: rawGame.platforms.map((e) => e.platform.id),
       background: rawGame.background_image,
       screenshots: [],
       description: rawGame.description_raw,
