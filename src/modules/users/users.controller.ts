@@ -27,6 +27,7 @@ import { ConfigService } from '@nestjs/config';
 
 import axios from 'axios';
 import { Types } from 'mongoose';
+import { MultipleMongoIdsDto } from 'src/common/dto/mutiple-mongo-ids.dto';
 
 @Controller('user')
 @Serialize(UserDto)
@@ -70,6 +71,12 @@ export class UserController {
   @UseGuards(UserGuard)
   async getInfoById(@Param('id') id: Types.ObjectId, @Request() req: any) {
     return this.usersService.getUserInfo(id, req.user.id);
+  }
+
+  @Post('info/multiple')
+  @UseGuards(UserGuard)
+  async getMulpleUsersInfo(@Body() body: MultipleMongoIdsDto) {
+    return this.usersService.getMultipleUsersInfo(body.ids);
   }
 
   @Get('reset-notifications')

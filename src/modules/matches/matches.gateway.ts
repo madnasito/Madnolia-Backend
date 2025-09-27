@@ -110,18 +110,12 @@ export class MatchesGateway
 
       client.emit('added_to_match', true);
 
-      const { _id, name, thumb, username } = user;
+      const { _id } = user;
 
       const newPlayerToMatchPayload: NewPlayerToMatch = {
         match: payload,
-        user: {
-          _id,
-          name,
-          thumb,
-          username,
-        },
+        user: _id,
       };
-
       client
         .to(payload.toString())
         .emit('new_player_to_match', newPlayerToMatchPayload);
