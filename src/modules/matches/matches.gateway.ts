@@ -111,7 +111,7 @@ export class MatchesGateway
 
       const { _id, name, thumb, username } = user;
 
-      client.to(payload).emit('new_player_to_match', {
+      client.to(payload.toString()).emit('new_player_to_match', {
         _id,
         name,
         thumb,
