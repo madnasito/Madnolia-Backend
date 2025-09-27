@@ -16,6 +16,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { MatchDto } from './dtos/match.dto';
 import { SendNotificationDto } from '../firebase/dtos/send-notification.dto';
 import { FirebaseCloudMessagingService } from '../firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
+import { Types } from 'mongoose';
 
 @WebSocketGateway()
 export class MatchesGateway
@@ -119,6 +120,27 @@ export class MatchesGateway
       this.logger.debug(`Client id: ${client.id} joined to match`);
     } catch (error) {
       client.emit('added_to_match', false);
+      throw new WsException(error);
+    }
+  }
+
+  @UseGuards(UserSocketGuard)
+  @SubscribeMessage('leave_match')
+  async handleLeaveMatch(client: Socket, payload: Types.ObjectId) {
+    try {
+      this.logger.debug(
+        `Client id: ${client.id} tries to leave the match ${payload}`,
+      );
+
+      const user = this.users.getUserBySocketId(client.id);
+
+      await this.matchesService.leaveMatch(payload, user._id);
+
+      client.emit('left_match', true);
+
+      client.to(payload.toString()).emit('player_left_match', user._id);
+    } catch (error) {
+      client.emit('left_match', false);
       throw new WsException(error);
     }
   }
