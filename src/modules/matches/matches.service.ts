@@ -162,8 +162,12 @@ export class MatchesService {
   };
 
   addUserToMatch = (id: Types.ObjectId, user: Types.ObjectId) => {
-    return this.matchModel.findByIdAndUpdate(
-      id,
+    return this.matchModel.findOneAndUpdate(
+      {
+        id,
+        $or: [{ status: MatchStatus.WAITING }, { status: MatchStatus.RUNNING }],
+        joined: { $ne: user },
+      },
       { $addToSet: { joined: user } },
       { new: true },
     );
