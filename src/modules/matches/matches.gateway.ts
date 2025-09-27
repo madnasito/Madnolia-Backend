@@ -89,7 +89,7 @@ export class MatchesGateway
 
   @UseGuards(UserSocketGuard)
   @SubscribeMessage('join_to_match')
-  async handleJoinToMatch(client: Socket, payload: string) {
+  async handleJoinToMatch(client: Socket, payload: Types.ObjectId) {
     try {
       this.logger.debug(`Client id: ${client.id} tries to join`);
 
@@ -97,7 +97,7 @@ export class MatchesGateway
       this.logger.debug(user);
       const matchUpdated = await this.matchesService.addUserToMatch(
         payload,
-        user._id.toString(),
+        user._id,
       );
 
       this.logger.debug(matchUpdated);
