@@ -17,6 +17,7 @@ import { MatchDto } from './dtos/match.dto';
 import { SendNotificationDto } from '../firebase/dtos/send-notification.dto';
 import { FirebaseCloudMessagingService } from '../firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
 import { Types } from 'mongoose';
+import { NewPlayerToMatch } from './interfaces/player-to-match.interface';
 
 @WebSocketGateway()
 export class MatchesGateway
@@ -111,12 +112,19 @@ export class MatchesGateway
 
       const { _id, name, thumb, username } = user;
 
-      client.to(payload.toString()).emit('new_player_to_match', {
-        _id,
-        name,
-        thumb,
-        username,
-      });
+      const newPlayerToMatchPayload: NewPlayerToMatch = {
+        match: payload,
+        user: {
+          _id,
+          name,
+          thumb,
+          username,
+        },
+      };
+
+      client
+        .to(payload.toString())
+        .emit('new_player_to_match', newPlayerToMatchPayload);
       this.logger.debug(`Client id: ${client.id} joined to match`);
     } catch (error) {
       client.emit('added_to_match', false);
