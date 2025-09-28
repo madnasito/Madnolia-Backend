@@ -245,7 +245,7 @@ export class UsersService {
         $nor: [{ _id: userId }],
         status: true,
       })
-      .select({ name: 1, username: 1, _id: 1, thumb: 1 })
+      .select({ name: 1, username: 1, _id: 1, thumb: 1, image: 1 })
       .lean()
       .skip(skip)
       .limit(limit)
