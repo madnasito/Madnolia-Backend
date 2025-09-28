@@ -17,10 +17,14 @@ import { UpdateMatchDto } from './dtos/update-match.dto';
 import { PlatformParent } from '../platforms/enums/platform-parent.enum';
 import { Types } from 'mongoose';
 import { PlayerMatchesFiltersDto } from './dtos/player-matches-filters.dto';
+import { MatchesGateway } from './matches.gateway';
 
 @Controller('match')
 export class MatchesController {
-  constructor(private matchesService: MatchesService) {}
+  constructor(
+    private matchesService: MatchesService,
+    private matchesGateway: MatchesGateway,
+  ) {}
 
   @Get('info/:id')
   async getMatch(@Param('id') id: Types.ObjectId) {
@@ -136,7 +140,13 @@ export class MatchesController {
 
   @UseGuards(UserGuard)
   @Delete('cancell/:id')
-  delete(@Request() req: any, @Param('id') id: string) {
-    return this.matchesService.delete(id, req.user.id);
+  async delete(@Request() req: any, @Param('id') id: string) {
+    try {
+      const match = await this.matchesService.delete(id, req.user.id);
+      this.matchesGateway.handleMatchCancelled(id);
+      return match;
+    } catch (error) {
+      throw error;
+    }
   }
 }

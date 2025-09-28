@@ -126,6 +126,10 @@ export class MatchesGateway
     }
   }
 
+  handleMatchCancelled(match: string) {
+    this.io.to(match).emit('match_cancelled', match);
+  }
+
   @UseGuards(UserSocketGuard)
   @SubscribeMessage('leave_match')
   async handleLeaveMatch(client: Socket, payload: Types.ObjectId) {
