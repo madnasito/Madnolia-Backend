@@ -135,7 +135,7 @@ export class MatchesController {
   }
 
   @UseGuards(UserGuard)
-  @Delete('delete/:id')
+  @Delete('cancell/:id')
   delete(@Request() req: any, @Param('id') id: string) {
     return this.matchesService.delete(id, req.user.id);
   }
