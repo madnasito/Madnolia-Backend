@@ -129,6 +129,32 @@ export class MatchesController {
   }
 
   @UseGuards(UserGuard)
+  @Patch('join/:id')
+  async joinMatch(@Param('id') id: Types.ObjectId, @Request() req: any) {
+    try {
+      const match = await this.matchesService.addUserToMatch(id, req.user.id);
+      this.matchesGateway.handleJoinToMatch(req.user.id, id);
+      return match;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @UseGuards(UserGuard)
+  @Patch('leave/:id')
+  async leaveMatch(@Request() req: any, @Param('id') id: Types.ObjectId) {
+    try {
+      const match = await this.matchesService.leaveMatch(id, req.user.id);
+
+      this.matchesGateway.handleLeaveMatch(id, req.user.id);
+
+      return match;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @UseGuards(UserGuard)
   @Patch('update/:id')
   update(
     @Param('id') id: string,

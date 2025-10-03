@@ -1,9 +1,8 @@
-import { Logger, NotFoundException, UseGuards } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
-  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
   WsException,
@@ -41,7 +40,7 @@ export class MatchesGateway
   handleConnection(client: any, ...args: any[]) {}
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('match_created')
+  // @SubscribeMessage('match_created')
   async handleMatchCreated(client: Socket, payload: string) {
     this.logger.debug(client);
     this.logger.debug(payload);
@@ -89,39 +88,28 @@ export class MatchesGateway
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('join_to_match')
-  async handleJoinToMatch(client: Socket, payload: Types.ObjectId) {
+  async handleJoinToMatch(user: Types.ObjectId, payload: Types.ObjectId) {
     try {
-      this.logger.debug(`Client id: ${client.id} tries to join`);
+      const userSocketIds = this.users.getUserSocketsById(user._id);
 
-      const user = this.users.getUserBySocketId(client.id);
-      this.logger.debug(user);
-      const matchUpdated = await this.matchesService.addUserToMatch(
-        payload,
-        user._id,
-      );
+      userSocketIds.forEach((socketId) => {
+        const client = this.io.sockets.get(socketId);
 
-      this.logger.debug(matchUpdated);
-
-      if (!matchUpdated) {
-        client.emit('added_to_match', false);
-        throw new WsException(new NotFoundException('NO_MATCH_FOUND'));
-      }
-
-      client.emit('added_to_match', true);
-
-      const { _id } = user;
+        if (client) {
+          this.logger.debug(`Client id: ${client.id} tries to join`);
+          client.join(payload.toString());
+          this.logger.debug(`Client id: ${client.id} joined to match`);
+        }
+      });
 
       const newPlayerToMatchPayload: NewPlayerToMatch = {
         match: payload,
-        user: _id,
+        user,
       };
-      client
+      this.io
         .to(payload.toString())
         .emit('new_player_to_match', newPlayerToMatchPayload);
-      this.logger.debug(`Client id: ${client.id} joined to match`);
     } catch (error) {
-      client.emit('added_to_match', false);
       throw new WsException(error);
     }
   }
@@ -131,22 +119,24 @@ export class MatchesGateway
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('leave_match')
-  async handleLeaveMatch(client: Socket, payload: Types.ObjectId) {
+  async handleLeaveMatch(user: Types.ObjectId, payload: Types.ObjectId) {
     try {
-      this.logger.debug(
-        `Client id: ${client.id} tries to leave the match ${payload}`,
-      );
-
-      const user = this.users.getUserBySocketId(client.id);
-
       await this.matchesService.leaveMatch(payload, user._id);
 
-      client.emit('left_match', true);
+      const userSocketIds = this.users.getUserSocketsById(user._id);
 
-      client.to(payload.toString()).emit('player_left_match', user._id);
+      userSocketIds.forEach((socketId) => {
+        const client = this.io.sockets.get(socketId);
+
+        if (client) {
+          this.logger.debug(`Client id: ${client.id} tries to leave`);
+          client.leave(payload.toString());
+          this.logger.debug(`Client id: ${client.id} leaved the match`);
+        }
+      });
+
+      this.io.to(payload.toString()).emit('player_left_match', user._id);
     } catch (error) {
-      client.emit('left_match', false);
       throw new WsException(error);
     }
   }
