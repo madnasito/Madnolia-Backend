@@ -17,7 +17,7 @@ export class Message {
   @Prop({
     required: true,
   })
-  text: string;
+  content: string;
 
   @Prop({
     default: new Date(),
