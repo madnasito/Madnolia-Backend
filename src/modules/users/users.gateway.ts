@@ -36,7 +36,19 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer() io: Namespace;
 
-  handleDisconnect(client: any) {
+  async handleDisconnect(client: any) {
+    const user = this.users.getUserBySocketId(client.id);
+
+    if (user) {
+      const device = user.devices.find((d) => d.socketId === client.id);
+      if (device) {
+        await this.usersService.handleUserDisconnection(
+          user._id,
+          device.fcmToken,
+        );
+      }
+    }
+
     this.users.deleteUserSocketId(client.id);
     this.logger.debug(`Cliend id:${client.id} disconnected`);
   }
@@ -59,6 +71,10 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
 
       const tokenPayload = await this.jwtService.verifyAsync(token as string);
+      await this.usersService.handleUserConnection(
+        tokenPayload.id,
+        fcm_token as string,
+      );
       await this.users.addUser(tokenPayload.id, client.id, fcm_token as string);
 
       const friendshipsIds = (

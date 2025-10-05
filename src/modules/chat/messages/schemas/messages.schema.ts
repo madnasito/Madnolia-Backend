@@ -32,6 +32,12 @@ export class Message {
 
   @Prop({ required: true })
   type: MessageType;
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Attachment' }],
+    default: [],
+  })
+  attachments: Types.ObjectId[];
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message);

@@ -29,6 +29,53 @@ export class UsersService {
     private readonly frienshipService: FriendshipService,
   ) {}
 
+  findByFcmToken = async (fcmToken: string) => {
+    return this.userModel.findOne({ 'devices.fcmToken': fcmToken });
+  };
+
+  handleUserConnection = async (userId: Types.ObjectId, fcmToken: string) => {
+    const userByFcmToken = await this.findByFcmToken(fcmToken);
+
+    if (userByFcmToken && !userByFcmToken._id.equals(userId)) {
+      userByFcmToken.devices = userByFcmToken.devices.filter(
+        (device) => device.fcmToken !== fcmToken,
+      );
+      await userByFcmToken.save();
+    }
+
+    const user = await this.findOneById(userId);
+
+    const device = user.devices.find((device) => device.fcmToken === fcmToken);
+
+    if (device) {
+      device.online = true;
+    } else {
+      user.devices.push({
+        fcmToken,
+        online: true,
+        lastActive: new Date(),
+        socketId: '',
+      });
+    }
+    await user.save();
+  };
+
+  handleUserDisconnection = async (
+    userId: Types.ObjectId,
+    fcmToken: string,
+  ) => {
+    const user = await this.findOneById(userId);
+
+    const device = user.devices.find((device) => device.fcmToken === fcmToken);
+
+    if (device) {
+      device.online = false;
+      device.lastActive = new Date();
+    }
+
+    await user.save();
+  };
+
   create = async (signUpDto: SignUpDto): Promise<User> => {
     const emailDb = await this.findOneByEmail(signUpDto.email);
 
