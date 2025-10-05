@@ -62,18 +62,18 @@ export class UsersService {
 
   handleUserDisconnection = async (
     userId: Types.ObjectId,
-    fcmToken: string,
+    socketId: string,
   ) => {
-    const user = await this.findOneById(userId);
-
-    const device = user.devices.find((device) => device.fcmToken === fcmToken);
-
-    if (device) {
-      device.online = false;
-      device.lastActive = new Date();
-    }
-
-    await user.save();
+    return await this.userModel.updateOne(
+      { _id: userId, 'devices.socketId': socketId },
+      {
+        $set: {
+          'devices.$.socketId': '',
+          'devices.$.online': false,
+          'devices.$.lastActive': new Date(),
+        },
+      },
+    );
   };
 
   create = async (signUpDto: SignUpDto): Promise<User> => {

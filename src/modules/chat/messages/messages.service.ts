@@ -18,6 +18,11 @@ import { MessageRecipientDTO } from './dtos/message-recipient.dto';
 import { MessageStatus } from './enums/message-status.enum';
 import { UpdateRecipientStatusDTO } from './dtos/update-recipient-status.dto';
 import { FirebaseCloudMessagingService } from 'src/modules/firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
+import {
+  MatchesTypeFilter,
+  PlayerMatchesFiltersDto,
+} from 'src/modules/matches/dtos/player-matches-filters.dto';
+import { MatchStatus } from 'src/modules/matches/enums/status.enum';
 
 @Injectable()
 export class MessagesService {
@@ -339,4 +344,55 @@ export class MessagesService {
 
   deleteAllUserMessagesRecipients = (user: Types.ObjectId) =>
     this.messageRecipientModel.deleteMany({ user });
+
+  async getMessagesFrom(userId: Types.ObjectId, fromDate: Date) {
+    const filter: PlayerMatchesFiltersDto = {
+      skip: 0,
+      sort: 'desc',
+      type: MatchesTypeFilter.ALL,
+      status: [MatchStatus.WAITING, MatchStatus.RUNNING],
+    };
+
+    const userMatches = await this.matchesService.getAllPlayerMatches(
+      userId,
+      filter,
+      100,
+    );
+    const matchIds = userMatches.map((m) => m._id);
+
+    return this.messageRecipientModel.aggregate([
+      {
+        $match: {
+          $or: [
+            {
+              $and: [{ conversation: { $in: matchIds } }, { user: null }],
+            },
+            { user: userId },
+          ],
+          createdAt: { $gte: fromDate },
+        },
+      },
+      {
+        $lookup: {
+          from: 'messages',
+          localField: 'message',
+          foreignField: '_id',
+          as: 'message',
+        },
+      },
+      { $unwind: '$message' },
+      { $sort: { 'message.date': 1 } },
+      {
+        $project: {
+          id: '$_id',
+          status: 1,
+          conversation: 1,
+          content: '$message.content',
+          type: '$message.type',
+          creator: '$message.creator',
+          date: '$message.date',
+        },
+      },
+    ]);
+  }
 }

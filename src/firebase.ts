@@ -32,7 +32,6 @@ export const FirebaseProvider = {
       const clientEmail = configService.get<string>('FIREBASE_CLIENT_EMAIL');
 
       if (projectId && privateKey && clientEmail) {
-        console.log('✅ Usando variables de entorno para Firebase');
         const serviceAccount: ServiceAccount = {
           projectId,
           privateKey: privateKey.replace(/\\n/g, '\n'),

@@ -37,16 +37,13 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() io: Namespace;
 
   async handleDisconnect(client: any) {
-    const user = this.users.getUserBySocketId(client.id);
+    try {
+      const user = this.users.getUserBySocketId(client.id);
 
-    if (user) {
-      const device = user.devices.find((d) => d.socketId === client.id);
-      if (device) {
-        await this.usersService.handleUserDisconnection(
-          user._id,
-          device.fcmToken,
-        );
-      }
+      await this.usersService.handleUserDisconnection(user._id, client.id);
+    } catch (error) {
+      console.error(error);
+      throw new WsException('ERROR_HANDLING_DISCONNECTION');
     }
 
     this.users.deleteUserSocketId(client.id);
