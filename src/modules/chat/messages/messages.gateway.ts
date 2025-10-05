@@ -129,7 +129,7 @@ export class MessagesGateway
       const message: MessageDto = {
         conversation: payload.conversation,
         creator: request.user,
-        text: payload.text,
+        content: payload.content,
         type: payload.type,
       };
       const messageRecipients = await this.messagesService.create(message);
@@ -154,7 +154,7 @@ export class MessagesGateway
               this.logger.debug(userFcms);
               this.logger.debug('Sending user message');
               const notificationPayload: SendNotificationDto = {
-                body: data.text,
+                body: data.content,
                 title: creator.name,
                 data: {
                   type: 'chat_message',
@@ -174,10 +174,12 @@ export class MessagesGateway
         client
           .to(messageRecipients[0].conversation.toString())
           .emit('message', data);
-        client.emit(
-          'message',
-          messageRecipients.find((message) => message.user == request.user),
-        );
+        client.emit('sended_message', {
+          uid: payload.id,
+          message: messageRecipients.find(
+            (message) => message.user == request.user,
+          ),
+        });
       } else {
         const messageRecipient = messageRecipients[0];
 
@@ -194,7 +196,7 @@ export class MessagesGateway
 
         if (fcmTokens.length > 0) {
           const notificationPayload: SendNotificationDto = {
-            body: messageRecipient.text,
+            body: messageRecipient.content,
             title: 'Match message',
             data: {
               type: 'chat_message',
@@ -210,7 +212,10 @@ export class MessagesGateway
         client
           .to(messageRecipient.conversation.toString())
           .emit('message', messageRecipient);
-        client.emit('message', messageRecipient);
+        client.emit('sended_message', {
+          uid: payload.id,
+          message: messageRecipient,
+        });
       }
     } catch (error) {
       console.log(error);

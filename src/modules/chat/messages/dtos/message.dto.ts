@@ -7,7 +7,7 @@ export class MessageDto {
   conversation: Types.ObjectId;
 
   @IsString()
-  text: string;
+  content: string;
 
   @IsMongoId()
   creator: Types.ObjectId;

@@ -150,8 +150,19 @@ export class UsersService {
       name: targetUser.name,
       username: targetUser.username,
       thumb: targetUser.thumb,
+      image: targetUser.image,
       connection: connectionStatus,
     };
+  };
+
+  getMultipleUsersInfo = async (users: Types.ObjectId[]) => {
+    const usersInfo = await this.userModel
+      .find({ _id: { $in: users } })
+      .select({ name: 1, username: 1, _id: 1, thumb: 1, image: 1 })
+      .lean()
+      .exec();
+
+    return usersInfo;
   };
 
   // getInvitations = async (user: string) => this.userModel.populate('')
@@ -234,7 +245,7 @@ export class UsersService {
         $nor: [{ _id: userId }],
         status: true,
       })
-      .select({ name: 1, username: 1, _id: 1, thumb: 1 })
+      .select({ name: 1, username: 1, _id: 1, thumb: 1, image: 1 })
       .lean()
       .skip(skip)
       .limit(limit)

@@ -145,12 +145,29 @@ export class MatchesService {
     return matchDeleted;
   };
 
-  addUserToMatch = (id: string, user: string) => {
-    if (!Types.ObjectId.isValid(id) || !Types.ObjectId.isValid(user))
-      throw new NotFoundException('USER_NOT_FOUND');
+  leaveMatch = async (id: Types.ObjectId, user: Types.ObjectId) => {
+    const match = await this.matchModel.findOneAndUpdate(
+      {
+        _id: id,
+        joined: user,
+        $or: [{ status: MatchStatus.WAITING }, { status: MatchStatus.RUNNING }],
+      },
+      { $pull: { joined: user } },
+      { new: true },
+    );
 
-    return this.matchModel.findByIdAndUpdate(
-      id,
+    if (!match) throw new NotFoundException('NO_MATCH_FOUND');
+
+    return match;
+  };
+
+  addUserToMatch = (id: Types.ObjectId, user: Types.ObjectId) => {
+    return this.matchModel.findOneAndUpdate(
+      {
+        _id: id,
+        $or: [{ status: MatchStatus.WAITING }, { status: MatchStatus.RUNNING }],
+        joined: { $ne: user },
+      },
       { $addToSet: { joined: user } },
       { new: true },
     );

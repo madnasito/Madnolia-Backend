@@ -29,6 +29,20 @@ export class FriendshipService {
     return this.friendshipModel.findById(id);
   }
 
+  async findFriendshipsByUsers(user: Types.ObjectId, users: Types.ObjectId[]) {
+    return Promise.all(
+      users.map(async (otherUser) => {
+        const friendship = await this.friendshipModel.findOne({
+          $or: [
+            { user1: user, user2: otherUser },
+            { user1: otherUser, user2: user },
+          ],
+        });
+        return friendship || null;
+      }),
+    );
+  }
+
   // Get friendship between two users
   findFriendshipByUsers(user1: Types.ObjectId, user2: Types.ObjectId) {
     return this.friendshipModel.findOne({

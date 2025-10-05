@@ -17,10 +17,14 @@ import { UpdateMatchDto } from './dtos/update-match.dto';
 import { PlatformParent } from '../platforms/enums/platform-parent.enum';
 import { Types } from 'mongoose';
 import { PlayerMatchesFiltersDto } from './dtos/player-matches-filters.dto';
+import { MatchesGateway } from './matches.gateway';
 
 @Controller('match')
 export class MatchesController {
-  constructor(private matchesService: MatchesService) {}
+  constructor(
+    private matchesService: MatchesService,
+    private matchesGateway: MatchesGateway,
+  ) {}
 
   @Get('info/:id')
   async getMatch(@Param('id') id: Types.ObjectId) {
@@ -125,6 +129,32 @@ export class MatchesController {
   }
 
   @UseGuards(UserGuard)
+  @Patch('join/:id')
+  async joinMatch(@Param('id') id: Types.ObjectId, @Request() req: any) {
+    try {
+      const match = await this.matchesService.addUserToMatch(id, req.user.id);
+      this.matchesGateway.handleJoinToMatch(req.user.id, id);
+      return match;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @UseGuards(UserGuard)
+  @Patch('leave/:id')
+  async leaveMatch(@Request() req: any, @Param('id') id: Types.ObjectId) {
+    try {
+      const match = await this.matchesService.leaveMatch(id, req.user.id);
+
+      this.matchesGateway.handleLeaveMatch(id, req.user.id);
+
+      return match;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @UseGuards(UserGuard)
   @Patch('update/:id')
   update(
     @Param('id') id: string,
@@ -135,8 +165,14 @@ export class MatchesController {
   }
 
   @UseGuards(UserGuard)
-  @Delete('delete/:id')
-  delete(@Request() req: any, @Param('id') id: string) {
-    return this.matchesService.delete(id, req.user.id);
+  @Delete('cancell/:id')
+  async delete(@Request() req: any, @Param('id') id: string) {
+    try {
+      const match = await this.matchesService.delete(id, req.user.id);
+      this.matchesGateway.handleMatchCancelled(id);
+      return match;
+    } catch (error) {
+      throw error;
+    }
   }
 }
