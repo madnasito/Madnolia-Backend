@@ -31,7 +31,12 @@ export class Users {
       if (device) {
         device.socketId = socketId;
       } else {
-        existingUser.devices.push({ fcmToken, socketId });
+        existingUser.devices.push({
+          fcmToken,
+          socketId,
+          online: true,
+          lastActive: new Date(),
+        });
       }
 
       return this.users;
@@ -51,7 +56,7 @@ export class Users {
       thumb,
       _id,
       room: '',
-      devices: [{ fcmToken, socketId }],
+      devices: [{ fcmToken, socketId, online: true, lastActive: new Date() }],
     });
 
     return this.users;

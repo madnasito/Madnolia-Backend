@@ -17,6 +17,7 @@ import { SendNotificationDto } from '../firebase/dtos/send-notification.dto';
 import { FirebaseCloudMessagingService } from '../firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
 import { Types } from 'mongoose';
 import { NewPlayerToMatch } from './interfaces/player-to-match.interface';
+import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway()
 export class MatchesGateway
@@ -26,6 +27,7 @@ export class MatchesGateway
 
   constructor(
     private matchesService: MatchesService,
+    private jwtService: JwtService,
     private users: Users,
     private firebaseCloudMessagingService: FirebaseCloudMessagingService,
   ) {}
@@ -37,7 +39,26 @@ export class MatchesGateway
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   afterInit(server: any) {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handleConnection(client: any, ...args: any[]) {}
+  async handleConnection(client: any, ...args: any[]) {
+    let { token } = client.handshake.auth;
+
+    if (!token) token = client.handshake.headers['token'];
+
+    if (token === undefined || token === null || token === '') {
+      client.disconnect(true);
+      throw new WsException('MISSING_TOKEN');
+    }
+
+    const tokenPayload = await this.jwtService.verifyAsync(token as string);
+
+    const userMatchesIds: string[] = (
+      await this.matchesService.getActiveMatchesJoinedOrCreatedByUser(
+        tokenPayload.id,
+      )
+    ).map((match) => match.id);
+
+    userMatchesIds.forEach((id) => client.join(id));
+  }
 
   @UseGuards(UserSocketGuard)
   // @SubscribeMessage('match_created')
