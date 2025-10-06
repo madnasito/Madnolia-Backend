@@ -23,6 +23,7 @@ import {
   PlayerMatchesFiltersDto,
 } from 'src/modules/matches/dtos/player-matches-filters.dto';
 import { MatchStatus } from 'src/modules/matches/enums/status.enum';
+import { SyncMessagesDto } from './dtos/sync-messages.dto';
 
 @Injectable()
 export class MessagesService {
@@ -311,6 +312,7 @@ export class MessagesService {
       },
       {
         status: body.status,
+        updatedAt: new Date(),
       },
     );
 
@@ -345,7 +347,10 @@ export class MessagesService {
   deleteAllUserMessagesRecipients = (user: Types.ObjectId) =>
     this.messageRecipientModel.deleteMany({ user });
 
-  async getMessagesFrom(userId: Types.ObjectId, fromDate: Date) {
+  async syncMessages(userId: Types.ObjectId, syncMessagesDto: SyncMessagesDto) {
+    const { date, limit = 50, skip = 0 } = syncMessagesDto;
+    const fromDate = new Date(date);
+
     const filter: PlayerMatchesFiltersDto = {
       skip: 0,
       sort: 'desc',
@@ -356,22 +361,25 @@ export class MessagesService {
     const userMatches = await this.matchesService.getAllPlayerMatches(
       userId,
       filter,
-      100,
+      null,
     );
     const matchIds = userMatches.map((m) => m._id);
 
-    return this.messageRecipientModel.aggregate([
+    const messages = await this.messageRecipientModel.aggregate([
       {
         $match: {
           $or: [
             {
-              $and: [{ conversation: { $in: matchIds } }, { user: null }],
+              $and: [{ conversation: { $in: matchIds } }],
             },
             { user: userId },
           ],
-          createdAt: { $gte: fromDate },
+          updatedAt: { $gte: fromDate },
         },
       },
+      { $sort: { updatedAt: 1 } },
+      { $skip: skip },
+      { $limit: limit },
       {
         $lookup: {
           from: 'messages',
@@ -381,7 +389,6 @@ export class MessagesService {
         },
       },
       { $unwind: '$message' },
-      { $sort: { 'message.date': 1 } },
       {
         $project: {
           id: '$_id',
@@ -394,5 +401,7 @@ export class MessagesService {
         },
       },
     ]);
+
+    return messages;
   }
 }

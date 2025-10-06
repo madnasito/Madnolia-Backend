@@ -11,22 +11,19 @@ import { MessagesService } from './messages.service';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { UserChatDto } from './dtos/user-chat-messages.dto';
 
-import { GetMessagesFromDto } from './dtos/get-messages-from.dto';
+import { SyncMessagesDto } from './dtos/sync-messages.dto';
 
 @Controller('messages')
 export class MessagesController {
   constructor(private messagesService: MessagesService) {}
 
-  @Get('from-date')
+  @Get('sync')
   @UseGuards(UserGuard)
-  async getMessagesFrom(
+  async syncMessages(
     @Request() req: any,
-    @Query() getMessagesFromDto: GetMessagesFromDto,
+    @Query() syncMessagesDto: SyncMessagesDto,
   ) {
-    return this.messagesService.getMessagesFrom(
-      req.user.id,
-      new Date(getMessagesFromDto.date),
-    );
+    return this.messagesService.syncMessages(req.user.id, syncMessagesDto);
   }
 
   @Get('')
