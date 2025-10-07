@@ -398,6 +398,7 @@ export class MessagesService {
           type: '$message.type',
           creator: '$message.creator',
           date: '$message.date',
+          updatedAt: 1,
         },
       },
     ]);
