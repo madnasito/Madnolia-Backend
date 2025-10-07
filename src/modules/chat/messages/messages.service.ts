@@ -370,14 +370,14 @@ export class MessagesService {
         $match: {
           $or: [
             {
-              $and: [{ conversation: { $in: matchIds } }],
+              conversation: { $in: matchIds },
             },
             { user: userId },
           ],
           updatedAt: { $gte: fromDate },
         },
       },
-      { $sort: { updatedAt: 1 } },
+      { $sort: { updatedAt: 1, _id: 1 } },
       { $skip: skip },
       { $limit: limit },
       {

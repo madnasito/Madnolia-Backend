@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsDateString, IsNotEmpty, IsNumber, IsOptional, Min } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  Min,
+} from 'class-validator';
 
 export class SyncMessagesDto {
   @IsNotEmpty()
@@ -16,5 +22,5 @@ export class SyncMessagesDto {
   @IsNumber()
   @Type(() => Number)
   @Min(1)
-  limit?: number = 50;
+  limit?: number = 300;
 }
