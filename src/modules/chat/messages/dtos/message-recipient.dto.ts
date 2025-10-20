@@ -24,4 +24,7 @@ export class MessageRecipientDTO {
 
   @IsDate()
   date: Date;
+
+  @IsDate()
+  updatedAt: Date;
 }

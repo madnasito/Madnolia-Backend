@@ -12,6 +12,7 @@ import { UserGuard } from 'src/common/guards/user.guard';
 import { UserChatDto } from './dtos/user-chat-messages.dto';
 
 import { SyncMessagesDto } from './dtos/sync-messages.dto';
+import { Types } from 'mongoose';
 
 @Controller('messages')
 export class MessagesController {
@@ -36,9 +37,9 @@ export class MessagesController {
   @Get('match')
   async getMatchMessages(
     @Query('match') id: string,
-    @Query('skip') skip: string,
+    @Query('cursor') cursor: Types.ObjectId,
   ) {
-    return this.messagesService.getRoomMessages(id, parseInt(skip));
+    return this.messagesService.getRoomMessages(id, cursor);
   }
 
   @Post('chat')
@@ -47,7 +48,7 @@ export class MessagesController {
     return this.messagesService.getUserChatMessages(
       req.user.id,
       body.user,
-      body.skip,
+      body.cursor,
     );
   }
 }

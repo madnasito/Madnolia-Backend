@@ -64,6 +64,7 @@ export class MessagesService {
           conversation: createMessageDto.conversation,
           creator: createMessageDto.creator,
           date: createdMessage.date,
+          updatedAt: createdRecipient.updatedAt,
         };
       });
     } catch (error) {
@@ -162,22 +163,33 @@ export class MessagesService {
 
   async getRoomMessages(
     room: string,
-    skip: number = 0,
+    cursor: Types.ObjectId | null,
     user: Types.ObjectId = null,
   ): Promise<MessageRecipientDTO[]> {
     const limit = 30;
+    const query: any = {
+      conversation: room,
+      $or: [{ user: null }, { user }],
+    };
+
+    if (cursor) {
+      // if (!mongoose.Types.ObjectId.isValid(cursor)) {
+      //   throw new BadRequestException('Invalid cursor');
+      // }
+      query._id = { $lt: cursor };
+    }
+
     const recipients = await this.messageRecipientModel.find(
-      { conversation: room, $or: [{ user: null }, { user }] },
+      query,
       {},
       {
         limit: limit,
-        skip: skip,
         sort: { _id: -1 },
         populate: { path: 'message' },
       },
     );
 
-    return recipients.map((recipient) => {
+    const messages = recipients.map((recipient) => {
       const messageMapped: MessageRecipientDTO = {
         id: recipient.id,
         status: recipient.status,
@@ -186,9 +198,12 @@ export class MessagesService {
         type: recipient.message.type,
         creator: recipient.message.creator,
         date: recipient.message.date,
+        updatedAt: recipient.updatedAt,
       };
       return messageMapped;
     });
+
+    return messages;
   }
 
   async getUserChats(userId: Types.ObjectId) {
@@ -282,7 +297,7 @@ export class MessagesService {
   async getUserChatMessages(
     user1: Types.ObjectId,
     user2: Types.ObjectId,
-    skip: number = 0,
+    cursor: Types.ObjectId | null,
   ) {
     const friendshipDb = await this.friendshipService.findFriendshipByUsers(
       user1,
@@ -291,7 +306,7 @@ export class MessagesService {
 
     if (!friendshipDb) throw new NotFoundException();
 
-    return this.getRoomMessages(friendshipDb.id, skip, user1);
+    return this.getRoomMessages(friendshipDb.id, cursor, user1);
   }
 
   updateRecipientStatus = async (
