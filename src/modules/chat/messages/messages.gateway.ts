@@ -8,7 +8,6 @@ import {
 import {
   ConnectedSocket,
   MessageBody,
-  OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
   SubscribeMessage,
@@ -18,13 +17,11 @@ import {
 } from '@nestjs/websockets';
 import { Namespace, Socket } from 'socket.io';
 import { UserSocketGuard } from 'src/common/guards/user-sockets.guard';
-import { UserGuard } from 'src/common/guards/user.guard';
+// import { UserGuard } from 'src/common/guards/user.guard';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dtos/create-message.dto';
 import { MessageDto } from './dtos/message.dto';
 import { Users } from '../../users/classes/user';
-import { JwtService } from '@nestjs/jwt';
-import { FriendshipService } from 'src/modules/friendship/friendship.service';
 import { MatchesService } from 'src/modules/matches/matches.service';
 import { UpdateRecipientStatusDTO } from './dtos/update-recipient-status.dto';
 import { MessageType } from './enums/message-type.enum';
@@ -36,15 +33,11 @@ import { SendNotificationDto } from 'src/modules/firebase/dtos/send-notification
 @WebSocketGateway({
   // namespace: 'messages'
 })
-export class MessagesGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
   private readonly logger = new Logger(MessagesGateway.name);
 
   constructor(
     private readonly messagesService: MessagesService,
-    private readonly jwtService: JwtService,
-    private readonly friendshipService: FriendshipService,
     private readonly matchesService: MatchesService,
     private users: Users,
     private firebaseCloudMessagingService: FirebaseCloudMessagingService,
@@ -55,48 +48,6 @@ export class MessagesGateway
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   afterInit(@ConnectedSocket() socket: Socket) {
     this.logger.log(`Initialized`);
-  }
-
-  @UseGuards(UserGuard)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async handleConnection(client: Socket, ...args: any[]) {
-    try {
-      const { size } = this.io.sockets;
-
-      console.table(client.handshake.auth);
-      let { token } = client.handshake.auth;
-
-      const { fcm_token } = client.handshake.headers;
-
-      if (!token) token = client.handshake.headers['token'];
-
-      if (token === undefined || token === null || token === '') {
-        client.disconnect(true);
-        throw new WsException('MISSING_TOKEN');
-      }
-
-      const tokenPayload = await this.jwtService.verifyAsync(token as string);
-      await this.users.addUser(tokenPayload.id, client.id, fcm_token as string);
-
-      const friendshipsIds = (
-        await this.friendshipService.findFriendshipsByUser(tokenPayload.id)
-      ).map((e) => e.id);
-
-      const userMatchesIds: string[] = (
-        await this.matchesService.getActiveMatchesJoinedOrCreatedByUser(
-          tokenPayload.id,
-        )
-      ).map((match) => match.id);
-
-      userMatchesIds.forEach((id) => client.join(id));
-
-      friendshipsIds.forEach((element) => client.join(element));
-
-      this.logger.debug(`Client id: ${client.id} connected`);
-      this.logger.debug(`Number of connected clients: ${size}`);
-    } catch (error) {
-      return new WsException(error);
-    }
   }
 
   handleDisconnect(client: any) {

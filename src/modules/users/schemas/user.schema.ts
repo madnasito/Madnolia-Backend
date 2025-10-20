@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { Availability } from '../enums/availability.enum';
 import { Platform } from 'src/common/enums/platforms.enum';
+import { UserDevice } from '../interfaces/user-device.interface';
 
 export type UserDocument = HydratedDocument<User>;
 @Schema()
@@ -65,6 +66,9 @@ export class User {
 
   @Prop({ default: Availability.EVERYONE, enum: Availability })
   availability: Availability;
+
+  @Prop({ default: [] })
+  devices: UserDevice[];
 
   @Prop({ type: Date, default: new Date() })
   createdAt: Date;

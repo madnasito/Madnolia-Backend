@@ -32,6 +32,9 @@ export class MessageRecipient {
     default: MessageStatus.SENT,
   })
   status: MessageStatus;
+
+  @Prop({ type: Date, default: Date.now, index: true })
+  updatedAt: Date;
 }
 
 export const MessageRecipientSchema =

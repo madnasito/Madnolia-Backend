@@ -14,6 +14,7 @@ import {
   MessageRecipientSchema,
 } from './schemas/messages-recipient.schema';
 import { FirebaseCloudMessagingModule } from 'src/modules/firebase/firebase-cloud-messaging/firebase-cloud-messaging.module';
+import { AttachmentsModule } from './attachments/attachments.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { FirebaseCloudMessagingModule } from 'src/modules/firebase/firebase-clou
       { name: MessageRecipient.name, schema: MessageRecipientSchema },
     ]),
     UsersModule,
+    AttachmentsModule,
     FriendshipModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
@@ -33,7 +35,8 @@ import { FirebaseCloudMessagingModule } from 'src/modules/firebase/firebase-clou
       },
     }),
     MatchesModule,
-    FirebaseCloudMessagingModule, // Ensure FirebaseCloudMessagingModule is imported
+    FirebaseCloudMessagingModule,
+    AttachmentsModule, // Ensure FirebaseCloudMessagingModule is imported
   ],
   providers: [MessagesService, MessagesGateway],
   exports: [MessagesService],

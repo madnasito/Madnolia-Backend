@@ -18,6 +18,12 @@ import { MessageRecipientDTO } from './dtos/message-recipient.dto';
 import { MessageStatus } from './enums/message-status.enum';
 import { UpdateRecipientStatusDTO } from './dtos/update-recipient-status.dto';
 import { FirebaseCloudMessagingService } from 'src/modules/firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
+import {
+  MatchesTypeFilter,
+  PlayerMatchesFiltersDto,
+} from 'src/modules/matches/dtos/player-matches-filters.dto';
+import { MatchStatus } from 'src/modules/matches/enums/status.enum';
+import { SyncMessagesDto } from './dtos/sync-messages.dto';
 
 @Injectable()
 export class MessagesService {
@@ -58,6 +64,7 @@ export class MessagesService {
           conversation: createMessageDto.conversation,
           creator: createMessageDto.creator,
           date: createdMessage.date,
+          updatedAt: createdRecipient.updatedAt,
         };
       });
     } catch (error) {
@@ -156,22 +163,33 @@ export class MessagesService {
 
   async getRoomMessages(
     room: string,
-    skip: number = 0,
+    cursor: Types.ObjectId | null,
     user: Types.ObjectId = null,
   ): Promise<MessageRecipientDTO[]> {
     const limit = 30;
+    const query: any = {
+      conversation: room,
+      $or: [{ user: null }, { user }],
+    };
+
+    if (cursor) {
+      // if (!mongoose.Types.ObjectId.isValid(cursor)) {
+      //   throw new BadRequestException('Invalid cursor');
+      // }
+      query._id = { $lt: cursor };
+    }
+
     const recipients = await this.messageRecipientModel.find(
-      { conversation: room, $or: [{ user: null }, { user }] },
+      query,
       {},
       {
         limit: limit,
-        skip: skip,
         sort: { _id: -1 },
         populate: { path: 'message' },
       },
     );
 
-    return recipients.map((recipient) => {
+    const messages = recipients.map((recipient) => {
       const messageMapped: MessageRecipientDTO = {
         id: recipient.id,
         status: recipient.status,
@@ -180,9 +198,12 @@ export class MessagesService {
         type: recipient.message.type,
         creator: recipient.message.creator,
         date: recipient.message.date,
+        updatedAt: recipient.updatedAt,
       };
       return messageMapped;
     });
+
+    return messages;
   }
 
   async getUserChats(userId: Types.ObjectId) {
@@ -276,7 +297,7 @@ export class MessagesService {
   async getUserChatMessages(
     user1: Types.ObjectId,
     user2: Types.ObjectId,
-    skip: number = 0,
+    cursor: Types.ObjectId | null,
   ) {
     const friendshipDb = await this.friendshipService.findFriendshipByUsers(
       user1,
@@ -285,7 +306,7 @@ export class MessagesService {
 
     if (!friendshipDb) throw new NotFoundException();
 
-    return this.getRoomMessages(friendshipDb.id, skip, user1);
+    return this.getRoomMessages(friendshipDb.id, cursor, user1);
   }
 
   updateRecipientStatus = async (
@@ -306,6 +327,7 @@ export class MessagesService {
       },
       {
         status: body.status,
+        updatedAt: new Date(),
       },
     );
 
@@ -339,4 +361,63 @@ export class MessagesService {
 
   deleteAllUserMessagesRecipients = (user: Types.ObjectId) =>
     this.messageRecipientModel.deleteMany({ user });
+
+  async syncMessages(userId: Types.ObjectId, syncMessagesDto: SyncMessagesDto) {
+    const { date, limit = 50, skip = 0 } = syncMessagesDto;
+    const fromDate = new Date(date);
+
+    const filter: PlayerMatchesFiltersDto = {
+      skip: 0,
+      sort: 'desc',
+      type: MatchesTypeFilter.ALL,
+      status: [MatchStatus.WAITING, MatchStatus.RUNNING],
+    };
+
+    const userMatches = await this.matchesService.getAllPlayerMatches(
+      userId,
+      filter,
+      null,
+    );
+    const matchIds = userMatches.map((m) => m._id);
+
+    const messages = await this.messageRecipientModel.aggregate([
+      {
+        $match: {
+          $or: [
+            {
+              conversation: { $in: matchIds },
+            },
+            { user: userId },
+          ],
+          updatedAt: { $gte: fromDate },
+        },
+      },
+      { $sort: { updatedAt: 1, _id: 1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: 'messages',
+          localField: 'message',
+          foreignField: '_id',
+          as: 'message',
+        },
+      },
+      { $unwind: '$message' },
+      {
+        $project: {
+          id: '$_id',
+          status: 1,
+          conversation: 1,
+          content: '$message.content',
+          type: '$message.type',
+          creator: '$message.creator',
+          date: '$message.date',
+          updatedAt: 1,
+        },
+      },
+    ]);
+
+    return messages;
+  }
 }

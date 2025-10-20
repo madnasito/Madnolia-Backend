@@ -9,6 +9,8 @@ import { UsersModule } from '../users/users.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { PlatformsModule } from '../platforms/platforms.module';
 import { FirebaseModule } from '../firebase/firebase.module';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -19,6 +21,15 @@ import { FirebaseModule } from '../firebase/firebase.module';
     UsersModule,
     PlatformsModule,
     FirebaseModule,
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return {
+          secret: config.get<string>('JWT_SECRET'),
+          signOptions: { expiresIn: '10d' },
+        };
+      },
+    }),
   ],
   providers: [MatchesService, MatchesGateway],
   controllers: [MatchesController],

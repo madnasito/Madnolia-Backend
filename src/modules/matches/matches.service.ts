@@ -199,6 +199,7 @@ export class MatchesService {
   getAllPlayerMatches = async (
     user: Types.ObjectId,
     payload: PlayerMatchesFiltersDto,
+    limit: number = 10,
   ) => {
     const filter: any = { $or: [{ user }, { joined: user }] };
 
@@ -208,10 +209,14 @@ export class MatchesService {
       filter.platform = { $ne: null }; // Only include if platform is not null
     }
 
+    if (payload.status && payload.status.length > 0) {
+      filter.status = { $in: payload.status };
+    }
+
     return this.matchModel
       .find(filter, {}, { populate: { path: 'game' } })
       .sort({ date: payload.sort })
-      .limit(10)
+      .limit(limit)
       .skip(payload.skip);
   };
 

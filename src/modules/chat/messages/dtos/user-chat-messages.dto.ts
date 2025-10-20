@@ -1,4 +1,4 @@
-import { IsInt, IsMongoId, IsOptional } from 'class-validator';
+import { IsMongoId, IsOptional } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class UserChatDto {
@@ -6,6 +6,6 @@ export class UserChatDto {
   user: Types.ObjectId;
 
   @IsOptional()
-  @IsInt()
-  skip: number;
+  @IsMongoId()
+  cursor?: Types.ObjectId;
 }
