@@ -31,6 +31,7 @@ export class SerializeInterceptor implements NestInterceptor {
             'createdAt',
             'modifiedAt',
             'emailModifiedAt',
+            'devices',
           ],
         });
       }),
