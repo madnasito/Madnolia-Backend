@@ -110,7 +110,10 @@ export class MessagesService {
         throw new UnauthorizedException();
     }
 
-    const createdMessage = new this.messageModel(createMessageDto);
+    const createdMessage = new this.messageModel({
+      ...createMessageDto,
+      date: new Date(),
+    });
 
     return createdMessage.save({ session });
   }
