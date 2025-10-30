@@ -33,7 +33,7 @@ export class MessageRecipient {
   })
   status: MessageStatus;
 
-  @Prop({ type: Date, default: Date.now, index: true })
+  @Prop({ type: Date, index: true })
   updatedAt: Date;
 }
 

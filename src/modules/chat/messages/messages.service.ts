@@ -110,7 +110,10 @@ export class MessagesService {
         throw new UnauthorizedException();
     }
 
-    const createdMessage = new this.messageModel(createMessageDto);
+    const createdMessage = new this.messageModel({
+      ...createMessageDto,
+      date: new Date(),
+    });
 
     return createdMessage.save({ session });
   }
@@ -382,20 +385,6 @@ export class MessagesService {
 
     const messages = await this.messageRecipientModel.aggregate([
       {
-        $match: {
-          $or: [
-            {
-              conversation: { $in: matchIds },
-            },
-            { user: userId },
-          ],
-          updatedAt: { $gte: fromDate },
-        },
-      },
-      { $sort: { updatedAt: 1, _id: 1 } },
-      { $skip: skip },
-      { $limit: limit },
-      {
         $lookup: {
           from: 'messages',
           localField: 'message',
@@ -404,6 +393,34 @@ export class MessagesService {
         },
       },
       { $unwind: '$message' },
+      {
+        $match: {
+          $and: [
+            {
+              $or: [
+                {
+                  conversation: { $in: matchIds },
+                },
+                { user: userId },
+              ],
+            },
+            {
+              $or: [
+                { updatedAt: { $gte: fromDate } },
+                {
+                  $and: [
+                    { updatedAt: { $eq: null } },
+                    { 'message.date': { $gte: fromDate } },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+      { $sort: { updatedAt: 1, _id: 1 } },
+      { $skip: skip },
+      { $limit: limit },
       {
         $project: {
           id: '$_id',

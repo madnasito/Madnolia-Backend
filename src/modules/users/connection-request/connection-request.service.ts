@@ -7,7 +7,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ConnectionRequest } from './schemas/connection-request.schema';
 import { Model, Types } from 'mongoose';
 import { ConnectionRequestStatus } from './enums/connection-status.enum';
-import { NotificationsService } from 'src/modules/notifications/notifications.service';
 import { FriendshipService } from 'src/modules/friendship/friendship.service';
 import { CreateFriendshipDto } from 'src/modules/friendship/dtos/create-frindship.dto';
 import { FriendshipStatus } from 'src/modules/friendship/enums/friendship-status.enum';
@@ -17,7 +16,6 @@ export class ConnectionRequestService {
   constructor(
     @InjectModel(ConnectionRequest.name)
     private connectionRequestModel: Model<ConnectionRequest>,
-    private notificationsService: NotificationsService,
     private friendshipService: FriendshipService,
   ) {}
 
