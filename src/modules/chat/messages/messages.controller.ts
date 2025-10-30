@@ -18,7 +18,7 @@ import { Types } from 'mongoose';
 export class MessagesController {
   constructor(private messagesService: MessagesService) {}
 
-  @Get('sync')
+  @Get('sync-from')
   @UseGuards(UserGuard)
   async syncMessages(
     @Request() req: any,
