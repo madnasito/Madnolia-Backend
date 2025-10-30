@@ -68,7 +68,9 @@ export class FriendshipService {
     );
   }
 
-  deleteUserFriendships = (user: Types.ObjectId) =>
+  deleteUserFriendships = (
+    user: Types.ObjectId,
+  ): Promise<{ deletedCount?: number }> =>
     this.friendshipModel.deleteMany({
       $or: [{ user1: user }, { user2: user }],
     });
