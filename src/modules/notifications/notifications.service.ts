@@ -41,7 +41,7 @@ export class NotificationsService {
     user: Types.ObjectId,
     cursor: Types.ObjectId | null,
   ): Promise<Array<Notification>> => {
-    const limit = 50;
+    const limit = 20;
     const query: RootFilterQuery<Notification> = {
       user,
     };
