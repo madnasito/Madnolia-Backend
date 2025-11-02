@@ -24,6 +24,7 @@ import {
 } from './dtos/player-matches-filters.dto';
 import { UsersService } from '../users/users.service';
 import { MatchesByPlatforms } from './interfaces/matches-by-platforms';
+import { Platform } from 'src/common/enums/platforms.enum';
 
 @Injectable()
 export class MatchesService {
@@ -426,7 +427,7 @@ export class MatchesService {
 
   async getLatestGamesByUserAndPlatform(
     user: string,
-    platform: number,
+    platform: Platform,
   ): Promise<any> {
     const distinctGameIds = await this.matchModel
       .distinct('game', { platform, user })

@@ -1,7 +1,7 @@
 import {
   IsArray,
   IsDefined,
-  IsInt,
+  IsEnum,
   IsMongoId,
   IsNotEmpty,
   IsNumber,
@@ -9,6 +9,7 @@ import {
   IsString,
 } from 'class-validator';
 import { ObjectId, Types } from 'mongoose';
+import { Platform } from 'src/common/enums/platforms.enum';
 
 export class MatchDto {
   @IsOptional()
@@ -26,8 +27,8 @@ export class MatchDto {
   @IsMongoId()
   user: Types.ObjectId;
 
-  @IsInt()
-  platform: number;
+  @IsEnum(Platform)
+  platform: Platform;
 
   @IsMongoId()
   game: string;

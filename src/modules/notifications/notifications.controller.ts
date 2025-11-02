@@ -15,8 +15,14 @@ export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
   @UseGuards(UserGuard)
   @Get('')
-  getNotifications(@Request() request: any) {
-    return this.notificationsService.getUserNotifications(request.user.id);
+  getNotifications(
+    @Request() request: any,
+    @Query('id') cursor: Types.ObjectId | null,
+  ) {
+    return this.notificationsService.getUserNotifications(
+      request.user.id,
+      cursor,
+    );
   }
 
   @UseGuards(UserGuard)

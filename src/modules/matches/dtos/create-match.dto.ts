@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsBoolean,
+  IsEnum,
   IsInt,
   IsMongoId,
   IsNumber,
@@ -10,6 +11,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { Platform } from 'src/common/enums/platforms.enum';
 
 export class CreateMatchDto {
   @IsString()
@@ -20,8 +22,8 @@ export class CreateMatchDto {
   @MaxLength(80)
   description: string;
 
-  @IsInt()
-  platform: number;
+  @IsEnum(Platform)
+  platform: Platform;
 
   @IsInt()
   game: number;
