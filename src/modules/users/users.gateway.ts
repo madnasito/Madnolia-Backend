@@ -40,7 +40,9 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       const user = this.users.getUserBySocketId(client.id);
 
-      await this.usersService.handleUserDisconnection(user._id, client.id);
+      if (user) {
+        await this.usersService.handleUserDisconnection(user._id, client.id);
+      }
     } catch (error) {
       console.error(error);
       throw new WsException('ERROR_HANDLING_DISCONNECTION');

@@ -1,5 +1,5 @@
 export enum NotificationType {
-  REQUEST,
-  INVITATION,
   SYSTEM,
+  REQUEST,
+  MATCH_INVITATION,
 }

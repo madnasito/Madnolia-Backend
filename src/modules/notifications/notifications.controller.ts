@@ -17,7 +17,7 @@ export class NotificationsController {
   @Get('')
   getNotifications(
     @Request() request: any,
-    @Query('id') cursor: Types.ObjectId | null,
+    @Query('from') cursor: Types.ObjectId | null,
   ) {
     return this.notificationsService.getUserNotifications(
       request.user.id,

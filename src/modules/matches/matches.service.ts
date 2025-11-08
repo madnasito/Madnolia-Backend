@@ -65,7 +65,7 @@ export class MatchesService {
         path: matchDb.id,
         title: matchDb.title,
         thumb: gameData.background,
-        type: NotificationType.INVITATION,
+        type: NotificationType.MATCH_INVITATION,
         user: element,
         sender: matchDb.user.toString(),
       };
