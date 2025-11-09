@@ -1,20 +1,20 @@
 import {
   IsArray,
   IsDefined,
+  IsDate,
   IsEnum,
   IsMongoId,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
-import { ObjectId, Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { Platform } from 'src/common/enums/platforms.enum';
 
 export class MatchDto {
   @IsOptional()
   @IsMongoId()
-  _id: ObjectId;
+  _id: Types.ObjectId;
 
   @IsString()
   title: string;
@@ -33,11 +33,11 @@ export class MatchDto {
   @IsMongoId()
   game: string;
 
-  @IsNumber()
-  date: number;
+  @IsDate()
+  date: Date;
 
   @IsArray()
-  inviteds: Array<string>;
+  inviteds: Array<Types.ObjectId>;
 
   @IsArray()
   joined: Array<Types.ObjectId>;

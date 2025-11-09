@@ -114,9 +114,6 @@ export class UsersService {
   };
 
   findOneById = async (id: Types.ObjectId) => {
-    if (!mongoose.Types.ObjectId.isValid(id))
-      throw new NotFoundException('USER_NOT_FOUND');
-
     const user = await this.userModel.findById(id);
 
     if (!user) throw new NotFoundException('USER_NOT_FOUND');

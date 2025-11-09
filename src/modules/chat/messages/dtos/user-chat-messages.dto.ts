@@ -7,5 +7,5 @@ export class UserChatDto {
 
   @IsOptional()
   @IsMongoId()
-  cursor?: Types.ObjectId;
+  cursor?: string;
 }

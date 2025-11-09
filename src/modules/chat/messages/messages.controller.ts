@@ -12,7 +12,7 @@ import { UserGuard } from 'src/common/guards/user.guard';
 import { UserChatDto } from './dtos/user-chat-messages.dto';
 
 import { SyncMessagesDto } from './dtos/sync-messages.dto';
-import { Types } from 'mongoose';
+// import { Types } from 'mongoose';
 
 @Controller('messages')
 export class MessagesController {
@@ -37,7 +37,7 @@ export class MessagesController {
   @Get('match')
   async getMatchMessages(
     @Query('match') id: string,
-    @Query('cursor') cursor: Types.ObjectId,
+    @Query('cursor') cursor: string,
   ) {
     return this.messagesService.getRoomMessages(id, cursor);
   }

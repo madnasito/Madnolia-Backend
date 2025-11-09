@@ -1,16 +1,19 @@
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
+  IsDate,
   IsEnum,
   IsInt,
   IsMongoId,
-  IsNumber,
   IsOptional,
   IsString,
   Max,
   MaxLength,
   Min,
+  MinDate,
 } from 'class-validator';
+import { Types } from 'mongoose';
 import { Platform } from 'src/common/enums/platforms.enum';
 
 export class CreateMatchDto {
@@ -28,9 +31,10 @@ export class CreateMatchDto {
   @IsInt()
   game: number;
 
-  @IsNumber()
-  @Min(new Date().getTime(), { message: 'INVALID_DATE' })
-  date: number;
+  @Type(() => Date)
+  @IsDate()
+  @MinDate(new Date(), { message: 'INVALID_DATE' })
+  date: Date;
 
   @IsInt()
   @Min(5)
@@ -38,7 +42,7 @@ export class CreateMatchDto {
   duration: number;
 
   @IsArray()
-  inviteds: Array<string>;
+  inviteds: Array<Types.ObjectId>;
 
   @IsOptional()
   @IsBoolean()

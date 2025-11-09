@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Game } from './schemas/game.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { RawgGame } from './interfaces/rawg-game.interface';
@@ -78,6 +78,6 @@ export class GamesService {
     }
   };
 
-  getGamesInfo = async (games: any[]) =>
+  getGamesInfo = async (games: Types.ObjectId[]) =>
     this.gameModel.find({ _id: { $in: games } });
 }

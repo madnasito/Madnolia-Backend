@@ -111,7 +111,7 @@ export class MatchesGateway
   @UseGuards(UserSocketGuard)
   async handleJoinToMatch(user: Types.ObjectId, payload: Types.ObjectId) {
     try {
-      const userSocketIds = this.users.getUserSocketsById(user._id);
+      const userSocketIds = this.users.getUserSocketsById(user);
 
       userSocketIds.forEach((socketId) => {
         const client = this.io.sockets.get(socketId);
@@ -142,9 +142,9 @@ export class MatchesGateway
   @UseGuards(UserSocketGuard)
   async handleLeaveMatch(user: Types.ObjectId, payload: Types.ObjectId) {
     try {
-      await this.matchesService.leaveMatch(payload, user._id);
+      await this.matchesService.leaveMatch(payload, user);
 
-      const userSocketIds = this.users.getUserSocketsById(user._id);
+      const userSocketIds = this.users.getUserSocketsById(user);
 
       userSocketIds.forEach((socketId) => {
         const client = this.io.sockets.get(socketId);
@@ -156,7 +156,7 @@ export class MatchesGateway
         }
       });
 
-      this.io.to(payload.toString()).emit('player_left_match', user._id);
+      this.io.to(payload.toString()).emit('player_left_match', user);
     } catch (error) {
       throw new WsException(error);
     }

@@ -1,11 +1,12 @@
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
-  IsNumber,
+  IsDate,
   IsOptional,
   IsString,
   MaxLength,
-  Min,
+  MinDate,
 } from 'class-validator';
 import { User } from 'src/modules/users/schemas/user.schema';
 
@@ -21,9 +22,10 @@ export class UpdateMatchDto {
   description: string;
 
   @IsOptional()
-  @IsNumber()
-  @Min(new Date().getTime())
-  date: number;
+  @Type(() => Date)
+  @IsDate()
+  @MinDate(new Date())
+  date: Date;
 
   @IsOptional()
   @IsBoolean()
