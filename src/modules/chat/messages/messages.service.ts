@@ -177,7 +177,7 @@ export class MessagesService {
 
     if (cursor) {
       if (!mongoose.Types.ObjectId.isValid(cursor)) {
-        throw new BadRequestException('Invalid cursor');
+        throw new BadRequestException('invalid_cursor');
       }
       query._id = { $lt: cursor };
     }
