@@ -28,7 +28,7 @@ export class Platform {
     required: true,
     enum: PlatformParent,
   })
-  parent: string;
+  parent: PlatformParent;
 }
 
 export const PlatformSchema = SchemaFactory.createForClass(Platform);
