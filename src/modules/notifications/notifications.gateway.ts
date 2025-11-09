@@ -13,7 +13,7 @@ import { NotificationsService } from './notifications.service';
 
 @WebSocketGateway()
 export class NotificationsGateway {
-  private readonly logger: Logger;
+  private readonly logger = new Logger(NotificationsGateway.name);
   constructor(private readonly notificationsService: NotificationsService) {}
   @UseGuards(UserSocketGuard)
   @SubscribeMessage('delete_notification')

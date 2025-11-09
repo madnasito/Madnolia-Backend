@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
-import { Game } from 'src/modules/games/schemas/game.schema';
 import { Group } from 'src/modules/groups/schema/group.schema';
 import { MatchStatus } from '../enums/status.enum';
+import { Platform } from 'src/common/enums/platforms.enum';
 
 export type MatchDocument = HydratedDocument<Match>;
 
@@ -13,17 +13,17 @@ export class Match {
     ref: 'Game',
     required: true,
   })
-  game: Game;
+  game: Types.ObjectId;
 
   @Prop({
     required: true,
   })
-  platform: number;
+  platform: Platform;
 
   @Prop({
     required: true,
   })
-  date: number;
+  date: Date;
 
   @Prop({
     type: Types.ObjectId,

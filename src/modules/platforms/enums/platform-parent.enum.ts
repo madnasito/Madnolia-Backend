@@ -1,7 +1,7 @@
 export enum PlatformParent {
-  'playstation',
-  'nintendo',
-  'pc',
-  'xbox',
-  'mobile',
+  PLAYSTATION = 'playstation',
+  NINTENDO = 'nintendo',
+  PC = 'pc',
+  XBOX = 'xbox',
+  MOBILE = 'mobile',
 }

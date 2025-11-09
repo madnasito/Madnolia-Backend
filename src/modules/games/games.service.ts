@@ -6,10 +6,11 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Game } from './schemas/game.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { RawgGame } from './interfaces/rawg-game.interface';
+import { Platform } from 'src/common/enums/platforms.enum';
 
 @Injectable()
 export class GamesService {
@@ -28,11 +29,17 @@ export class GamesService {
 
     if (!rawGame) throw new BadGatewayException('LOADING_GAME');
 
+    const validPlatforms = Object.values(Platform).filter(
+      (value) => typeof value === 'number',
+    );
+
     const newGame = {
       name: rawGame.name,
       slug: rawGame.slug,
       gameId: rawGame.id,
-      platforms: rawGame.platforms.map((e) => e.platform.id),
+      platforms: rawGame.platforms
+        .map((e) => e.platform.id)
+        .filter((p) => validPlatforms.includes(p)),
       background: rawGame.background_image,
       screenshots: [],
       description: rawGame.description_raw,
@@ -71,6 +78,6 @@ export class GamesService {
     }
   };
 
-  getGamesInfo = async (games: any[]) =>
+  getGamesInfo = async (games: Types.ObjectId[]) =>
     this.gameModel.find({ _id: { $in: games } });
 }

@@ -166,7 +166,7 @@ export class MessagesService {
 
   async getRoomMessages(
     room: string,
-    cursor: Types.ObjectId | null,
+    cursor: string | null,
     user: Types.ObjectId = null,
   ): Promise<MessageRecipientDTO[]> {
     const limit = 30;
@@ -176,9 +176,9 @@ export class MessagesService {
     };
 
     if (cursor) {
-      // if (!mongoose.Types.ObjectId.isValid(cursor)) {
-      //   throw new BadRequestException('Invalid cursor');
-      // }
+      if (!mongoose.Types.ObjectId.isValid(cursor)) {
+        throw new BadRequestException('invalid_cursor');
+      }
       query._id = { $lt: cursor };
     }
 
@@ -300,7 +300,7 @@ export class MessagesService {
   async getUserChatMessages(
     user1: Types.ObjectId,
     user2: Types.ObjectId,
-    cursor: Types.ObjectId | null,
+    cursor: string | null,
   ) {
     const friendshipDb = await this.friendshipService.findFriendshipByUsers(
       user1,

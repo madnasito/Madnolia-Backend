@@ -24,6 +24,8 @@ import {
 } from './dtos/player-matches-filters.dto';
 import { UsersService } from '../users/users.service';
 import { MatchesByPlatforms } from './interfaces/matches-by-platforms';
+import { Platform } from 'src/common/enums/platforms.enum';
+import { MatchWithGame } from './interfaces/match-with-game';
 
 @Injectable()
 export class MatchesService {
@@ -64,7 +66,7 @@ export class MatchesService {
         path: matchDb.id,
         title: matchDb.title,
         thumb: gameData.background,
-        type: NotificationType.INVITATION,
+        type: NotificationType.MATCH_INVITATION,
         user: element,
         sender: matchDb.user.toString(),
       };
@@ -81,7 +83,7 @@ export class MatchesService {
     return this.matchModel.findById(id);
   };
 
-  getMatchWithGame = async (id: string) => {
+  getMatchWithGame = async (id: string): Promise<MatchWithGame> => {
     if (!Types.ObjectId.isValid(id))
       throw new ConflictException('NO_GAME_FOUND');
     return this.matchModel.findOne(
@@ -214,7 +216,7 @@ export class MatchesService {
     }
 
     return this.matchModel
-      .find(filter, {}, { populate: { path: 'game' } })
+      .find(filter, {} /*,{ populate: { path: 'game' } } */)
       .sort({ date: payload.sort })
       .limit(limit)
       .skip(payload.skip);
@@ -246,7 +248,7 @@ export class MatchesService {
       {
         sort: { date: payload.sort },
         skip: payload.skip,
-        populate: { path: 'game' },
+        // populate: { path: 'game' },
         limit: 10,
       },
     );
@@ -346,7 +348,7 @@ export class MatchesService {
       { joined: userId },
       {},
       {
-        populate: { path: 'game' },
+        // populate: { path: 'game' },
         sort: { date: payload.sort },
         limit: 10,
         skip: payload.skip,
@@ -426,7 +428,7 @@ export class MatchesService {
 
   async getLatestGamesByUserAndPlatform(
     user: string,
-    platform: number,
+    platform: Platform,
   ): Promise<any> {
     const distinctGameIds = await this.matchModel
       .distinct('game', { platform, user })

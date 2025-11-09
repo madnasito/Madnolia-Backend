@@ -7,7 +7,7 @@ import { UserDevice } from '../interfaces/user-device.interface';
 export type UserDocument = HydratedDocument<User>;
 @Schema()
 export class User {
-  _id: mongoose.Types.ObjectId;
+  _id: Types.ObjectId;
 
   @Prop({
     required: true,

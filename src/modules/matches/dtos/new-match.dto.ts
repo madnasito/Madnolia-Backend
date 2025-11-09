@@ -1,15 +1,17 @@
 import {
   IsArray,
   IsDefined,
+  IsDate,
   IsInt,
   IsMongoId,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   Max,
   Min,
+  MinDate,
 } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class NewMatchDto {
   @IsString()
@@ -29,8 +31,9 @@ export class NewMatchDto {
   @IsMongoId()
   game: string;
 
-  @IsNumber()
-  date: number;
+  @IsDate()
+  @MinDate(new Date())
+  date: Date;
 
   @IsInt()
   @Min(5)
@@ -38,7 +41,7 @@ export class NewMatchDto {
   duration: number;
 
   @IsArray()
-  inviteds: Array<string>;
+  inviteds: Array<Types.ObjectId>;
 
   @IsString()
   @IsOptional()

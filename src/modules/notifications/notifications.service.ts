@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Notification } from './schemas/notification.schema';
-import { Model, Types } from 'mongoose';
+import { Model, RootFilterQuery, Types } from 'mongoose';
 import { CreateNotificationDto } from './dtos/create-notification.dto';
 
 @Injectable()
@@ -39,9 +39,21 @@ export class NotificationsService {
 
   getUserNotifications = async (
     user: Types.ObjectId,
+    cursor: string | null,
   ): Promise<Array<Notification>> => {
+    const limit = 20;
+    const query: RootFilterQuery<Notification> = {
+      user,
+    };
+
+    if (cursor) {
+      if (!Types.ObjectId.isValid(cursor)) {
+        throw new BadRequestException('invalid_cursor');
+      }
+      query._id = { $lt: cursor };
+    }
     await this.readAllUserNotifications(user);
-    return this.notificationModel.find({ user }, {}, { sort: { _id: -1 } });
+    return this.notificationModel.find(query, {}, { sort: { _id: -1 }, limit });
   };
 
   getUserUnreadNotificationsCount = (user: Types.ObjectId) =>
