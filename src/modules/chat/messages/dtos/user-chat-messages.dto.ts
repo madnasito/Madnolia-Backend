@@ -1,9 +1,8 @@
 import { IsMongoId, IsOptional } from 'class-validator';
-import { Types } from 'mongoose';
 
 export class UserChatDto {
-  @IsMongoId({ message: 'INVALID_USER' })
-  user: Types.ObjectId;
+  @IsMongoId({ message: 'INVALID_USER_CHAT' })
+  conversation: string;
 
   @IsOptional()
   @IsMongoId()
