@@ -47,7 +47,7 @@ export class MessagesController {
   async getChatMessages(@Request() req: any, @Body() body: UserChatDto) {
     return this.messagesService.getUserChatMessages(
       req.user.id,
-      body.user,
+      body.conversation,
       body.cursor,
     );
   }

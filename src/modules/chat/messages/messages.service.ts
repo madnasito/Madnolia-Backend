@@ -298,18 +298,18 @@ export class MessagesService {
   }
 
   async getUserChatMessages(
-    user1: Types.ObjectId,
-    user2: Types.ObjectId,
+    user: Types.ObjectId,
+    conversation: string,
     cursor: string | null,
   ) {
-    const friendshipDb = await this.friendshipService.findFriendshipByUsers(
-      user1,
-      user2,
-    );
+    // const friendshipDb = await this.friendshipService.findFriendshipByUsers(
+    //   user1,
+    //   user2,
+    // );
 
-    if (!friendshipDb) throw new NotFoundException();
+    // if (!friendshipDb) throw new NotFoundException();
 
-    return this.getRoomMessages(friendshipDb.id, cursor, user1);
+    return this.getRoomMessages(conversation, cursor, user);
   }
 
   updateRecipientStatus = async (
