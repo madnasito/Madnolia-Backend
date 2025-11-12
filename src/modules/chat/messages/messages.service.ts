@@ -370,7 +370,6 @@ export class MessagesService {
     const fromDate = new Date(date);
 
     const filter: PlayerMatchesFiltersDto = {
-      skip: 0,
       sort: 'desc',
       type: MatchesTypeFilter.ALL,
       status: [MatchStatus.WAITING, MatchStatus.RUNNING],

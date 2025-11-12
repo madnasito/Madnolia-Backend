@@ -9,7 +9,9 @@ describe('FirebaseCloudMessagingController', () => {
       controllers: [FirebaseCloudMessagingController],
     }).compile();
 
-    controller = module.get<FirebaseCloudMessagingController>(FirebaseCloudMessagingController);
+    controller = module.get<FirebaseCloudMessagingController>(
+      FirebaseCloudMessagingController,
+    );
   });
 
   it('should be defined', () => {

@@ -1,4 +1,11 @@
-import { IsEnum, IsNotEmpty, IsString, IsMongoId, IsOptional, IsUrl } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  IsMongoId,
+  IsOptional,
+  IsUrl,
+} from 'class-validator';
 import { Types } from 'mongoose';
 import { ReportType } from '../enums/report-type.enum';
 

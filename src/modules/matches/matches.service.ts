@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   Logger,
@@ -53,6 +54,7 @@ export class MatchesService {
       user: user,
       group: createMatchDto.group,
       duration: createMatchDto.duration,
+      createdAt: new Date(new Date().toUTCString()),
     };
 
     const createdMatch = new this.matchModel(newMatch);
@@ -203,23 +205,60 @@ export class MatchesService {
     payload: PlayerMatchesFiltersDto,
     limit: number = 10,
   ) => {
-    const filter: any = { $or: [{ user }, { joined: user }] };
+    const filters: any[] = [{ $or: [{ user }, { joined: user }] }];
 
     if (payload.platform) {
-      filter.platform = payload.platform;
+      filters.push({ platform: payload.platform });
     } else {
-      filter.platform = { $ne: null }; // Only include if platform is not null
+      filters.push({ platform: { $ne: null } });
     }
 
     if (payload.status && payload.status.length > 0) {
-      filter.status = { $in: payload.status };
+      filters.push({ status: { $in: payload.status } });
     }
 
-    return this.matchModel
-      .find(filter, {} /*,{ populate: { path: 'game' } } */)
-      .sort({ date: payload.sort })
-      .limit(limit)
-      .skip(payload.skip);
+    const sortField: string = payload.sortBy || 'date';
+    const sortOrderVal = payload.sort === 'asc' ? 1 : -1;
+    const sort: any = { [sortField]: sortOrderVal };
+    if (sortField !== '_id') {
+      sort._id = sortOrderVal;
+    }
+
+    if (payload.cursor) {
+      if (!Types.ObjectId.isValid(payload.cursor)) {
+        throw new BadRequestException('invalid_cursor');
+      }
+      const cursorMatch = await this.matchModel.findById(payload.cursor).lean();
+      if (cursorMatch) {
+        const cursorValue = cursorMatch[sortField];
+        const cursorId = cursorMatch._id;
+
+        const cursorFilter =
+          sortOrderVal === -1
+            ? {
+                $or: [
+                  { [sortField]: { $lt: cursorValue } },
+                  { [sortField]: cursorValue, _id: { $lt: cursorId } },
+                ],
+              }
+            : {
+                $or: [
+                  { [sortField]: { $gt: cursorValue } },
+                  { [sortField]: cursorValue, _id: { $gt: cursorId } },
+                ],
+              };
+        filters.push(cursorFilter);
+      }
+    }
+
+    const query = { $and: filters };
+
+    const matches = await this.matchModel
+      .find(query, {})
+      .sort(sort)
+      .limit(limit);
+
+    return matches;
   };
 
   getPlayerMatches = async (
@@ -236,22 +275,56 @@ export class MatchesService {
     }
   };
 
-  getMatchesCreatedByPlayer = (
+  getMatchesCreatedByPlayer = async (
     user: Types.ObjectId,
     payload: PlayerMatchesFiltersDto,
-  ) =>
-    this.matchModel.find(
-      {
-        user,
-      },
-      {},
-      {
-        sort: { date: payload.sort },
-        skip: payload.skip,
-        // populate: { path: 'game' },
-        limit: 10,
-      },
-    );
+    limit: number = 10,
+  ) => {
+    const filters: any[] = [{ user }];
+
+    const sortField: string = payload.sortBy || 'date';
+    const sortOrderVal = payload.sort === 'asc' ? 1 : -1;
+    const sort: any = { [sortField]: sortOrderVal };
+    if (sortField !== '_id') {
+      sort._id = sortOrderVal;
+    }
+
+    if (payload.cursor) {
+      if (!Types.ObjectId.isValid(payload.cursor)) {
+        throw new BadRequestException('invalid_cursor');
+      }
+      const cursorMatch = await this.matchModel.findById(payload.cursor).lean();
+      if (cursorMatch) {
+        const cursorValue = cursorMatch[sortField];
+        const cursorId = cursorMatch._id;
+
+        const cursorFilter =
+          sortOrderVal === -1
+            ? {
+                $or: [
+                  { [sortField]: { $lt: cursorValue } },
+                  { [sortField]: cursorValue, _id: { $lt: cursorId } },
+                ],
+              }
+            : {
+                $or: [
+                  { [sortField]: { $gt: cursorValue } },
+                  { [sortField]: cursorValue, _id: { $gt: cursorId } },
+                ],
+              };
+        filters.push(cursorFilter);
+      }
+    }
+
+    const query = filters.length > 1 ? { $and: filters } : filters[0];
+
+    const matches = await this.matchModel
+      .find(query, {})
+      .sort(sort)
+      .limit(limit);
+
+    return matches;
+  };
 
   getPlayerInvitations = async (user: string, skip: number = 0) =>
     this.matchModel.find(
@@ -340,20 +413,56 @@ export class MatchesService {
     return platformMatches.sort((a, b) => b.matches.length - a.matches.length);
   };
 
-  getMatchesWithUserJoined = (
+  getMatchesWithUserJoined = async (
     userId: Types.ObjectId,
     payload: PlayerMatchesFiltersDto,
-  ) =>
-    this.matchModel.find(
-      { joined: userId },
-      {},
-      {
-        // populate: { path: 'game' },
-        sort: { date: payload.sort },
-        limit: 10,
-        skip: payload.skip,
-      },
-    );
+    limit: number = 10,
+  ) => {
+    const filters: any[] = [{ joined: userId }];
+
+    const sortField: string = payload.sortBy || 'date';
+    const sortOrderVal = payload.sort === 'asc' ? 1 : -1;
+    const sort: any = { [sortField]: sortOrderVal };
+    if (sortField !== '_id') {
+      sort._id = sortOrderVal;
+    }
+
+    if (payload.cursor) {
+      if (!Types.ObjectId.isValid(payload.cursor)) {
+        throw new BadRequestException('invalid_cursor');
+      }
+      const cursorMatch = await this.matchModel.findById(payload.cursor).lean();
+      if (cursorMatch) {
+        const cursorValue = cursorMatch[sortField];
+        const cursorId = cursorMatch._id;
+
+        const cursorFilter =
+          sortOrderVal === -1
+            ? {
+                $or: [
+                  { [sortField]: { $lt: cursorValue } },
+                  { [sortField]: cursorValue, _id: { $lt: cursorId } },
+                ],
+              }
+            : {
+                $or: [
+                  { [sortField]: { $gt: cursorValue } },
+                  { [sortField]: cursorValue, _id: { $gt: cursorId } },
+                ],
+              };
+        filters.push(cursorFilter);
+      }
+    }
+
+    const query = filters.length > 1 ? { $and: filters } : filters[0];
+
+    const matches = await this.matchModel
+      .find(query, {})
+      .sort(sort)
+      .limit(limit);
+
+    return matches;
+  };
 
   getActiveMatchesJoinedOrCreatedByUser = (userId: Types.ObjectId) =>
     this.matchModel.find(

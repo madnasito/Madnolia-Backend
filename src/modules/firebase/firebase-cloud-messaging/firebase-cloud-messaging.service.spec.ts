@@ -9,7 +9,9 @@ describe('FirebaseCloudMessagingService', () => {
       providers: [FirebaseCloudMessagingService],
     }).compile();
 
-    service = module.get<FirebaseCloudMessagingService>(FirebaseCloudMessagingService);
+    service = module.get<FirebaseCloudMessagingService>(
+      FirebaseCloudMessagingService,
+    );
   });
 
   it('should be defined', () => {

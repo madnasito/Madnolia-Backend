@@ -1,14 +1,14 @@
-import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsEnum,
-  IsInt,
   IsNotEmpty,
   IsOptional,
+  IsString,
 } from 'class-validator';
 import { SortOrder } from 'mongoose';
 import { Platform } from 'src/common/enums/platforms.enum';
 import { MatchStatus } from '../enums/status.enum';
+import { MatchesSortBy } from '../enums/matches-sort.enum';
 
 export enum MatchesTypeFilter {
   ALL = 'all',
@@ -24,9 +24,13 @@ export class PlayerMatchesFiltersDto {
   @IsNotEmpty()
   sort: SortOrder;
 
-  @IsInt()
-  @Transform(({ value }) => parseInt(value))
-  skip: number = 0;
+  @IsOptional()
+  @IsString()
+  cursor?: string;
+
+  @IsOptional()
+  @IsEnum(MatchesSortBy)
+  sortBy?: MatchesSortBy = MatchesSortBy.DATE;
 
   @IsOptional()
   @IsEnum(Platform)

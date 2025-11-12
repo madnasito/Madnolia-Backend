@@ -86,6 +86,11 @@ export class Match {
     default: MatchStatus.WAITING,
   })
   status: MatchStatus;
+
+  @Prop({
+    required: true,
+  })
+  createdAt: Date;
 }
 
 export const MatchSchema = SchemaFactory.createForClass(Match);
