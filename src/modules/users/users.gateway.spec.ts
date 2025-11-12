@@ -89,7 +89,9 @@ describe('UsersGateway', () => {
       const client = { id: 'some-socket-id' };
       const user = { _id: 'some-user-id' };
       (users.getUserBySocketId as jest.Mock).mockReturnValue(user);
-      mockUsersService.handleUserDisconnection.mockRejectedValue(new Error('Some error'));
+      mockUsersService.handleUserDisconnection.mockRejectedValue(
+        new Error('Some error'),
+      );
 
       await expect(gateway.handleDisconnect(client)).rejects.toThrow(
         new WsException('ERROR_HANDLING_DISCONNECTION'),

@@ -50,4 +50,7 @@ export class NewMatchDto {
   @IsOptional()
   @IsMongoId()
   group: string;
+
+  @IsDate()
+  createdAt: Date;
 }

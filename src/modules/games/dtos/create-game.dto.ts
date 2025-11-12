@@ -1,27 +1,26 @@
-import { IsArray, IsInt, IsString } from "class-validator";
+import { IsArray, IsInt, IsString } from 'class-validator';
 
 export class CreateGameDto {
+  @IsInt()
+  gameId: number;
 
-    @IsInt()
-    gameId: number;
+  @IsString()
+  name: string;
 
-    @IsString()
-    name: string;
+  @IsArray()
+  platforms: gamePlatform[];
 
-    @IsArray()
-    platforms: gamePlatform[]
+  @IsString()
+  background: string;
 
-    @IsString()
-    background: string;
+  @IsArray()
+  screenshots: Array<string>;
 
-    @IsArray()
-    screenshots: Array<string>
-
-    @IsString()
-    description: string;
+  @IsString()
+  description: string;
 }
 
 interface gamePlatform {
-    id: number,
-    amount: number
+  id: number;
+  amount: number;
 }

@@ -58,9 +58,9 @@ export class MatchesController {
   @Get('player-matches')
   async getPlayerMatches(
     @Request() request: any,
-    @Body() body: PlayerMatchesFiltersDto,
+    @Query() query: PlayerMatchesFiltersDto,
   ) {
-    return this.matchesService.getPlayerMatches(request.user.id, body);
+    return this.matchesService.getPlayerMatches(request.user.id, query);
   }
 
   @UseGuards(UserGuard)
