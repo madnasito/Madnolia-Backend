@@ -217,7 +217,7 @@ export class MatchesService {
       filters.push({ status: { $in: payload.status } });
     }
 
-    const sortField: string = payload.sortBy || 'date';
+    const sortField: string = payload.sortBy;
     const sortOrderVal = payload.sort === 'asc' ? 1 : -1;
     const sort: any = { [sortField]: sortOrderVal };
     if (sortField !== '_id') {
@@ -238,13 +238,13 @@ export class MatchesService {
             ? {
                 $or: [
                   { [sortField]: { $lt: cursorValue } },
-                  { [sortField]: cursorValue, _id: { $lt: cursorId } },
+                  { _id: { $lt: cursorId } },
                 ],
               }
             : {
                 $or: [
                   { [sortField]: { $gt: cursorValue } },
-                  { [sortField]: cursorValue, _id: { $gt: cursorId } },
+                  { _id: { $gt: cursorId } },
                 ],
               };
         filters.push(cursorFilter);
@@ -303,13 +303,13 @@ export class MatchesService {
             ? {
                 $or: [
                   { [sortField]: { $lt: cursorValue } },
-                  { [sortField]: cursorValue, _id: { $lt: cursorId } },
+                  { _id: { $lt: cursorId } },
                 ],
               }
             : {
                 $or: [
                   { [sortField]: { $gt: cursorValue } },
-                  { [sortField]: cursorValue, _id: { $gt: cursorId } },
+                  { _id: { $gt: cursorId } },
                 ],
               };
         filters.push(cursorFilter);
@@ -441,13 +441,13 @@ export class MatchesService {
             ? {
                 $or: [
                   { [sortField]: { $lt: cursorValue } },
-                  { [sortField]: cursorValue, _id: { $lt: cursorId } },
+                  { _id: { $lt: cursorId } },
                 ],
               }
             : {
                 $or: [
                   { [sortField]: { $gt: cursorValue } },
-                  { [sortField]: cursorValue, _id: { $gt: cursorId } },
+                  { _id: { $gt: cursorId } },
                 ],
               };
         filters.push(cursorFilter);
