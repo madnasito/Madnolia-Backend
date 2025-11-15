@@ -279,6 +279,7 @@ export class MessagesService {
               type: '$latestRecipient.message.type',
               date: '$latestRecipient.message.date',
               status: '$latestRecipient.status',
+              updatedAt: '$latestRecipient.updatedAt',
             },
           },
         },
@@ -287,6 +288,9 @@ export class MessagesService {
           $sort: {
             'message.date': -1,
           },
+        },
+        {
+          $limit: 50,
         },
       ]);
 
