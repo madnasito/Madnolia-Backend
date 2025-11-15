@@ -7,7 +7,7 @@ import {
   WebSocketServer,
   WsException,
 } from '@nestjs/websockets';
-import { Namespace, Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { UserSocketGuard } from 'src/common/guards/user-sockets.guard';
 import { MatchesService } from './matches.service';
 import { Users } from 'src/modules/users/classes/user';
@@ -32,7 +32,7 @@ export class MatchesGateway
     private firebaseCloudMessagingService: FirebaseCloudMessagingService,
   ) {}
 
-  @WebSocketServer() io: Namespace;
+  @WebSocketServer() io: Server;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handleDisconnect(client: any) {}
@@ -114,7 +114,7 @@ export class MatchesGateway
       const userSocketIds = this.users.getUserSocketsById(user);
 
       userSocketIds.forEach((socketId) => {
-        const client = this.io.sockets.get(socketId);
+        const client = this.io.sockets.sockets.get(socketId);
 
         if (client) {
           this.logger.debug(`Client id: ${client.id} tries to join`);
@@ -147,7 +147,7 @@ export class MatchesGateway
       const userSocketIds = this.users.getUserSocketsById(user);
 
       userSocketIds.forEach((socketId) => {
-        const client = this.io.sockets.get(socketId);
+        const client = this.io.sockets.sockets.get(socketId);
 
         if (client) {
           this.logger.debug(`Client id: ${client.id} tries to leave`);
