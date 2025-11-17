@@ -29,9 +29,9 @@ export class MessagesController {
 
   @Get('')
   @UseGuards(UserGuard)
-  async getChats(@Request() req: any) {
+  async getChats(@Request() req: any, @Query('skip') skip: number) {
     // return false;
-    return this.messagesService.getUserChats(req.user.id);
+    return this.messagesService.getUserChats(req.user.id, skip);
   }
 
   @Get('match')

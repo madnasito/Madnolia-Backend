@@ -209,7 +209,7 @@ export class MessagesService {
     return messages;
   }
 
-  async getUserChats(userId: Types.ObjectId) {
+  async getUserChats(userId: Types.ObjectId, skip = 0) {
     try {
       // 1. Obtener todas las amistades del usuario
       const friendships =
@@ -290,7 +290,10 @@ export class MessagesService {
           },
         },
         {
-          $limit: 50,
+          $skip: skip,
+        },
+        {
+          $limit: 30,
         },
       ]);
 

@@ -1,7 +1,9 @@
 import {
+  Body,
   Controller,
   Get,
   NotFoundException,
+  Post,
   Query,
   Request,
   UseGuards,
@@ -9,6 +11,7 @@ import {
 import { Types } from 'mongoose';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { FriendshipService } from './friendship.service';
+import { MultipleMongoIdsDto } from 'src/common/dto/mutiple-mongo-ids.dto';
 
 @Controller('friendship')
 export class FriendshipController {
@@ -40,5 +43,23 @@ export class FriendshipController {
       throw new NotFoundException();
 
     return friendshipDb;
+  }
+
+  @Post('friendships-by-users')
+  @UseGuards(UserGuard)
+  async getFriendshipsByUsers(
+    @Request() req: any,
+    @Body() body: MultipleMongoIdsDto,
+  ) {
+    return this.friendshipService.findFriendshipsByUsers(req.user.id, body.ids);
+  }
+
+  @Post('friendships-by-ids')
+  @UseGuards(UserGuard)
+  async getFriendshipsByIds(
+    @Request() req: any,
+    @Body() body: MultipleMongoIdsDto,
+  ) {
+    return this.friendshipService.findFriendshipsByIds(req.user.id, body.ids);
   }
 }
