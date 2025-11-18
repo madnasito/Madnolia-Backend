@@ -209,7 +209,7 @@ export class MessagesService {
     return messages;
   }
 
-  async getUserChats(userId: Types.ObjectId) {
+  async getUserChats(userId: Types.ObjectId, skip = 0) {
     try {
       // 1. Obtener todas las amistades del usuario
       const friendships =
@@ -279,6 +279,7 @@ export class MessagesService {
               type: '$latestRecipient.message.type',
               date: '$latestRecipient.message.date',
               status: '$latestRecipient.status',
+              updatedAt: '$latestRecipient.updatedAt',
             },
           },
         },
@@ -287,6 +288,12 @@ export class MessagesService {
           $sort: {
             'message.date': -1,
           },
+        },
+        {
+          $skip: skip,
+        },
+        {
+          $limit: 30,
         },
       ]);
 
@@ -380,7 +387,15 @@ export class MessagesService {
       filter,
       null,
     );
+
     const matchIds = userMatches.map((m) => m._id);
+
+    const friendships =
+      await this.friendshipService.findFriendshipsByUser(userId);
+
+    const friendshipIds = friendships.map((f) => f._id);
+
+    const conversationsIds = [...matchIds, ...friendshipIds];
 
     const messages = await this.messageRecipientModel.aggregate([
       {
@@ -398,7 +413,7 @@ export class MessagesService {
             {
               $or: [
                 {
-                  conversation: { $in: matchIds },
+                  conversation: { $in: conversationsIds },
                 },
                 { user: userId },
               ],
