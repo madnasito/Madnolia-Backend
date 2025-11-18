@@ -387,7 +387,15 @@ export class MessagesService {
       filter,
       null,
     );
+
     const matchIds = userMatches.map((m) => m._id);
+
+    const friendships =
+      await this.friendshipService.findFriendshipsByUser(userId);
+
+    const friendshipIds = friendships.map((f) => f._id);
+
+    const conversationsIds = [...matchIds, ...friendshipIds];
 
     const messages = await this.messageRecipientModel.aggregate([
       {
@@ -405,7 +413,7 @@ export class MessagesService {
             {
               $or: [
                 {
-                  conversation: { $in: matchIds },
+                  conversation: { $in: conversationsIds },
                 },
                 { user: userId },
               ],
