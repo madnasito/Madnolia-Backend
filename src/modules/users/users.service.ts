@@ -19,6 +19,7 @@ import { FriendshipService } from '../friendship/friendship.service';
 import { FriendshipStatus } from '../friendship/enums/friendship-status.enum';
 import { Friendship } from '../friendship/schemas/friendship.schema';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { Availability } from './enums/availability.enum';
 // import { SimpleUser } from './classes/simple-user';
 
 @Injectable()
@@ -248,6 +249,17 @@ export class UsersService {
 
     return updatedUser;
   }
+
+  updateAvailability = async (
+    userId: Types.ObjectId,
+    availability: Availability,
+  ) => {
+    return this.userModel.findByIdAndUpdate(
+      userId,
+      { availability, modifiedAt: new Date() },
+      { new: true },
+    );
+  };
 
   userExists = async (username: string, email: string) => {
     const usernameDb = await this.userModel.findOne({ username });
@@ -514,7 +526,7 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} could not be updated`);
     }
 
-    return { ok: true };
+    return updatedUser;
   }
   delete = async (user: Types.ObjectId) =>
     this.userModel.findByIdAndDelete(user);
