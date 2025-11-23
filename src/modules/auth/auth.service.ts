@@ -63,7 +63,16 @@ export class AuthService {
     return this.mailService.sendPasswordRecoveryEmail(userData.email, token);
   };
 
-  updatePassword = (body: UpdatePasswordDto, id: Types.ObjectId) => {
-    return this.usersService.updatePassword(body.password, id);
+  updatePassword = async (body: UpdatePasswordDto, id: Types.ObjectId) => {
+    try {
+      const user = await this.usersService.updatePassword(body.password, id);
+      const payload = { id: user._id };
+      const token = await this.jwtService.signAsync(payload);
+      return {
+        token,
+      };
+    } catch (error) {
+      throw error;
+    }
   };
 }

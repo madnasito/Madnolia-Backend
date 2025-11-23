@@ -20,6 +20,7 @@ import { NotificationType } from '../notifications/enums/notification-type.enum'
 import { Users } from './classes/user';
 import { JwtService } from '@nestjs/jwt';
 import { FriendshipService } from '../friendship/friendship.service';
+import { Availability } from './enums/availability.enum';
 
 @WebSocketGateway()
 export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -86,6 +87,34 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.debug(`Number of connected clients: ${size}`);
     } catch (error) {
       return new WsException(error);
+    }
+  }
+
+  @UseGuards(UserSocketGuard)
+  @SubscribeMessage('update_availability')
+  async updateAvailability(
+    @MessageBody() availability: Availability,
+    @ConnectedSocket() client: Socket,
+    @Request() request: any,
+  ) {
+    try {
+      this.logger.debug('Updating availability...' + availability);
+      await this.usersService.updateAvailability(request.user, availability);
+
+      client.emit('update_availability', availability);
+
+      const userSockets = this.users.getUserSocketsById(request.user);
+
+      userSockets.forEach((socketId) => {
+        if (socketId !== client.id) {
+          client.to(socketId).emit('update_availability', availability);
+        }
+      });
+
+      return availability;
+    } catch (error) {
+      this.logger.error(error);
+      throw new WsException('ERROR_UPDATING_AVAILABILITY');
     }
   }
 
