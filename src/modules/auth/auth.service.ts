@@ -33,7 +33,7 @@ export class AuthService {
   };
 
   signIn = async (signInDto: SignInDto) => {
-    const user = await this.usersService.fincOneByUsername(
+    const user = await this.usersService.fincOneByUsernameOrEmail(
       signInDto.username.toLocaleLowerCase(),
     );
 

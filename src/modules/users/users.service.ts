@@ -109,6 +109,14 @@ export class UsersService {
     return user;
   };
 
+  fincOneByUsernameOrEmail = async (data: string) => {
+    // username = username.toLowerCase().trim();
+    const user = await this.userModel.findOne({
+      $or: [{ username: data }, { email: data }],
+    });
+    return user;
+  };
+
   findOneByEmail = async (email: string): Promise<User | null> => {
     const user = await this.userModel.findOne({ email });
     return user;
