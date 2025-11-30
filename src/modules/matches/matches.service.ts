@@ -535,17 +535,75 @@ export class MatchesService {
     return matches;
   };
 
+  async recommendGamesForPlatform(
+    user: string,
+    platform: Platform,
+  ): Promise<GameInterface[] | unknown> {
+    const recentGames = await this.getLatestGamesByUserAndPlatform(
+      user,
+      platform,
+    );
+
+    if (recentGames.length >= 5) return recentGames;
+
+    const rawgGames = await this.gamesService.searchGames({
+      platforms: platform.toString(),
+      tags: 'online',
+      search: '',
+      key: '',
+    });
+
+    return rawgGames;
+  }
+
   async getLatestGamesByUserAndPlatform(
     user: string,
     platform: Platform,
   ): Promise<any> {
-    const distinctGameIds = await this.matchModel
-      .distinct('game', { platform, user })
-      .exec();
+    if (!Types.ObjectId.isValid(user)) {
+      throw new BadRequestException('invalid_user_id');
+    }
 
-    const games = await this.gamesService.getGamesInfo(distinctGameIds);
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
-    return games;
+    const gameIdsByFrequency = await this.matchModel.aggregate([
+      {
+        $match: {
+          $or: [{ user: user }, { joined: user }],
+          platform,
+          createdAt: { $gte: ninetyDaysAgo },
+        },
+      },
+      {
+        $group: {
+          _id: '$game',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: {
+          count: -1,
+        },
+      },
+    ]);
+
+    if (gameIdsByFrequency.length === 0) {
+      return [];
+    }
+
+    const sortedGameIds = gameIdsByFrequency.map((item) => item._id);
+
+    const games = await this.gamesService.getGamesInfo(sortedGameIds);
+
+    // The `getGamesInfo` service might not return games in the sorted order from the aggregation.
+    // We need to re-sort them based on the `sortedGameIds` order.
+    const gameMap = new Map(games.map((game) => [game._id.toString(), game]));
+    const sortedGames = sortedGameIds
+      .map((id) => gameMap.get(id.toString()))
+      .filter((game) => game !== undefined);
+
+    return sortedGames;
   }
 
   deleteUserFromMatches = async (user: Types.ObjectId) => {

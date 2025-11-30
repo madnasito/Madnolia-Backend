@@ -81,7 +81,7 @@ export class MatchesController {
     @Request() request: any,
     @Param('platform') platform: string,
   ) {
-    return this.matchesService.getLatestGamesByUserAndPlatform(
+    return this.matchesService.recommendGamesForPlatform(
       request.user.id,
       parseInt(platform),
     );

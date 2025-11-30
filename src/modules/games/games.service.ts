@@ -11,6 +11,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { RawgGame } from './interfaces/rawg-game.interface';
 import { Platform } from 'src/common/enums/platforms.enum';
+import { SearchGamesDto } from './dtos/search-games.dto';
 
 @Injectable()
 export class GamesService {
@@ -80,4 +81,44 @@ export class GamesService {
 
   getGamesInfo = async (games: Types.ObjectId[]) =>
     this.gameModel.find({ _id: { $in: games } });
+
+  searchGames = async (payload: SearchGamesDto) => {
+    try {
+      const apiKey = this.config.get<string>('RAWG_API_KEY');
+
+      payload.key = apiKey;
+
+      const gamesData: RawgGame[] = (
+        await this.httpService.axiosRef.get('', {
+          params: payload,
+        })
+      ).data.results;
+
+      if (!gamesData) throw new BadGatewayException('LOADING_GAME');
+
+      const validPlatforms = Object.values(Platform).filter(
+        (value) => typeof value === 'number',
+      );
+
+      const games: Array<any> = gamesData.map((rawGame) => {
+        const gameData = {
+          name: rawGame.name,
+          slug: rawGame.slug,
+          gameId: rawGame.id,
+          platforms: rawGame.platforms
+            .map((e) => e.platform.id)
+            .filter((p) => validPlatforms.includes(p)),
+          background: rawGame.background_image,
+          screenshots: [],
+          description: rawGame.description_raw,
+        };
+        return gameData;
+      });
+
+      return games;
+    } catch (error) {
+      Logger.error(error);
+      throw error;
+    }
+  };
 }
