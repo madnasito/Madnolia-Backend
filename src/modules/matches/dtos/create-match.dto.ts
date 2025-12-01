@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -11,7 +11,6 @@ import {
   Max,
   MaxLength,
   Min,
-  MinDate,
 } from 'class-validator';
 import { Types } from 'mongoose';
 import { Platform } from 'src/common/enums/platforms.enum';
@@ -33,7 +32,7 @@ export class CreateMatchDto {
 
   @Type(() => Date)
   @IsDate()
-  @MinDate(new Date(), { message: 'INVALID_DATE' })
+  @Transform(({ value }) => (value < new Date() ? new Date() : value))
   date: Date;
 
   @IsInt()
