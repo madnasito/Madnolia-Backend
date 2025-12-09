@@ -37,11 +37,11 @@ export class AuthService {
       signInDto.username.toLocaleLowerCase(),
     );
 
-    if (!user) throw new NotFoundException('USER_NOT_FOUND');
+    if (!user) throw new NotFoundException('INVALID_CREDENTIALS');
 
     const isMatch = await compare(signInDto.password, user.password);
 
-    if (!isMatch) throw new BadRequestException('WRONG_PASSWORD');
+    if (!isMatch) throw new BadRequestException('INVALID_CREDENTIALS');
 
     const payload = { id: user._id };
     const token = await this.jwtService.signAsync(payload);
