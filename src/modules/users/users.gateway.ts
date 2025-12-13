@@ -176,6 +176,12 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
 
       client.emit('connection_accepted', connectionRequestDb);
+
+      const senderUserSockets = this.users.getUserSocketsById(sender);
+
+      senderUserSockets.forEach((socketId) => {
+        client.to(socketId).emit('connection_accepted', connectionRequestDb);
+      });
       return connectionRequestDb;
     } catch (error) {
       Logger.error(error);
