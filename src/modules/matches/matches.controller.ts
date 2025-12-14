@@ -104,10 +104,12 @@ export class MatchesController {
   async getMatchesByGameAndPlatform(
     @Param('platform') platform: string,
     @Param('game') game: string,
+    @Query('skip') skip: string,
   ) {
     return this.matchesService.getMatchesByGameAndPlatform(
       parseInt(platform),
       game,
+      parseInt(skip),
     );
   }
 
@@ -115,10 +117,12 @@ export class MatchesController {
   async getMatchesByGameSlugAndPlatform(
     @Param('platform') platform: string,
     @Param('game') game: string,
+    @Query('skip') skip: string,
   ) {
     return this.matchesService.getMatchesByGameSlugAndPlatform(
       parseInt(platform),
       game,
+      parseInt(skip),
     );
   }
 
