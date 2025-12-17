@@ -18,7 +18,7 @@ export class UpdateMatchDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(80)
+  @MaxLength(100)
   description: string;
 
   @IsOptional()
