@@ -16,6 +16,16 @@ import { MultipleMongoIdsDto } from 'src/common/dto/mutiple-mongo-ids.dto';
 @Controller('friendship')
 export class FriendshipController {
   constructor(private readonly friendshipService: FriendshipService) {}
+
+  @Get('all')
+  @UseGuards(UserGuard)
+  async getAllFriendships(@Request() req: any, @Query() page: string) {
+    return this.friendshipService.findAllUserFriendships(
+      req.user.id,
+      parseInt(page),
+    );
+  }
+
   @Get('with')
   @UseGuards(UserGuard)
   async getFriendshipByUser(
