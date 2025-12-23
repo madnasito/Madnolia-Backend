@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -29,8 +30,16 @@ export class ConnectionRequestService {
     });
 
     if (verifyRequest) {
-      if (verifyRequest.status != ConnectionRequestStatus.PENDING)
-        throw new ConflictException();
+      if (verifyRequest.status != ConnectionRequestStatus.PENDING) {
+        try {
+          verifyRequest.status = ConnectionRequestStatus.PENDING;
+          verifyRequest.updatedAt = new Date();
+          return verifyRequest.save();
+        } catch (error) {
+          Logger.error(error);
+          throw new ConflictException();
+        }
+      }
       return verifyRequest;
     }
 
