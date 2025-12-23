@@ -27,7 +27,7 @@ export class MessagesController {
     return this.messagesService.syncMessages(req.user.id, syncMessagesDto);
   }
 
-  @Get('')
+  @Get('users')
   @UseGuards(UserGuard)
   async getChats(@Request() req: any, @Query('skip') skip: number) {
     // return false;
