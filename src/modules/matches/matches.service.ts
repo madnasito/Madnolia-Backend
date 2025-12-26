@@ -485,7 +485,7 @@ export class MatchesService {
     this.matchModel.find(
       { platform, game, status: { $ne: MatchStatus.FINISHED } },
       {},
-      { skip, sort: { date: 1 } },
+      { skip, sort: { date: 1 }, limit: 20 },
     );
 
   getMatchesByGameSlugAndPlatform = async (
@@ -498,34 +498,35 @@ export class MatchesService {
     return this.matchModel.find(
       { platform, game: game._id, status: { $ne: MatchStatus.FINISHED } },
       {},
-      { skip, sort: { date: 1 } },
+      { skip, sort: { date: 1 }, limit: 20 },
     );
   };
 
   updatePastTimeMatches = async (): Promise<Array<Match>> => {
-    const currentTimeMillis = new Date().getTime();
+    const currentTime = new Date();
 
     const matches = await this.matchModel.find({
       status: MatchStatus.WAITING,
-      date: { $lt: new Date().getTime() },
+      date: { $lt: currentTime },
     });
 
     await this.matchModel.updateMany(
       {
         status: MatchStatus.WAITING,
-        date: { $lt: new Date().getTime() },
+        date: { $lt: currentTime },
       },
       { status: MatchStatus.RUNNING },
     );
 
     await this.matchModel.updateMany(
       {
+        status: { $in: [MatchStatus.RUNNING, MatchStatus.WAITING] },
         $expr: {
           $lt: [
             {
               $add: ['$date', { $multiply: ['$duration', 60000] }],
             },
-            currentTimeMillis,
+            currentTime.getTime(),
           ],
         },
       },

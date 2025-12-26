@@ -7,6 +7,8 @@ import {
   Query,
   Request,
   UseGuards,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { UserGuard } from 'src/common/guards/user.guard';
@@ -16,6 +18,16 @@ import { MultipleMongoIdsDto } from 'src/common/dto/mutiple-mongo-ids.dto';
 @Controller('friendship')
 export class FriendshipController {
   constructor(private readonly friendshipService: FriendshipService) {}
+
+  @Get('all')
+  @UseGuards(UserGuard)
+  async getAllFriendships(
+    @Request() req: any,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+  ) {
+    return this.friendshipService.findAllUserFriendships(req.user.id, page);
+  }
+
   @Get('with')
   @UseGuards(UserGuard)
   async getFriendshipByUser(

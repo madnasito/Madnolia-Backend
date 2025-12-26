@@ -292,9 +292,9 @@ export class MessagesService {
         {
           $skip: skip,
         },
-        {
-          $limit: 30,
-        },
+        // {
+        //   $limit: 30,
+        // },
       ]);
 
       return results;

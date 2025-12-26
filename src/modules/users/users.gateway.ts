@@ -86,7 +86,9 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.debug(`Client id: ${client.id} connected`);
       this.logger.debug(`Number of connected clients: ${size}`);
     } catch (error) {
-      return new WsException(error);
+      this.logger.error(`Authentication failed: ${error.message}`);
+      client.disconnect(true);
+      throw new WsException('Invalid token');
     }
   }
 
@@ -125,6 +127,9 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @Request() request: any,
   ) {
+    if (requestedUser.toString() === request.user.toString()) {
+      throw new WsException('CANNOT_REQUEST_YOURSELF');
+    }
     const requested = await this.usersService.findOneById(requestedUser);
     const { name, thumb, id } = await this.usersService.findOneById(
       request.user,
@@ -176,6 +181,12 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
 
       client.emit('connection_accepted', connectionRequestDb);
+
+      const senderUserSockets = this.users.getUserSocketsById(sender);
+
+      senderUserSockets.forEach((socketId) => {
+        client.to(socketId).emit('connection_accepted', connectionRequestDb);
+      });
       return connectionRequestDb;
     } catch (error) {
       Logger.error(error);
