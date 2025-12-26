@@ -7,6 +7,8 @@ import {
   Query,
   Request,
   UseGuards,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { UserGuard } from 'src/common/guards/user.guard';
@@ -19,11 +21,11 @@ export class FriendshipController {
 
   @Get('all')
   @UseGuards(UserGuard)
-  async getAllFriendships(@Request() req: any, @Query() page: string) {
-    return this.friendshipService.findAllUserFriendships(
-      req.user.id,
-      parseInt(page),
-    );
+  async getAllFriendships(
+    @Request() req: any,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+  ) {
+    return this.friendshipService.findAllUserFriendships(req.user.id, page);
   }
 
   @Get('with')

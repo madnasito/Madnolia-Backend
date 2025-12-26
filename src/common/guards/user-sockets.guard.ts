@@ -42,13 +42,14 @@ export class UserSocketGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: WsArgumentsHost): string | undefined {
-    const { auth } = request.getClient().handshake;
+    try {
+      const { auth } = request.getClient().handshake;
 
-    if (!auth.token) return request.getClient().handshake.headers['token'];
+      if (!auth.token) return request.getClient().handshake.headers['token'];
 
-    return auth.token;
-
-    // const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    // return type === 'Bearer' ? token : undefined;
+      return auth.token;
+    } catch (error) {
+      throw error;
+    }
   }
 }

@@ -33,7 +33,7 @@ export class ConnectionRequestService {
       if (verifyRequest.status != ConnectionRequestStatus.PENDING) {
         try {
           verifyRequest.status = ConnectionRequestStatus.PENDING;
-          verifyRequest.updatedAt = new Date();
+          verifyRequest.updatedAt = new Date(new Date().toISOString()); // UTC ISO
           return verifyRequest.save();
         } catch (error) {
           Logger.error(error);
@@ -46,6 +46,7 @@ export class ConnectionRequestService {
     const createdRequest = new this.connectionRequestModel({
       sender,
       receiver,
+      createdAt: new Date().toISOString(), // created at UTC ISO
     });
 
     return createdRequest.save();
@@ -64,7 +65,10 @@ export class ConnectionRequestService {
     try {
       const requestDb = await this.connectionRequestModel.findOneAndUpdate(
         { sender, receiver, status: ConnectionRequestStatus.PENDING },
-        { status: ConnectionRequestStatus.ACCEPTED, updatedAt: new Date() },
+        {
+          status: ConnectionRequestStatus.ACCEPTED,
+          updatedAt: new Date(new Date().toISOString()),
+        },
         { new: true },
       );
 
@@ -88,7 +92,10 @@ export class ConnectionRequestService {
   ): Promise<ConnectionRequest | null> {
     return this.connectionRequestModel.findOneAndUpdate(
       { sender, receiver, status: ConnectionRequestStatus.PENDING },
-      { status: ConnectionRequestStatus.REJECTED, updatedAt: new Date() },
+      {
+        status: ConnectionRequestStatus.REJECTED,
+        updatedAt: new Date(new Date().toISOString()),
+      },
       { new: true },
     );
   }

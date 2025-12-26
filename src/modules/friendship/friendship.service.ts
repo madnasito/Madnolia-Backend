@@ -37,7 +37,7 @@ export class FriendshipService {
       },
       {},
       {
-        sort: { updatedAt: -1 },
+        sort: { createdAt: -1 },
         skip: (page - 1) * 20,
         limit: 20,
       },

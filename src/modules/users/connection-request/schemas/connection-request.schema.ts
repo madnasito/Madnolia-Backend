@@ -19,10 +19,10 @@ export class ConnectionRequest {
   })
   status: ConnectionRequestStatus;
 
-  @Prop({ type: Date, default: new Date() })
+  @Prop({ type: Date, default: new Date().toISOString() })
   createdAt: Date;
 
-  @Prop({ type: Date, default: new Date() })
+  @Prop({ type: Date, default: new Date().toISOString() })
   updatedAt: Date;
 }
 
