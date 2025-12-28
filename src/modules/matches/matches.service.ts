@@ -526,7 +526,7 @@ export class MatchesService {
             {
               $add: ['$date', { $multiply: ['$duration', 60000] }],
             },
-            currentTime.getTime(),
+            currentTime,
           ],
         },
       },
