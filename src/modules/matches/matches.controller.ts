@@ -3,11 +3,13 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
   Query,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { CreateMatchDto } from './dtos/create-match.dto';
@@ -140,7 +142,8 @@ export class MatchesController {
       this.matchesGateway.handleJoinToMatch(req.user.id, id);
       return match;
     } catch (error) {
-      throw error;
+      Logger.error('Error joining match', error);
+      throw new UnauthorizedException('JOIN_FAILED');
     }
   }
 
