@@ -3,9 +3,10 @@ import { FirebaseCloudMessagingService } from './firebase-cloud-messaging.servic
 import { FirebaseCloudMessagingController } from './firebase-cloud-messaging.controller';
 import { FirebaseProvider } from 'src/firebase';
 import { ConfigModule } from '@nestjs/config';
+import { UsersModule } from 'src/modules/users/users.module';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, UsersModule],
   providers: [FirebaseProvider, FirebaseCloudMessagingService],
   controllers: [FirebaseCloudMessagingController],
   exports: [FirebaseCloudMessagingService],

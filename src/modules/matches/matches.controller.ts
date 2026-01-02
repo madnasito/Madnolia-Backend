@@ -3,11 +3,13 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
   Query,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { CreateMatchDto } from './dtos/create-match.dto';
@@ -129,7 +131,11 @@ export class MatchesController {
   @UseGuards(UserGuard)
   @Post('create')
   async create(@Request() req: any, @Body() body: CreateMatchDto) {
-    return this.matchesService.create(body, req.user.id);
+    const matchDb = await this.matchesService.create(body, req.user.id);
+
+    this.matchesGateway.handleMatchCreated(req.user.id, matchDb.id);
+
+    return matchDb;
   }
 
   @UseGuards(UserGuard)
@@ -140,7 +146,8 @@ export class MatchesController {
       this.matchesGateway.handleJoinToMatch(req.user.id, id);
       return match;
     } catch (error) {
-      throw error;
+      Logger.error('Error joining match', error);
+      throw new UnauthorizedException('JOIN_FAILED');
     }
   }
 

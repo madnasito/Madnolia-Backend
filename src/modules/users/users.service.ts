@@ -61,6 +61,13 @@ export class UsersService {
     await user.save();
   };
 
+  removeFcmToken = async (token: string) => {
+    return this.userModel.updateOne(
+      { 'devices.fcmToken': token },
+      { $pull: { devices: { fcmToken: token } } },
+    );
+  };
+
   handleUserDisconnection = async (
     userId: Types.ObjectId,
     socketId: string,

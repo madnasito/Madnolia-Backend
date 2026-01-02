@@ -6,6 +6,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Users } from '../../users/classes/user';
+import { Logger } from '@nestjs/common';
 
 @WebSocketGateway()
 export class CallsGateway implements OnGatewayConnection {
@@ -21,10 +22,15 @@ export class CallsGateway implements OnGatewayConnection {
 
   @SubscribeMessage('join_call_room')
   handleJoinRoom(client: Socket, payload: { callRoom: string }) {
-    client.join(payload.callRoom);
-    this.addUserToRoom(payload.callRoom, client.id);
-    const user = this.users.getUserBySocketId(client.id);
-    console.log(`Client ${user.username} joined room ${payload.callRoom}`);
+    try {
+      client.join(payload.callRoom);
+      this.addUserToRoom(payload.callRoom, client.id);
+      const user = this.users.getUserBySocketId(client.id);
+      Logger.debug(`Client ${user.username} joined room ${payload.callRoom}`);
+    } catch (error) {
+      Logger.error('Error joining call room', error);
+      throw error;
+    }
   }
 
   @SubscribeMessage('leave_call_room')
