@@ -7,7 +7,7 @@ import {
   WebSocketServer,
   WsException,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { UserSocketGuard } from 'src/common/guards/user-sockets.guard';
 import { MatchesService } from './matches.service';
 import { Users } from 'src/modules/users/classes/user';
@@ -62,8 +62,21 @@ export class MatchesGateway
 
   @UseGuards(UserSocketGuard)
   // @SubscribeMessage('match_created')
-  async handleMatchCreated(client: Socket, payload: string) {
-    this.logger.debug(client);
+  async handleMatchCreated(user: Types.ObjectId, payload: string) {
+    const userSocketIds = this.users.getUserSocketsById(user);
+
+    userSocketIds.forEach((socketId) => {
+      const client = this.io.sockets.sockets.get(socketId);
+
+      if (client) {
+        this.logger.debug(
+          `Client id: ${client.id} has created a match and tries to join`,
+        );
+        client.join(payload.toString());
+        this.logger.debug(`Client id: ${client.id} joined to match`);
+      }
+    });
+
     this.logger.debug(payload);
 
     const match = await this.matchesService.getMatchWithGame(payload);
