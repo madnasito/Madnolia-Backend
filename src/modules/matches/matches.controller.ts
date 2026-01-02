@@ -131,7 +131,11 @@ export class MatchesController {
   @UseGuards(UserGuard)
   @Post('create')
   async create(@Request() req: any, @Body() body: CreateMatchDto) {
-    return this.matchesService.create(body, req.user.id);
+    const matchDb = await this.matchesService.create(body, req.user.id);
+
+    this.matchesGateway.handleMatchCreated(req.user.id, matchDb.id);
+
+    return matchDb;
   }
 
   @UseGuards(UserGuard)

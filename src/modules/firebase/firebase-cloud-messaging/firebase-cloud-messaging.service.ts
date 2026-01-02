@@ -5,11 +5,15 @@ import {
   MulticastMessage,
 } from 'firebase-admin/lib/messaging/messaging-api';
 import { app } from 'firebase-admin';
+import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
 export class FirebaseCloudMessagingService {
   private readonly logger = new Logger(FirebaseCloudMessagingService.name);
-  constructor(@Inject('FIREBASE_APP') private firebaseApp: app.App) {}
+  constructor(
+    @Inject('FIREBASE_APP') private firebaseApp: app.App,
+    private readonly usersService: UsersService,
+  ) {}
 
   async sendNotification(payload: SendNotificationDto) {
     try {
@@ -59,9 +63,16 @@ export class FirebaseCloudMessagingService {
       if (response.failureCount > 0) {
         response.responses.forEach((resp, idx) => {
           if (!resp.success) {
+            const failedToken = payload.tokens[idx];
+            const errorCode = resp.error?.code;
             this.logger.error(
-              `Token falló ${payload.tokens[idx]}: ${resp.error?.message}`,
+              `Token falló ${failedToken}: ${resp.error?.message}`,
             );
+
+            if (errorCode === 'messaging/registration-token-not-registered') {
+              this.logger.warn(`Borrando token invalido: ${failedToken}`);
+              this.usersService.removeFcmToken(failedToken);
+            }
           }
         });
       }
