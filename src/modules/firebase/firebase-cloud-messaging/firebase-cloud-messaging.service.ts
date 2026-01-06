@@ -52,11 +52,11 @@ export class FirebaseCloudMessagingService {
         android: {
           priority: 'high',
         },
-        apns: {
-          headers: {
-            'apns-priority': '10',
-          },
-        },
+        // apns: {
+        //   headers: {
+        //     'apns-priority': '10',
+        //   },
+        // },
       };
 
       const response = await this.firebaseApp
