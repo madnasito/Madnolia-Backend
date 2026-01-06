@@ -1,10 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { SendNotificationDto } from '../dtos/send-notification.dto';
-import {
-  Message,
-  MulticastMessage,
-} from 'firebase-admin/lib/messaging/messaging-api';
-import { app } from 'firebase-admin';
+import { messaging, app } from 'firebase-admin';
 import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
@@ -19,7 +15,7 @@ export class FirebaseCloudMessagingService {
     try {
       if (!this.firebaseApp) throw new Error('FIREBASE_NOT_INITIALIZED');
 
-      const message: Message = {
+      const message: messaging.Message = {
         notification: {
           title: payload.title,
           body: payload.body,
@@ -45,7 +41,7 @@ export class FirebaseCloudMessagingService {
         throw Error('FCM_NO_TOKENS');
 
       // Do not use notification to avoid display notification handled by FCM lib
-      const message: MulticastMessage = {
+      const message: messaging.MulticastMessage = {
         tokens: payload.tokens, // Use tokens for multiple devices
         // notification: {
         //   title: payload.title,
@@ -53,6 +49,14 @@ export class FirebaseCloudMessagingService {
         //   imageUrl: payload.imageUrl,
         // },
         data: payload.data || {},
+        android: {
+          priority: 'high',
+        },
+        // apns: {
+        //   headers: {
+        //     'apns-priority': '10',
+        //   },
+        // },
       };
 
       const response = await this.firebaseApp
