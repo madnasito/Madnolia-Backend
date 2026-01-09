@@ -51,12 +51,19 @@ export class FirebaseCloudMessagingService {
         data: payload.data || {},
         android: {
           priority: 'high',
+          data: payload.data || {},
+          directBootOk: true,
         },
-        // apns: {
-        //   headers: {
-        //     'apns-priority': '10',
-        //   },
-        // },
+        apns: {
+          headers: {
+            'apns-priority': '10',
+          },
+          payload: {
+            aps: {
+              contentAvailable: true,
+            },
+          },
+        },
       };
 
       const response = await this.firebaseApp

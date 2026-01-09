@@ -21,7 +21,7 @@ export class CreateMatchDto {
   title: string;
 
   @IsString()
-  @MaxLength(80)
+  @MaxLength(100)
   description: string;
 
   @IsEnum(Platform)
