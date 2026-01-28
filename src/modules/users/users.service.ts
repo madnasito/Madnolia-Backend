@@ -153,8 +153,7 @@ export class UsersService {
     return user;
   };
 
-  getInfo = async (user: Types.ObjectId) =>
-    (await this.userModel.findOne({ _id: user, status: true })).toJSON();
+  getInfo = async (user: Types.ObjectId) => this.userModel.findOne({ _id: user, status: true });
 
   getUserInfo = async (
     targetUserId: Types.ObjectId,

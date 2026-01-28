@@ -37,7 +37,7 @@ export class AuthService {
       signInDto.username.toLocaleLowerCase(),
     );
 
-    if (!user) throw new NotFoundException('INVALID_CREDENTIALS');
+    if (!user || !user.status) throw new NotFoundException('INVALID_CREDENTIALS');
 
     const isMatch = await compare(signInDto.password, user.password);
 
