@@ -6,6 +6,7 @@ export type ConnectionRequestDocument = HydratedDocument<ConnectionRequest>;
 
 @Schema()
 export class ConnectionRequest {
+  _id: mongoose.Types.ObjectId;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
   sender: mongoose.Types.ObjectId;
 

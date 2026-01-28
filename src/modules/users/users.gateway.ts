@@ -186,7 +186,10 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       senderUserSockets.forEach((socketId) => {
         client.to(socketId).emit('connection_accepted', connectionRequestDb);
+        this.io.sockets.get(socketId).join(connectionRequestDb._id.toString()); 
       });
+
+      client.join(connectionRequestDb._id.toString());
       return connectionRequestDb;
     } catch (error) {
       Logger.error(error);
