@@ -149,13 +149,15 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       path: id,
     };
 
-    await this.notificationsService.create(newNotification);
+    const notificationDb =
+      await this.notificationsService.create(newNotification);
     client.emit('new_request_connection', requestDb);
 
     const requestedUserSockets = this.users.getUserSocketsById(requestedUser);
 
     requestedUserSockets.forEach((socketId) => {
       client.to(socketId).emit('new_request_connection', requestDb);
+      client.to(socketId).emit('standard_notification', notificationDb);
     });
 
     return requestDb;

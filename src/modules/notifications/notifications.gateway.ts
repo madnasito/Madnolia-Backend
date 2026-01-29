@@ -1,10 +1,11 @@
 import { Logger, UseGuards, Request } from '@nestjs/common';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import {
   ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
+  WebSocketServer,
   WsException,
 } from '@nestjs/websockets';
 import { Types } from 'mongoose';
@@ -15,6 +16,26 @@ import { NotificationsService } from './notifications.service';
 export class NotificationsGateway {
   private readonly logger = new Logger(NotificationsGateway.name);
   constructor(private readonly notificationsService: NotificationsService) {}
+
+  @WebSocketServer() io: Server;
+
+  emitStandartNotification(
+    userSockets: Array<string>,
+    notification: any,
+  ): void {
+    userSockets.forEach((socketId) => {
+      const client = this.io.sockets.sockets.get(socketId);
+
+      if (client) {
+        this.logger.debug(
+          `Emitting standart_notification to socket ID: ${socketId}`,
+        );
+
+        client.emit('standard_notification', notification);
+      }
+    });
+  }
+
   @UseGuards(UserSocketGuard)
   @SubscribeMessage('delete_notification')
   async deleteNotification(

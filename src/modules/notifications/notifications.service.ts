@@ -13,6 +13,7 @@ export class NotificationsService {
 
   async create(payload: CreateNotificationDto) {
     const newNotification = new this.notificationModel(payload);
+    newNotification.date = new Date(new Date().toUTCString());
 
     return await newNotification.save();
   }

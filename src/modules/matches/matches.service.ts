@@ -27,6 +27,8 @@ import { UsersService } from '../users/users.service';
 import { MatchesByPlatforms } from './interfaces/matches-by-platforms';
 import { Platform } from 'src/common/enums/platforms.enum';
 import { MatchWithGame } from './interfaces/match-with-game';
+import { Users } from '../users/classes/user';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 @Injectable()
 export class MatchesService {
@@ -34,8 +36,10 @@ export class MatchesService {
     @InjectModel(Match.name) private matchModel: Model<Match>,
     private readonly gamesService: GamesService,
     private readonly notificationsService: NotificationsService,
+    private readonly notificationsGateway: NotificationsGateway,
     private readonly platformsService: PlatformsService,
     private readonly usersService: UsersService,
+    private readonly users: Users,
   ) {}
 
   create = async (createMatchDto: CreateMatchDto, user: string) => {
@@ -64,6 +68,8 @@ export class MatchesService {
     // await this.gamesService.increaseAmountInPlatform(gameData.gameId, createMatchDto.platform)
 
     matchDb.inviteds.forEach(async (element) => {
+      const userSocketIds = this.users.getUserSocketsById(element);
+
       const newNotification: CreateNotificationDto = {
         path: matchDb.id,
         title: matchDb.title,
@@ -73,7 +79,15 @@ export class MatchesService {
         sender: matchDb.user.toString(),
       };
 
-      await this.notificationsService.create(newNotification);
+      const notificationDb =
+        await this.notificationsService.create(newNotification);
+
+      Logger.debug(userSocketIds);
+      if (userSocketIds.length > 0)
+        this.notificationsGateway.emitStandartNotification(
+          userSocketIds,
+          notificationDb,
+        );
     });
 
     return matchDb;
