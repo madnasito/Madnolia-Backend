@@ -29,7 +29,24 @@ import { FirebaseCloudMessagingService } from 'src/modules/firebase/firebase-clo
 import { SendNotificationDto } from 'src/modules/firebase/dtos/send-notification.dto';
 // import { SendNotificationDto } from 'src/modules/firebase/dtos/send-notification.dto';
 
-@UsePipes(new ValidationPipe())
+@UsePipes(
+  new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    exceptionFactory: (errors) => {
+      const logger = new Logger('MessagesGateway');
+      logger.error('Validation errors:', JSON.stringify(errors, null, 2));
+      return new WsException({
+        status: 'error',
+        message: 'Validation failed',
+        errors: errors.map((err) => ({
+          property: err.property,
+          constraints: err.constraints,
+        })),
+      });
+    },
+  }),
+)
 @WebSocketGateway({
   // namespace: 'messages'
 })
@@ -169,7 +186,8 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
         });
       }
     } catch (error) {
-      console.log(error);
+      console.error('Error in handleMessage:');
+      console.error(error);
       throw new WsException(error);
     }
   }
