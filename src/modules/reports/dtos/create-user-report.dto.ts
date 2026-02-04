@@ -4,18 +4,19 @@ import {
   IsString,
   IsMongoId,
   IsOptional,
-  IsUrl,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
-import { ReportType } from '../enums/report-type.enum';
+import { UserReportType } from '../enums/user-report-type.enum';
 
-export class CreateReportDto {
-  @IsEnum(['0', '1'])
+export class CreateUserReportDto {
+  @IsEnum(UserReportType)
+  @Type(() => Number)
   @IsNotEmpty()
-  type: ReportType;
+  type: UserReportType;
 
+  @IsNotEmpty()
   @IsMongoId()
-  @IsNotEmpty()
   to: Types.ObjectId;
 
   @IsString()
@@ -23,6 +24,5 @@ export class CreateReportDto {
   description: string;
 
   @IsOptional()
-  @IsUrl()
   media: any;
 }

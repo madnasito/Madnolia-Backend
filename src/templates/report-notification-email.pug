@@ -1,0 +1,120 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title New Report Notification
+    style.
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+      
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0f0f15;
+        margin: 0;
+        padding: 0;
+        color: #e0e0e0;
+      }
+      
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      
+      .header {
+        text-align: center;
+        padding: 30px 0;
+      }
+      
+      .logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 28px;
+        font-weight: 700;
+        background: linear-gradient(90deg, #00f0ff, #ff0040ff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 10px;
+        text-decoration: none;
+      }
+      
+      .card {
+        background-color: #1a1a25;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+      
+      h1 {
+        color: #ffffff;
+        font-size: 24px;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      
+      .report-item {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #252535;
+        border-radius: 6px;
+      }
+      
+      .label {
+        font-weight: 700;
+        color: #00f0ff;
+        display: block;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+      
+      .value {
+        font-size: 16px;
+        color: #ffffff;
+      }
+      
+      .footer {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 14px;
+        color: #888899;
+      }
+
+  body
+    .container
+      .header
+        a.logo(href="https://madnolia.app") madnolia
+      
+      .card
+        h1 New #{reportType} Received
+        
+        .report-item
+          span.label Reported By:
+          span.value #{reporterName} (#{reporterEmail})
+        
+        if reportedUserName
+          .report-item
+            span.label Reported User:
+            span.value #{reportedUserName} (#{reportedUserEmail})
+        
+        .report-item
+          span.label Reason/Type:
+          span.value #{reason}
+        
+        .report-item
+          span.label Description:
+          span.value #{description}
+        
+        if media
+          .report-item
+            span.label Attachment:
+            div(style="margin-top: 10px; text-align: center;")
+              img(src=media alt="Report Media" style="max-width: 100%; border-radius: 8px; border: 1px solid #333344;")
+            div(style="margin-top: 10px; text-align: center;")
+              a.value(href=media target="_blank" style="font-size: 12px; color: #888899;") View Full Image
+      
+      .footer
+        p © #{new Date().getFullYear()} Madnolia. This is an automated notification.

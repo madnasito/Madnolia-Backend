@@ -2,16 +2,17 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { ReportType } from '../enums/report-type.enum';
 import { ReportStatus } from '../enums/report-status.enum';
+import { BugReportType } from '../enums/bug-report-type.enum';
 
-export type ReportDocument = HydratedDocument<Report>;
+export type BugReportDocument = HydratedDocument<BugReport>;
 
 @Schema()
-export class Report {
+export class BugReport {
   @Prop({
-    enum: ReportType,
+    enum: BugReportType,
     required: true,
   })
-  type: ReportType;
+  type: BugReportType;
 
   @Prop({
     type: Types.ObjectId,
@@ -19,13 +20,6 @@ export class Report {
     ref: 'User',
   })
   user: Types.ObjectId;
-
-  @Prop({
-    type: Types.ObjectId,
-    required: true,
-    ref: 'User',
-  })
-  to: Types.ObjectId;
 
   @Prop({
     type: String,
@@ -50,4 +44,4 @@ export class Report {
   status: ReportStatus;
 }
 
-export const ReportSchema = SchemaFactory.createForClass(Report);
+export const BugReportSchema = SchemaFactory.createForClass(BugReport);
