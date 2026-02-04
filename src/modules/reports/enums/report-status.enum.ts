@@ -1,6 +1,6 @@
 export enum ReportStatus {
   OPEN,
-  UNRED_REVIEW,
+  UNDER_REVIEW,
   REJECTED,
   CLOSED,
 }

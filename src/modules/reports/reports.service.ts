@@ -39,7 +39,7 @@ export class ReportsService {
       to: body.to,
       $or: [
         { status: ReportStatus.OPEN },
-        { status: ReportStatus.UNRED_REVIEW },
+        { status: ReportStatus.UNDER_REVIEW },
       ],
     });
 
@@ -77,7 +77,7 @@ export class ReportsService {
       user,
       $or: [
         { status: ReportStatus.OPEN },
-        { status: ReportStatus.UNRED_REVIEW },
+        { status: ReportStatus.UNDER_REVIEW },
       ],
     });
 
