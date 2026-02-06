@@ -13,11 +13,12 @@ import {
   Logger,
 } from '@nestjs/common';
 import { UserGuard } from 'src/common/guards/user.guard';
-import { CreateReportDto } from './dtos/create-report.dto';
 import { ReportsService } from './reports.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
+import { CreateUserReportDto } from './dtos/create-user-report.dto';
+import { CreateBugReportDto } from './dtos/create-bug-report.dto';
 
 @Controller('reports')
 export class ReportsController {
@@ -27,21 +28,22 @@ export class ReportsController {
   ) {}
 
   @UseGuards(UserGuard)
-  @Post('create')
+  @Post('create-user-report')
   @UseInterceptors(FileInterceptor('media'))
   async create(
     @Request() req: any,
-    @Body() body: CreateReportDto,
+    @Body() body: CreateUserReportDto,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 1000 * 1024 }), // 1MB
+          new MaxFileSizeValidator({ maxSize: 1000 * 2048 }), // 2MB
           new FileTypeValidator({ fileType: /(jpg|jpeg|png|webp)$/ }),
         ],
       }),
     )
     media: Express.Multer.File, // Make it optional if needed
   ) {
+
     if (!media) {
       throw new BadRequestException('Media file is required');
     }
@@ -49,7 +51,7 @@ export class ReportsController {
     const form = new FormData();
     const apiKey = this.config.get<string>('IMGBB_KEY');
 
-    form.append('file', new Blob([media.buffer], { type: media.mimetype }));
+    form.append('file', new Blob([new Uint8Array(media.buffer)], { type: media.mimetype }), media.originalname);
     form.append('apikey', apiKey);
 
     try {
@@ -67,12 +69,67 @@ export class ReportsController {
         resp.data.files.status === 'Success' ||
         resp.data.files.status === 'Duplicate'
       ) {
-        const createReportBody: CreateReportDto = {
+        const createReportBody: CreateUserReportDto = {
           media: resp.data.files.url,
           ...body,
         };
 
-        return this.reportsService.create(createReportBody, req.user.id);
+        return this.reportsService.createUserReport(createReportBody, req.user.id);
+      }
+    } catch (error) {
+      Logger.error(error);
+      throw new error();
+    }
+  }
+
+  @UseGuards(UserGuard)
+  @Post('create-bug-report')
+  @UseInterceptors(FileInterceptor('media'))
+  async createBugReport(
+    @Request() req: any,
+    @Body() body: CreateBugReportDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1000 * 2048 }), // 2MB
+          new FileTypeValidator({ fileType: /(jpg|jpeg|png|webp)$/ }),
+        ],
+      }),
+    )
+    media: Express.Multer.File, // Make it optional if needed
+  ) {
+
+    if (!media) {
+      throw new BadRequestException('Media file is required');
+    }
+
+    const form = new FormData();
+    const apiKey = this.config.get<string>('IMGBB_KEY');
+
+    form.append('file', new Blob([new Uint8Array(media.buffer)], { type: media.mimetype }), media.originalname);
+    form.append('apikey', apiKey);  
+
+    try {
+      const resp = await axios.post(
+        'https://beeimg.com/api/upload/file/json/',
+        form,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data', // Corrected Content-Type
+          },
+        },
+      );
+
+      if (
+        resp.data.files.status === 'Success' ||
+        resp.data.files.status === 'Duplicate'
+      ) {
+        const createReportBody: CreateBugReportDto = {
+          media: resp.data.files.url,
+          ...body,
+        };
+
+        return this.reportsService.createBugReport(createReportBody, req.user.id);
       }
     } catch (error) {
       Logger.error(error);

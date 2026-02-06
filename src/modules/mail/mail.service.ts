@@ -59,4 +59,24 @@ export class MailService {
       { token },
     );
   }
+
+  async sendReportNotification(to: string, context: any) {
+    try {
+      const sendMailParams: ISendMailOptions = {
+        to,
+        subject: 'New Report Notification',
+        template: 'report-notification-email',
+        context,
+      };
+      const response = await this.mailerService.sendMail(sendMailParams);
+      this.logger.debug(
+        `Report notification sent successfully to ${to}`,
+        response,
+      );
+      return { ok: true };
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException('Error sending report notification');
+    }
+  }
 }

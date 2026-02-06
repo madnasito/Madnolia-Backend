@@ -481,11 +481,8 @@ export class MatchesService {
   getActiveMatchesJoinedOrCreatedByUser = (userId: Types.ObjectId) =>
     this.matchModel.find(
       {
-        $or: [
-          { status: MatchStatus.RUNNING },
-          { status: MatchStatus.WAITING },
-          { $or: [{ user: userId }, { joined: userId }] },
-        ],
+        status: { $in: [MatchStatus.RUNNING, MatchStatus.WAITING] },
+        $or: [{ user: userId }, { joined: userId }],
       },
       {},
       { sort: { _id: -1 } },
