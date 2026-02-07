@@ -97,7 +97,10 @@ export class UsersService {
       throw new BadRequestException('USERNAME_IN_USE');
     }
 
-    const createdUser = new this.userModel(signUpDto);
+    const createdUser = new this.userModel({
+      ...signUpDto,
+      createdAt: new Date(new Date().toUTCString()),
+    });
     const saltOrRounds = 10;
     const password = signUpDto.password;
     const hash = hashSync(password, saltOrRounds);
@@ -153,7 +156,8 @@ export class UsersService {
     return user;
   };
 
-  getInfo = async (user: Types.ObjectId) => this.userModel.findOne({ _id: user, status: true });
+  getInfo = async (user: Types.ObjectId) =>
+    this.userModel.findOne({ _id: user, status: true }).lean();
 
   getUserInfo = async (
     targetUserId: Types.ObjectId,
@@ -239,7 +243,7 @@ export class UsersService {
       const emailDb = await this.findOneByEmail(updateData.email);
       if (emailDb) throw new ConflictException('EMAIL_IN_USE');
 
-      user.emailModifiedAt = new Date();
+      user.emailModifiedAt = new Date(new Date().toUTCString());
     }
     // 3. Actualizar y retornar el documento
     const updatedUser = await this.userModel
@@ -248,7 +252,7 @@ export class UsersService {
         {
           $set: {
             ...updateData,
-            modifiedAt: new Date(),
+            modifiedAt: new Date(new Date().toUTCString()),
             emailModifiedAt: user.emailModifiedAt,
           },
         },
@@ -394,14 +398,23 @@ export class UsersService {
 
     const foundUsers = await this.userModel
       .find({
-        $or: [{ username: regex }, { name: regex }],
-        $nor: [{ _id: userId }],
-        status: true,
+        $and: [
+          { $or: [{ username: regex }, { name: regex }] },
+          { $nor: [{ _id: userId }] },
+          { status: true },
+          {
+            $or: [
+              { availability: Availability.EVERYONE },
+              {
+                availability: Availability.PARTNERS,
+                _id: { $in: partners },
+              },
+            ],
+          },
+        ],
       })
       .select({ name: 1, username: 1, _id: 1, thumb: 1 })
       .lean()
-      .skip(skip)
-      .limit(limit)
       .exec();
 
     const results = foundUsers.map((foundUser) => {
