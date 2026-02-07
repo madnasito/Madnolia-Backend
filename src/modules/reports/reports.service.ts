@@ -73,15 +73,15 @@ export class ReportsService {
       date: new Date().toUTCString(),
     };
 
-    const reportDb = await this.bugReportModel.findOne({
-      user,
-      $or: [
-        { status: ReportStatus.OPEN },
-        { status: ReportStatus.UNDER_REVIEW },
-      ],
-    });
+    // const reportDb = await this.bugReportModel.findOne({
+    //   user,
+    //   $or: [
+    //     { status: ReportStatus.OPEN },
+    //     { status: ReportStatus.UNDER_REVIEW },
+    //   ],
+    // });
 
-    if (reportDb) throw new ConflictException('REPORT_EXISTS');
+    // if (reportDb) throw new ConflictException('REPORT_EXISTS');
     const createdReport = await this.bugReportModel.create(newReport);
 
     // Send Email Notification
