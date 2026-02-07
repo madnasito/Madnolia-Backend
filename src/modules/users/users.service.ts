@@ -35,30 +35,48 @@ export class UsersService {
   };
 
   handleUserConnection = async (userId: Types.ObjectId, fcmToken: string) => {
-    const userByFcmToken = await this.findByFcmToken(fcmToken);
+    // 1. Remove fcmToken from ANY user that has it (except potentially the current one, but easier to just pull from all to ensure uniqueness)
+    // Actually, we can just pull from everyone except the current user to avoid unnecessary writes if it's already there?
+    // No, let's pull from everyone ELSE.
+    await this.userModel.updateMany(
+      { 'devices.fcmToken': fcmToken, _id: { $ne: userId } },
+      { $pull: { devices: { fcmToken } } },
+    );
 
-    if (userByFcmToken && !userByFcmToken._id.equals(userId)) {
-      userByFcmToken.devices = userByFcmToken.devices.filter(
-        (device) => device.fcmToken !== fcmToken,
+    // 2. Try to update the device if it exists in the current user
+    const updateResult = await this.userModel.updateOne(
+      { _id: userId, 'devices.fcmToken': fcmToken },
+      {
+        $set: {
+          'devices.$.online': true,
+          'devices.$.lastActive': new Date(),
+          'devices.$.socketId': '', // Assuming socketId is reset or set elsewhere? The original code set it to '' in the push.
+        },
+      },
+    );
+
+    // 3. If the device didn't exist (matchedCount === 0), push it
+    if (updateResult.matchedCount === 0) {
+      await this.userModel.updateOne(
+        { _id: userId },
+        {
+          $push: {
+            devices: {
+              $each: [
+                {
+                  fcmToken,
+                  online: true,
+                  lastActive: new Date(),
+                  socketId: '',
+                },
+              ],
+              $sort: { lastActive: -1 },
+              $slice: 5,
+            },
+          },
+        },
       );
-      await userByFcmToken.save();
     }
-
-    const user = await this.findOneById(userId);
-
-    const device = user.devices.find((device) => device.fcmToken === fcmToken);
-
-    if (device) {
-      device.online = true;
-    } else {
-      user.devices.push({
-        fcmToken,
-        online: true,
-        lastActive: new Date(),
-        socketId: '',
-      });
-    }
-    await user.save();
   };
 
   removeFcmToken = async (token: string) => {
@@ -72,7 +90,7 @@ export class UsersService {
     userId: Types.ObjectId,
     socketId: string,
   ) => {
-    return await this.userModel.updateOne(
+    return this.userModel.updateOne(
       { _id: userId, 'devices.socketId': socketId },
       {
         $set: {

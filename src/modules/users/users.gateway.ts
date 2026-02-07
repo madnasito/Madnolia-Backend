@@ -66,8 +66,11 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!token) token = client.handshake.headers['token'];
 
       if (token === undefined || token === null || token === '') {
+        this.logger.error(
+          `Connection denied: Missing token for client ${client.id}`,
+        );
         client.disconnect(true);
-        throw new WsException('MISSING_TOKEN');
+        return;
       }
 
       const tokenPayload = await this.jwtService.verifyAsync(token as string);
@@ -86,9 +89,11 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.debug(`Client id: ${client.id} connected`);
       this.logger.debug(`Number of connected clients: ${size}`);
     } catch (error) {
-      this.logger.error(`Authentication failed: ${error.message}`);
+      this.logger.error(
+        `Authentication failed for client ${client.id}: ${error.stack || error.message}`,
+      );
       client.disconnect(true);
-      throw new WsException('Invalid token');
+      return;
     }
   }
 
@@ -188,7 +193,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       senderUserSockets.forEach((socketId) => {
         client.to(socketId).emit('connection_accepted', connectionRequestDb);
-        this.io.sockets.get(socketId).join(connectionRequestDb._id.toString()); 
+        this.io.sockets.get(socketId).join(connectionRequestDb._id.toString());
       });
 
       client.join(connectionRequestDb._id.toString());
