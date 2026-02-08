@@ -24,29 +24,34 @@ export class ConnectionRequestService {
     sender: Types.ObjectId,
     receiver: Types.ObjectId,
   ): Promise<ConnectionRequest> {
-    const verifyRequest = await this.connectionRequestModel.findOne({
-      sender,
-      receiver,
+    const existingRequest = await this.connectionRequestModel.findOne({
+      $or: [
+        { sender, receiver },
+        { sender: receiver, receiver: sender },
+      ],
     });
 
-    if (verifyRequest) {
-      if (verifyRequest.status != ConnectionRequestStatus.PENDING) {
-        try {
-          verifyRequest.status = ConnectionRequestStatus.PENDING;
-          verifyRequest.updatedAt = new Date(new Date().toISOString()); // UTC ISO
-          return verifyRequest.save();
-        } catch (error) {
-          Logger.error(error);
-          throw new ConflictException();
-        }
+    if (existingRequest) {
+      if (existingRequest.status === ConnectionRequestStatus.PENDING) {
+        return existingRequest;
       }
-      return verifyRequest;
+
+      try {
+        existingRequest.sender = sender;
+        existingRequest.receiver = receiver;
+        existingRequest.status = ConnectionRequestStatus.PENDING;
+        existingRequest.updatedAt = new Date();
+        return await existingRequest.save();
+      } catch (error) {
+        Logger.error(error);
+        throw new ConflictException();
+      }
     }
 
     const createdRequest = new this.connectionRequestModel({
       sender,
       receiver,
-      createdAt: new Date().toISOString(), // created at UTC ISO
+      createdAt: new Date(),
     });
 
     return createdRequest.save();
@@ -121,11 +126,24 @@ export class ConnectionRequestService {
     return deletedRequest;
   }
 
+  findOneByUserIds = async (
+    sender: Types.ObjectId,
+    receiver: Types.ObjectId,
+  ): Promise<ConnectionRequest | null> =>
+    this.connectionRequestModel
+      .findOne({
+        $or: [
+          { sender, receiver },
+          { sender: receiver, receiver: sender },
+        ],
+      })
+      .exec();
+
   findPendingRequestsForUser = async (
     userId: Types.ObjectId,
   ): Promise<ConnectionRequest[]> =>
     this.connectionRequestModel
-      .find({ receiver: userId, status: 'pending' })
+      .find({ receiver: userId, status: ConnectionRequestStatus.PENDING })
       .populate('sender')
       .exec();
 

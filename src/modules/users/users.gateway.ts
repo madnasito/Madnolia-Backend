@@ -21,6 +21,9 @@ import { Users } from './classes/user';
 import { JwtService } from '@nestjs/jwt';
 import { FriendshipService } from '../friendship/friendship.service';
 import { Availability } from './enums/availability.enum';
+import { SendNotificationDto } from '../firebase/dtos/send-notification.dto';
+import { FirebaseCloudMessagingService } from '../firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
+import { ConnectionRequestStatus } from './connection-request/enums/connection-status.enum';
 
 @WebSocketGateway()
 export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -32,6 +35,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly jwtService: JwtService,
     private readonly friendshipService: FriendshipService,
     private readonly notificationsService: NotificationsService,
+    private firebaseCloudMessagingService: FirebaseCloudMessagingService,
     private users: Users,
   ) {}
 
@@ -140,6 +144,19 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       request.user,
     );
     if (!requested) throw new WsException('USER_NOT_FOUND');
+
+    const alreadyRequested =
+      await this.connectionRequestService.findOneByUserIds(
+        request.user,
+        requested.id,
+      );
+
+    if (
+      alreadyRequested != null &&
+      alreadyRequested.status != ConnectionRequestStatus.REJECTED
+    )
+      throw new WsException('ALREADY_REQUESTED');
+
     const requestDb = await this.connectionRequestService.create(
       request.user,
       requested.id,
@@ -164,6 +181,28 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.to(socketId).emit('new_request_connection', requestDb);
       client.to(socketId).emit('standard_notification', notificationDb);
     });
+
+    try {
+      const fcmTokens = this.users.getUserFcmTokensNoSocketById(requestedUser);
+
+      if (fcmTokens.length > 0) {
+        const notificationPayload: SendNotificationDto = {
+          tokens: fcmTokens,
+          title: name,
+          body: '',
+          imageUrl: thumb,
+          data: {
+            type: 'new_request_connection',
+            data: JSON.stringify(requestDb),
+          },
+        };
+        await this.firebaseCloudMessagingService.sendToMultipleTokens(
+          notificationPayload,
+        );
+      }
+    } catch (error) {
+      this.logger.error(error);
+    }
 
     return requestDb;
   }
@@ -195,6 +234,30 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.to(socketId).emit('connection_accepted', connectionRequestDb);
         this.io.sockets.get(socketId).join(connectionRequestDb._id.toString());
       });
+
+      const { name, thumb } = await this.usersService.findOneById(request.user);
+
+      try {
+        const fcmTokens = this.users.getUserFcmTokensNoSocketById(sender);
+
+        if (fcmTokens.length > 0) {
+          const notificationPayload: SendNotificationDto = {
+            tokens: fcmTokens,
+            title: name,
+            body: '',
+            imageUrl: thumb,
+            data: {
+              type: 'connection_accepted',
+              data: JSON.stringify(connectionRequestDb),
+            },
+          };
+          await this.firebaseCloudMessagingService.sendToMultipleTokens(
+            notificationPayload,
+          );
+        }
+      } catch (error) {
+        this.logger.error(error);
+      }
 
       client.join(connectionRequestDb._id.toString());
       return connectionRequestDb;
