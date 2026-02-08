@@ -11,7 +11,7 @@ import {
 } from '@nestjs/websockets';
 import { UsersService } from './users.service';
 import { UserSocketGuard } from 'src/common/guards/user-sockets.guard';
-import { Namespace, Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { ConnectionRequestService } from './connection-request/connection-request.service';
 import { Types } from 'mongoose';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -39,7 +39,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private users: Users,
   ) {}
 
-  @WebSocketServer() io: Namespace;
+  @WebSocketServer() io: Server;
 
   async handleDisconnect(client: any) {
     try {
@@ -60,7 +60,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handleConnection(client: Socket, ...args: any[]) {
     try {
-      const { size } = this.io.sockets;
+      const { size } = this.io.sockets.sockets;
 
       console.table(client.handshake.auth);
       let { token } = client.handshake.auth;
@@ -208,7 +208,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('accept_connection')
+  @SubscribeMessage('request_accepted')
   async acceptConnection(
     @MessageBody() sender: Types.ObjectId,
     @ConnectedSocket() client: Socket,
@@ -222,17 +222,20 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
         );
 
       await this.notificationsService.deleteRequestConnection(
-        connectionRequestDb.receiver,
-        connectionRequestDb.sender,
+        connectionRequestDb.request.receiver,
+        connectionRequestDb.request.sender,
       );
 
-      client.emit('connection_accepted', connectionRequestDb);
+      client.emit('request_accepted', connectionRequestDb.request);
 
       const senderUserSockets = this.users.getUserSocketsById(sender);
 
       senderUserSockets.forEach((socketId) => {
-        client.to(socketId).emit('connection_accepted', connectionRequestDb);
-        this.io.sockets.get(socketId).join(connectionRequestDb._id.toString());
+        client.to(socketId).emit('request_accepted', connectionRequestDb);
+        const targetSocket = this.io.sockets.sockets.get(socketId);
+        if (targetSocket) {
+          targetSocket.join(connectionRequestDb.request._id.toString());
+        }
       });
 
       const { name, thumb } = await this.usersService.findOneById(request.user);
@@ -247,7 +250,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
             body: '',
             imageUrl: thumb,
             data: {
-              type: 'connection_accepted',
+              type: 'request_accepted',
               data: JSON.stringify(connectionRequestDb),
             },
           };
@@ -259,7 +262,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.logger.error(error);
       }
 
-      client.join(connectionRequestDb._id.toString());
+      client.join(connectionRequestDb.request._id.toString());
       return connectionRequestDb;
     } catch (error) {
       Logger.error(error);

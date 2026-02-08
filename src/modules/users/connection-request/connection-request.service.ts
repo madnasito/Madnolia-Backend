@@ -11,6 +11,7 @@ import { ConnectionRequestStatus } from './enums/connection-status.enum';
 import { FriendshipService } from 'src/modules/friendship/friendship.service';
 import { CreateFriendshipDto } from 'src/modules/friendship/dtos/create-frindship.dto';
 import { FriendshipStatus } from 'src/modules/friendship/enums/friendship-status.enum';
+import { Friendship } from 'src/modules/friendship/schemas/friendship.schema';
 
 @Injectable()
 export class ConnectionRequestService {
@@ -66,7 +67,10 @@ export class ConnectionRequestService {
   async acceptConnection(
     sender: Types.ObjectId,
     receiver: Types.ObjectId,
-  ): Promise<ConnectionRequest | null> {
+  ): Promise<{
+    request: ConnectionRequest;
+    friendship: Friendship;
+  } | null> {
     try {
       const requestDb = await this.connectionRequestModel.findOneAndUpdate(
         { sender, receiver, status: ConnectionRequestStatus.PENDING },
@@ -83,9 +87,10 @@ export class ConnectionRequestService {
         status: FriendshipStatus.ALIVE,
       };
 
-      await this.friendshipService.create(friendshipPayload);
+      const friendshipDb =
+        await this.friendshipService.create(friendshipPayload);
 
-      return requestDb;
+      return { request: requestDb, friendship: friendshipDb };
     } catch (error) {
       throw error;
     }

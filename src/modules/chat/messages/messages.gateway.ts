@@ -15,7 +15,7 @@ import {
   WebSocketServer,
   WsException,
 } from '@nestjs/websockets';
-import { Namespace, Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { UserSocketGuard } from 'src/common/guards/user-sockets.guard';
 // import { UserGuard } from 'src/common/guards/user.guard';
 import { MessagesService } from './messages.service';
@@ -60,7 +60,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
     private firebaseCloudMessagingService: FirebaseCloudMessagingService,
   ) {}
 
-  @WebSocketServer() io: Namespace;
+  @WebSocketServer() io: Server;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   afterInit(@ConnectedSocket() socket: Socket) {
