@@ -37,7 +37,8 @@ import { SitemapModule } from './modules/sitemap/sitemap.module';
           socketTimeoutMS: 45000, // 45 seconds
           retryAttempts: 3, // Retry up to 3 times
           retryDelay: 1000,
-          directConnection: process.env.NODE_ENV === 'development' ? true : false,
+          directConnection:
+            process.env.NODE_ENV === 'development' ? true : false,
           replicaSet: config.get<string>('MONGODB_REPLICA_SET'),
           readPreference: 'primary',
         };

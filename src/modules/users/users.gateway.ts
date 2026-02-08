@@ -11,7 +11,7 @@ import {
 } from '@nestjs/websockets';
 import { UsersService } from './users.service';
 import { UserSocketGuard } from 'src/common/guards/user-sockets.guard';
-import { Namespace, Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { ConnectionRequestService } from './connection-request/connection-request.service';
 import { Types } from 'mongoose';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -21,6 +21,9 @@ import { Users } from './classes/user';
 import { JwtService } from '@nestjs/jwt';
 import { FriendshipService } from '../friendship/friendship.service';
 import { Availability } from './enums/availability.enum';
+import { SendNotificationDto } from '../firebase/dtos/send-notification.dto';
+import { FirebaseCloudMessagingService } from '../firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
+import { ConnectionRequestStatus } from './connection-request/enums/connection-status.enum';
 
 @WebSocketGateway()
 export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -32,10 +35,11 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly jwtService: JwtService,
     private readonly friendshipService: FriendshipService,
     private readonly notificationsService: NotificationsService,
+    private firebaseCloudMessagingService: FirebaseCloudMessagingService,
     private users: Users,
   ) {}
 
-  @WebSocketServer() io: Namespace;
+  @WebSocketServer() io: Server;
 
   async handleDisconnect(client: any) {
     try {
@@ -56,7 +60,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handleConnection(client: Socket, ...args: any[]) {
     try {
-      const { size } = this.io.sockets;
+      const { size } = this.io.sockets.sockets;
 
       console.table(client.handshake.auth);
       let { token } = client.handshake.auth;
@@ -66,8 +70,11 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!token) token = client.handshake.headers['token'];
 
       if (token === undefined || token === null || token === '') {
+        this.logger.error(
+          `Connection denied: Missing token for client ${client.id}`,
+        );
         client.disconnect(true);
-        throw new WsException('MISSING_TOKEN');
+        return;
       }
 
       const tokenPayload = await this.jwtService.verifyAsync(token as string);
@@ -86,9 +93,11 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.debug(`Client id: ${client.id} connected`);
       this.logger.debug(`Number of connected clients: ${size}`);
     } catch (error) {
-      this.logger.error(`Authentication failed: ${error.message}`);
+      this.logger.error(
+        `Authentication failed for client ${client.id}: ${error.stack || error.message}`,
+      );
       client.disconnect(true);
-      throw new WsException('Invalid token');
+      return;
     }
   }
 
@@ -135,6 +144,19 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       request.user,
     );
     if (!requested) throw new WsException('USER_NOT_FOUND');
+
+    const alreadyRequested =
+      await this.connectionRequestService.findOneByUserIds(
+        request.user,
+        requested.id,
+      );
+
+    if (
+      alreadyRequested != null &&
+      alreadyRequested.status != ConnectionRequestStatus.REJECTED
+    )
+      throw new WsException('ALREADY_REQUESTED');
+
     const requestDb = await this.connectionRequestService.create(
       request.user,
       requested.id,
@@ -160,11 +182,33 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.to(socketId).emit('standard_notification', notificationDb);
     });
 
+    try {
+      const fcmTokens = this.users.getUserFcmTokensNoSocketById(requestedUser);
+
+      if (fcmTokens.length > 0) {
+        const notificationPayload: SendNotificationDto = {
+          tokens: fcmTokens,
+          title: name,
+          body: '',
+          imageUrl: thumb,
+          data: {
+            type: 'new_request_connection',
+            data: JSON.stringify(requestDb),
+          },
+        };
+        await this.firebaseCloudMessagingService.sendToMultipleTokens(
+          notificationPayload,
+        );
+      }
+    } catch (error) {
+      this.logger.error(error);
+    }
+
     return requestDb;
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('accept_connection')
+  @SubscribeMessage('request_accepted')
   async acceptConnection(
     @MessageBody() sender: Types.ObjectId,
     @ConnectedSocket() client: Socket,
@@ -178,20 +222,47 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
         );
 
       await this.notificationsService.deleteRequestConnection(
-        connectionRequestDb.receiver,
-        connectionRequestDb.sender,
+        connectionRequestDb.request.receiver,
+        connectionRequestDb.request.sender,
       );
 
-      client.emit('connection_accepted', connectionRequestDb);
+      client.emit('request_accepted', connectionRequestDb.request);
 
       const senderUserSockets = this.users.getUserSocketsById(sender);
 
       senderUserSockets.forEach((socketId) => {
-        client.to(socketId).emit('connection_accepted', connectionRequestDb);
-        this.io.sockets.get(socketId).join(connectionRequestDb._id.toString()); 
+        client.to(socketId).emit('request_accepted', connectionRequestDb);
+        const targetSocket = this.io.sockets.sockets.get(socketId);
+        if (targetSocket) {
+          targetSocket.join(connectionRequestDb.request._id.toString());
+        }
       });
 
-      client.join(connectionRequestDb._id.toString());
+      const { name, thumb } = await this.usersService.findOneById(request.user);
+
+      try {
+        const fcmTokens = this.users.getUserFcmTokensNoSocketById(sender);
+
+        if (fcmTokens.length > 0) {
+          const notificationPayload: SendNotificationDto = {
+            tokens: fcmTokens,
+            title: name,
+            body: '',
+            imageUrl: thumb,
+            data: {
+              type: 'request_accepted',
+              data: JSON.stringify(connectionRequestDb),
+            },
+          };
+          await this.firebaseCloudMessagingService.sendToMultipleTokens(
+            notificationPayload,
+          );
+        }
+      } catch (error) {
+        this.logger.error(error);
+      }
+
+      client.join(connectionRequestDb.request._id.toString());
       return connectionRequestDb;
     } catch (error) {
       Logger.error(error);

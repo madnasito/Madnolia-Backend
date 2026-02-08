@@ -11,6 +11,7 @@ import { ConnectionRequestStatus } from './enums/connection-status.enum';
 import { FriendshipService } from 'src/modules/friendship/friendship.service';
 import { CreateFriendshipDto } from 'src/modules/friendship/dtos/create-frindship.dto';
 import { FriendshipStatus } from 'src/modules/friendship/enums/friendship-status.enum';
+import { Friendship } from 'src/modules/friendship/schemas/friendship.schema';
 
 @Injectable()
 export class ConnectionRequestService {
@@ -24,29 +25,34 @@ export class ConnectionRequestService {
     sender: Types.ObjectId,
     receiver: Types.ObjectId,
   ): Promise<ConnectionRequest> {
-    const verifyRequest = await this.connectionRequestModel.findOne({
-      sender,
-      receiver,
+    const existingRequest = await this.connectionRequestModel.findOne({
+      $or: [
+        { sender, receiver },
+        { sender: receiver, receiver: sender },
+      ],
     });
 
-    if (verifyRequest) {
-      if (verifyRequest.status != ConnectionRequestStatus.PENDING) {
-        try {
-          verifyRequest.status = ConnectionRequestStatus.PENDING;
-          verifyRequest.updatedAt = new Date(new Date().toISOString()); // UTC ISO
-          return verifyRequest.save();
-        } catch (error) {
-          Logger.error(error);
-          throw new ConflictException();
-        }
+    if (existingRequest) {
+      if (existingRequest.status === ConnectionRequestStatus.PENDING) {
+        return existingRequest;
       }
-      return verifyRequest;
+
+      try {
+        existingRequest.sender = sender;
+        existingRequest.receiver = receiver;
+        existingRequest.status = ConnectionRequestStatus.PENDING;
+        existingRequest.updatedAt = new Date();
+        return await existingRequest.save();
+      } catch (error) {
+        Logger.error(error);
+        throw new ConflictException();
+      }
     }
 
     const createdRequest = new this.connectionRequestModel({
       sender,
       receiver,
-      createdAt: new Date().toISOString(), // created at UTC ISO
+      createdAt: new Date(),
     });
 
     return createdRequest.save();
@@ -61,7 +67,10 @@ export class ConnectionRequestService {
   async acceptConnection(
     sender: Types.ObjectId,
     receiver: Types.ObjectId,
-  ): Promise<ConnectionRequest | null> {
+  ): Promise<{
+    request: ConnectionRequest;
+    friendship: Friendship;
+  } | null> {
     try {
       const requestDb = await this.connectionRequestModel.findOneAndUpdate(
         { sender, receiver, status: ConnectionRequestStatus.PENDING },
@@ -78,9 +87,10 @@ export class ConnectionRequestService {
         status: FriendshipStatus.ALIVE,
       };
 
-      await this.friendshipService.create(friendshipPayload);
+      const friendshipDb =
+        await this.friendshipService.create(friendshipPayload);
 
-      return requestDb;
+      return { request: requestDb, friendship: friendshipDb };
     } catch (error) {
       throw error;
     }
@@ -121,11 +131,24 @@ export class ConnectionRequestService {
     return deletedRequest;
   }
 
+  findOneByUserIds = async (
+    sender: Types.ObjectId,
+    receiver: Types.ObjectId,
+  ): Promise<ConnectionRequest | null> =>
+    this.connectionRequestModel
+      .findOne({
+        $or: [
+          { sender, receiver },
+          { sender: receiver, receiver: sender },
+        ],
+      })
+      .exec();
+
   findPendingRequestsForUser = async (
     userId: Types.ObjectId,
   ): Promise<ConnectionRequest[]> =>
     this.connectionRequestModel
-      .find({ receiver: userId, status: 'pending' })
+      .find({ receiver: userId, status: ConnectionRequestStatus.PENDING })
       .populate('sender')
       .exec();
 

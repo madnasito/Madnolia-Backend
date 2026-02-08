@@ -40,24 +40,34 @@ export class MatchesGateway
   afterInit(server: any) {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handleConnection(client: any, ...args: any[]) {
-    let { token } = client.handshake.auth;
+    try {
+      let { token } = client.handshake.auth;
 
-    if (!token) token = client.handshake.headers['token'];
+      if (!token) token = client.handshake.headers['token'];
 
-    if (token === undefined || token === null || token === '') {
+      if (token === undefined || token === null || token === '') {
+        this.logger.error(
+          `Connection denied: Missing token for client ${client.id}`,
+        );
+        client.disconnect(true);
+        return;
+      }
+
+      const tokenPayload = await this.jwtService.verifyAsync(token as string);
+
+      const userMatchesIds: string[] = (
+        await this.matchesService.getActiveMatchesJoinedOrCreatedByUser(
+          tokenPayload.id,
+        )
+      ).map((match) => match.id);
+
+      userMatchesIds.forEach((id) => client.join(id));
+    } catch (error) {
+      this.logger.error(
+        `Authentication failed for client ${client.id}: ${error.stack || error.message}`,
+      );
       client.disconnect(true);
-      throw new WsException('MISSING_TOKEN');
     }
-
-    const tokenPayload = await this.jwtService.verifyAsync(token as string);
-
-    const userMatchesIds: string[] = (
-      await this.matchesService.getActiveMatchesJoinedOrCreatedByUser(
-        tokenPayload.id,
-      )
-    ).map((match) => match.id);
-
-    userMatchesIds.forEach((id) => client.join(id));
   }
 
   @UseGuards(UserSocketGuard)

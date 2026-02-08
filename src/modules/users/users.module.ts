@@ -9,6 +9,7 @@ import { Users } from './classes/user';
 import { ConnectionRequestModule } from './connection-request/connection-request.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { FriendshipModule } from '../friendship/friendship.module';
+import { FirebaseModule } from '../firebase/firebase.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { FriendshipModule } from '../friendship/friendship.module';
     ConnectionRequestModule,
     NotificationsModule,
     FriendshipModule,
+    FirebaseModule,
   ],
   controllers: [UserController],
   providers: [UsersService, UserGuard, UsersGateway, Users],

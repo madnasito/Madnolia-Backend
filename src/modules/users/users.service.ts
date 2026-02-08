@@ -35,30 +35,48 @@ export class UsersService {
   };
 
   handleUserConnection = async (userId: Types.ObjectId, fcmToken: string) => {
-    const userByFcmToken = await this.findByFcmToken(fcmToken);
+    // 1. Remove fcmToken from ANY user that has it (except potentially the current one, but easier to just pull from all to ensure uniqueness)
+    // Actually, we can just pull from everyone except the current user to avoid unnecessary writes if it's already there?
+    // No, let's pull from everyone ELSE.
+    await this.userModel.updateMany(
+      { 'devices.fcmToken': fcmToken, _id: { $ne: userId } },
+      { $pull: { devices: { fcmToken } } },
+    );
 
-    if (userByFcmToken && !userByFcmToken._id.equals(userId)) {
-      userByFcmToken.devices = userByFcmToken.devices.filter(
-        (device) => device.fcmToken !== fcmToken,
+    // 2. Try to update the device if it exists in the current user
+    const updateResult = await this.userModel.updateOne(
+      { _id: userId, 'devices.fcmToken': fcmToken },
+      {
+        $set: {
+          'devices.$.online': true,
+          'devices.$.lastActive': new Date(),
+          'devices.$.socketId': '', // Assuming socketId is reset or set elsewhere? The original code set it to '' in the push.
+        },
+      },
+    );
+
+    // 3. If the device didn't exist (matchedCount === 0), push it
+    if (updateResult.matchedCount === 0) {
+      await this.userModel.updateOne(
+        { _id: userId },
+        {
+          $push: {
+            devices: {
+              $each: [
+                {
+                  fcmToken,
+                  online: true,
+                  lastActive: new Date(),
+                  socketId: '',
+                },
+              ],
+              $sort: { lastActive: -1 },
+              $slice: 5,
+            },
+          },
+        },
       );
-      await userByFcmToken.save();
     }
-
-    const user = await this.findOneById(userId);
-
-    const device = user.devices.find((device) => device.fcmToken === fcmToken);
-
-    if (device) {
-      device.online = true;
-    } else {
-      user.devices.push({
-        fcmToken,
-        online: true,
-        lastActive: new Date(),
-        socketId: '',
-      });
-    }
-    await user.save();
   };
 
   removeFcmToken = async (token: string) => {
@@ -72,7 +90,7 @@ export class UsersService {
     userId: Types.ObjectId,
     socketId: string,
   ) => {
-    return await this.userModel.updateOne(
+    return this.userModel.updateOne(
       { _id: userId, 'devices.socketId': socketId },
       {
         $set: {
@@ -97,7 +115,10 @@ export class UsersService {
       throw new BadRequestException('USERNAME_IN_USE');
     }
 
-    const createdUser = new this.userModel(signUpDto);
+    const createdUser = new this.userModel({
+      ...signUpDto,
+      createdAt: new Date(new Date().toUTCString()),
+    });
     const saltOrRounds = 10;
     const password = signUpDto.password;
     const hash = hashSync(password, saltOrRounds);
@@ -153,7 +174,8 @@ export class UsersService {
     return user;
   };
 
-  getInfo = async (user: Types.ObjectId) => this.userModel.findOne({ _id: user, status: true });
+  getInfo = async (user: Types.ObjectId) =>
+    this.userModel.findOne({ _id: user, status: true }).lean();
 
   getUserInfo = async (
     targetUserId: Types.ObjectId,
@@ -239,7 +261,7 @@ export class UsersService {
       const emailDb = await this.findOneByEmail(updateData.email);
       if (emailDb) throw new ConflictException('EMAIL_IN_USE');
 
-      user.emailModifiedAt = new Date();
+      user.emailModifiedAt = new Date(new Date().toUTCString());
     }
     // 3. Actualizar y retornar el documento
     const updatedUser = await this.userModel
@@ -248,7 +270,7 @@ export class UsersService {
         {
           $set: {
             ...updateData,
-            modifiedAt: new Date(),
+            modifiedAt: new Date(new Date().toUTCString()),
             emailModifiedAt: user.emailModifiedAt,
           },
         },
@@ -394,14 +416,23 @@ export class UsersService {
 
     const foundUsers = await this.userModel
       .find({
-        $or: [{ username: regex }, { name: regex }],
-        $nor: [{ _id: userId }],
-        status: true,
+        $and: [
+          { $or: [{ username: regex }, { name: regex }] },
+          { $nor: [{ _id: userId }] },
+          { status: true },
+          {
+            $or: [
+              { availability: Availability.EVERYONE },
+              {
+                availability: Availability.PARTNERS,
+                _id: { $in: partners },
+              },
+            ],
+          },
+        ],
       })
       .select({ name: 1, username: 1, _id: 1, thumb: 1 })
       .lean()
-      .skip(skip)
-      .limit(limit)
       .exec();
 
     const results = foundUsers.map((foundUser) => {

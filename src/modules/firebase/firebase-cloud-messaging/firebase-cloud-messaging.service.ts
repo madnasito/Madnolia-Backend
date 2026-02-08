@@ -1,14 +1,14 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { SendNotificationDto } from '../dtos/send-notification.dto';
 import { messaging, app } from 'firebase-admin';
-import { UsersService } from 'src/modules/users/users.service';
+// import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
 export class FirebaseCloudMessagingService {
   private readonly logger = new Logger(FirebaseCloudMessagingService.name);
   constructor(
     @Inject('FIREBASE_APP') private firebaseApp: app.App,
-    private readonly usersService: UsersService,
+    // private readonly usersService: UsersService,
   ) {}
 
   async sendNotification(payload: SendNotificationDto) {
@@ -82,7 +82,7 @@ export class FirebaseCloudMessagingService {
 
             if (errorCode === 'messaging/registration-token-not-registered') {
               this.logger.warn(`Borrando token invalido: ${failedToken}`);
-              this.usersService.removeFcmToken(failedToken);
+              // this.usersService.removeFcmToken(failedToken);
             }
           }
         });

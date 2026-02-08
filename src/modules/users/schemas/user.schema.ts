@@ -67,7 +67,13 @@ export class User {
   @Prop({ default: Availability.EVERYONE, enum: Availability })
   availability: Availability;
 
-  @Prop({ default: [] })
+  @Prop({
+    default: [],
+    validate: [
+      (value: any) => value.length <= 5,
+      'List of devices must not exceed 5 items',
+    ],
+  })
   devices: UserDevice[];
 
   @Prop({ type: Date, default: new Date() })
