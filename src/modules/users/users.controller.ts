@@ -125,11 +125,6 @@ export class UserController {
       const resp = await axios.post(
         'https://beeimg.com/api/upload/file/json/',
         form,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data', // Corrected Content-Type
-          },
-        },
       );
 
       if (
@@ -154,7 +149,16 @@ export class UserController {
 
       throw new BadRequestException();
     } catch (error) {
-      Logger.error(error);
+      if (axios.isAxiosError(error)) {
+        Logger.error({
+          message: 'Error uploading user image to BeeImg',
+          status: error.response?.status,
+          data: error.response?.data,
+          error: error.message,
+        });
+      } else {
+        Logger.error(error);
+      }
       throw new BadGatewayException();
     }
   }

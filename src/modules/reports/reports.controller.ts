@@ -61,11 +61,6 @@ export class ReportsController {
       const resp = await axios.post(
         'https://beeimg.com/api/upload/file/json/',
         form,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data', // Corrected Content-Type
-          },
-        },
       );
 
       if (
@@ -83,8 +78,17 @@ export class ReportsController {
         );
       }
     } catch (error) {
-      Logger.error(error);
-      throw new error();
+      if (axios.isAxiosError(error)) {
+        Logger.error({
+          message: 'Error during image upload',
+          status: error.response?.status,
+          data: error.response?.data,
+          error: error.message,
+        });
+      } else {
+        Logger.error(error);
+      }
+      throw error;
     }
   }
 
@@ -122,11 +126,6 @@ export class ReportsController {
       const resp = await axios.post(
         'https://beeimg.com/api/upload/file/json/',
         form,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data', // Corrected Content-Type
-          },
-        },
       );
 
       Logger.log(resp.data);
@@ -146,7 +145,16 @@ export class ReportsController {
         );
       }
     } catch (error) {
-      Logger.error(error);
+      if (axios.isAxiosError(error)) {
+        Logger.error({
+          message: 'Error during image upload',
+          status: error.response?.status,
+          data: error.response?.data,
+          error: error.message,
+        });
+      } else {
+        Logger.error(error);
+      }
       throw error;
     }
   }
