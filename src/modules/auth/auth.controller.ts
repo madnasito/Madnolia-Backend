@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Get,
   Patch,
   Post,
   UseGuards,
@@ -31,7 +30,7 @@ export class AuthController {
     return await this.authService.signIn(body);
   }
 
-  @Get('recover-password-email')
+  @Post('recover-password-email')
   recoverPasswordEmail(@Body() body: EmailDto) {
     return this.authService.recoverPasswordEmail(body);
   }

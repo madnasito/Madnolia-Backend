@@ -43,7 +43,6 @@ export class ReportsController {
     )
     media: Express.Multer.File, // Make it optional if needed
   ) {
-
     if (!media) {
       throw new BadRequestException('Media file is required');
     }
@@ -51,7 +50,11 @@ export class ReportsController {
     const form = new FormData();
     const apiKey = this.config.get<string>('IMGBB_KEY');
 
-    form.append('file', new Blob([new Uint8Array(media.buffer)], { type: media.mimetype }), media.originalname);
+    form.append(
+      'file',
+      new Blob([new Uint8Array(media.buffer)], { type: media.mimetype }),
+      media.originalname,
+    );
     form.append('apikey', apiKey);
 
     try {
@@ -74,7 +77,10 @@ export class ReportsController {
           ...body,
         };
 
-        return this.reportsService.createUserReport(createReportBody, req.user.id);
+        return this.reportsService.createUserReport(
+          createReportBody,
+          req.user.id,
+        );
       }
     } catch (error) {
       Logger.error(error);
@@ -98,7 +104,6 @@ export class ReportsController {
     )
     media: Express.Multer.File, // Make it optional if needed
   ) {
-
     if (!media) {
       throw new BadRequestException('Media file is required');
     }
@@ -106,8 +111,12 @@ export class ReportsController {
     const form = new FormData();
     const apiKey = this.config.get<string>('IMGBB_KEY');
 
-    form.append('file', new Blob([new Uint8Array(media.buffer)], { type: media.mimetype }), media.originalname);
-    form.append('apikey', apiKey);  
+    form.append(
+      'file',
+      new Blob([new Uint8Array(media.buffer)], { type: media.mimetype }),
+      media.originalname,
+    );
+    form.append('apikey', apiKey);
 
     try {
       const resp = await axios.post(
@@ -129,7 +138,10 @@ export class ReportsController {
           ...body,
         };
 
-        return this.reportsService.createBugReport(createReportBody, req.user.id);
+        return this.reportsService.createBugReport(
+          createReportBody,
+          req.user.id,
+        );
       }
     } catch (error) {
       Logger.error(error);
