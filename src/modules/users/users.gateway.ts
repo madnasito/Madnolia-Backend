@@ -208,7 +208,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('request_accepted')
+  @SubscribeMessage('accept_request')
   async acceptConnection(
     @MessageBody() sender: Types.ObjectId,
     @ConnectedSocket() client: Socket,
@@ -226,7 +226,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
         connectionRequestDb.request.sender,
       );
 
-      client.emit('request_accepted', connectionRequestDb.request);
+      client.emit('request_accepted', connectionRequestDb);
 
       const senderUserSockets = this.users.getUserSocketsById(sender);
 
@@ -263,7 +263,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
 
       client.join(connectionRequestDb.request._id.toString());
-      return connectionRequestDb;
+      // return connectionRequestDb;
     } catch (error) {
       Logger.error(error);
       throw new WsException('NOT_FOUND_REQUEST_CONNECTION');
