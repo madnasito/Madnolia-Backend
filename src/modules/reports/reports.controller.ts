@@ -129,6 +129,8 @@ export class ReportsController {
         },
       );
 
+      Logger.log(resp.data);
+
       if (
         resp.data.files.status === 'Success' ||
         resp.data.files.status === 'Duplicate'
@@ -145,7 +147,7 @@ export class ReportsController {
       }
     } catch (error) {
       Logger.error(error);
-      throw new error();
+      throw error;
     }
   }
 }
