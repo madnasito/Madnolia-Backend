@@ -344,4 +344,36 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async logoutDevice(@ConnectedSocket() client: Socket) {
     this.users.logoutDevice(client.id);
   }
+
+  @UseGuards(UserSocketGuard)
+  @SubscribeMessage('read_all_notifications')
+  async readAllNotifications(
+    @Request() request: any,
+    @ConnectedSocket() client: Socket,
+  ): Promise<void> {
+    try {
+      this.logger.debug(`Reading all notifications for user ${request.user}`);
+      await this.notificationsService.readAllUserNotifications(request.user);
+
+      client.emit('notifications_read');
+
+      const userSockets = this.users.getUserSocketsById(request.user);
+
+      userSockets.forEach((socketId) => {
+        if (socketId !== client.id) {
+          client.to(socketId).emit('notifications_read');
+        }
+      });
+    } catch (error) {
+      this.logger.error(
+        `Error reading all notifications for user ${request.user}:`,
+        error,
+      );
+      throw new WsException(
+        error instanceof Error
+          ? error.message
+          : 'Failed to read all notifications',
+      );
+    }
+  }
 }
