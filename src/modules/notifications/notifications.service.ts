@@ -53,7 +53,7 @@ export class NotificationsService {
       }
       query._id = { $lt: cursor };
     }
-    await this.readAllUserNotifications(user);
+
     return this.notificationModel.find(query, {}, { sort: { _id: -1 }, limit });
   };
 
