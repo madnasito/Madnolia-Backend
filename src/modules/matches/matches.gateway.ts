@@ -198,8 +198,8 @@ export class MatchesGateway
         };
 
         // Event to hoster
-        this.logger.debug(`Looking for hoster with ID: ${match.user}`);
-        this.logger.debug(
+        this.logger.log(`Looking for hoster with ID: ${match.user}`);
+        this.logger.log(
           `Connected users: ${this.users
             .getUsers()
             .map((u) => u._id)
@@ -207,15 +207,15 @@ export class MatchesGateway
         );
 
         const hoster = this.users.getUserSocketsById(match.user);
-        this.logger.debug(`Hoster sockets found: ${hoster.length}`);
+        this.logger.log(`Hoster sockets found: ${hoster.length}`);
 
         let usersSockets: string[] = this.users.getUsersSockets(match.joined);
         this.logger.debug(`Joined users sockets found: ${usersSockets.length}`);
 
         usersSockets = usersSockets.concat(hoster);
 
-        Logger.debug(hoster);
-        Logger.debug(usersSockets);
+        this.logger.log(hoster);
+        this.logger.log(usersSockets);
 
         usersSockets.forEach((socketId) =>
           this.io.to(socketId).emit('match_ready', payload),
@@ -228,11 +228,11 @@ export class MatchesGateway
         const fcmTokens =
           this.users.getUsersFcmTokensWithoutSocketById(userIds);
 
-        Logger.debug(fcmTokens);
+        this.logger.log(fcmTokens);
 
         try {
           if (fcmTokens.length > 0) {
-            this.logger.debug('Push notification of match ready');
+            this.logger.log('Push notification of match ready');
 
             const notificationPayload: SendNotificationDto = {
               title: match.title,
