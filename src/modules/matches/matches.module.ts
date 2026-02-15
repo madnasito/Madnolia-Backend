@@ -11,6 +11,7 @@ import { PlatformsModule } from '../platforms/platforms.module';
 import { FirebaseModule } from '../firebase/firebase.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ConfigService } from '@nestjs/config';
         };
       },
     }),
+    ScheduleModule.forRoot(),
   ],
   providers: [MatchesService, MatchesGateway],
   controllers: [MatchesController],
