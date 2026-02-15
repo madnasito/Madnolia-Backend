@@ -37,7 +37,9 @@ export class MatchesGateway
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handleDisconnect(client: any) {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  afterInit(server: any) {}
+  afterInit(server: any) {
+    this.logger.log('MatchesGateway initialized');
+  }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handleConnection(client: any, ...args: any[]) {
     try {
@@ -188,8 +190,6 @@ export class MatchesGateway
   @Cron(CronExpression.EVERY_MINUTE)
   async handleCron() {
     try {
-      this.logger.log('🚀 CRON JOB INICIADO');
-      this.logger.log(`Timestamp: ${new Date().toISOString()}`);
       const matches: any = await this.matchesService.updatePastTimeMatches();
 
       matches.forEach((match: MatchDto) => {
@@ -199,8 +199,8 @@ export class MatchesGateway
         };
 
         // Event to hoster
-        this.logger.log(`Looking for hoster with ID: ${match.user}`);
-        this.logger.log(
+        this.logger.debug(`Looking for hoster with ID: ${match.user}`);
+        this.logger.debug(
           `Connected users: ${this.users
             .getUsers()
             .map((u) => u._id)
@@ -208,15 +208,15 @@ export class MatchesGateway
         );
 
         const hoster = this.users.getUserSocketsById(match.user);
-        this.logger.log(`Hoster sockets found: ${hoster.length}`);
+        this.logger.debug(`Hoster sockets found: ${hoster.length}`);
 
         let usersSockets: string[] = this.users.getUsersSockets(match.joined);
         this.logger.debug(`Joined users sockets found: ${usersSockets.length}`);
 
         usersSockets = usersSockets.concat(hoster);
 
-        this.logger.log(hoster);
-        this.logger.log(usersSockets);
+        this.logger.debug(hoster);
+        this.logger.debug(usersSockets);
 
         usersSockets.forEach((socketId) =>
           this.io.to(socketId).emit('match_ready', payload),
@@ -229,11 +229,11 @@ export class MatchesGateway
         const fcmTokens =
           this.users.getUsersFcmTokensWithoutSocketById(userIds);
 
-        this.logger.log(fcmTokens);
+        this.logger.debug(fcmTokens);
 
         try {
           if (fcmTokens.length > 0) {
-            this.logger.log('Push notification of match ready');
+            this.logger.debug('Push notification of match ready');
 
             const notificationPayload: SendNotificationDto = {
               title: match.title,
