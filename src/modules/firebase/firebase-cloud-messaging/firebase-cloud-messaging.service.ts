@@ -75,15 +75,15 @@ export class FirebaseCloudMessagingService {
         response.responses.forEach((resp, idx) => {
           if (!resp.success) {
             const failedToken = payload.tokens[idx];
-            const errorCode = resp.error?.code;
+            // const errorCode = resp.error?.code;
             this.logger.error(
               `Token falló ${failedToken}: ${resp.error?.message}`,
             );
 
-            if (errorCode === 'messaging/registration-token-not-registered') {
-              this.logger.warn(`Borrando token invalido: ${failedToken}`);
-              // this.usersService.removeFcmToken(failedToken);
-            }
+            // if (errorCode === 'messaging/registration-token-not-registered') {
+            //   this.logger.error(`Borrando token invalido: ${failedToken}`);
+            //   // this.usersService.removeFcmToken(failedToken);
+            // }
           }
         });
       }
@@ -105,7 +105,7 @@ export class FirebaseCloudMessagingService {
       ); // dry run
       return true;
     } catch (error) {
-      this.logger.warn(`Invalid token: ${error.message}`);
+      this.logger.error(`Invalid token: ${error.message}`);
       return false;
     }
   }

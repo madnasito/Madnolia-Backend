@@ -272,7 +272,7 @@ export class MatchesGateway
         // });
       });
     } catch (error) {
-      this.logger.debug(error);
+      this.logger.error(error);
       throw new WsException(error);
     }
   }
