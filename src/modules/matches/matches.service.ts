@@ -48,7 +48,7 @@ export class MatchesService {
     );
 
     const newMatch: NewMatchDto = {
-      date: createMatchDto.date,
+      date: new Date(createMatchDto.date.toUTCString()),
       game: gameData._id,
       inviteds: createMatchDto.inviteds,
       platform: createMatchDto.platform,
