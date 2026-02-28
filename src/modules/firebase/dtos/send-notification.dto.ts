@@ -3,7 +3,7 @@ import { IsArray, IsJSON, IsOptional, IsString, IsUrl } from 'class-validator';
 export class SendNotificationDto {
   @IsOptional()
   @IsArray()
-  tokens?: string[];
+  tokens: string[];
 
   @IsOptional()
   @IsString()

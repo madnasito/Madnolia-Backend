@@ -94,6 +94,8 @@ export class Users {
   getUserFcmTokensById(id: Types.ObjectId) {
     const user = this.getUserById(id);
 
+    if (!user) return [];
+
     return user.devices.map((device) => device.fcmToken);
   }
 
@@ -123,6 +125,8 @@ export class Users {
   logoutDevice = (socketId: string) => {
     const user = this.getUserBySocketId(socketId);
 
+    if (!user) return;
+
     user.devices = user.devices.filter((device) => device.socketId != socketId);
 
     if (user.devices.length == 0) this.deleteUser(user._id);
@@ -135,6 +139,8 @@ export class Users {
     }
 
     const device = user.devices.find((device) => device.socketId == socketId);
+
+    if (!device) return;
 
     device.socketId = '';
 

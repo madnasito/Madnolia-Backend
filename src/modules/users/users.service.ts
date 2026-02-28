@@ -322,7 +322,9 @@ export class UsersService {
 
     const partners = (
       await this.frienshipService.findFriendshipsByUser(userId)
-    ).map((e: Friendship) => (e.user1 != userInfo.id ? e.user1 : e.user2));
+    ).map((e: Friendship) =>
+      e.user1.toString() != userInfo.id ? e.user1 : e.user2,
+    );
 
     const userRequests =
       await this.connectionRequestService.findRequestsByUser(userId);
@@ -407,7 +409,9 @@ export class UsersService {
 
     const partners = (
       await this.frienshipService.findFriendshipsByUser(userId)
-    ).map((e: Friendship) => (e.user1 != userInfo.id ? e.user1 : e.user2));
+    ).map((e: Friendship) =>
+      e.user1.toString() != userInfo.id ? e.user1 : e.user2,
+    );
 
     const userRequests =
       await this.connectionRequestService.findRequestsByUser(userId);
@@ -522,7 +526,7 @@ export class UsersService {
       if (!friendshipDb) throw new NotFoundException('FRIENDSHIP_NOT_FOUND');
 
       return this.frienshipService.updateStatusById(
-        friendshipDb.id,
+        friendshipDb._id,
         FriendshipStatus.BROKE,
       );
     } catch (error) {

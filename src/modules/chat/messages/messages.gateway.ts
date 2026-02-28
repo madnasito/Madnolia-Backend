@@ -74,10 +74,16 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
 
   @UseGuards(UserSocketGuard)
   @SubscribeMessage('init_chat')
-  handleEvent(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
+  async handleEvent(
+    @MessageBody() data: string,
+    @ConnectedSocket() client: Socket,
+  ) {
     try {
-      this.users.getUserBySocketId(client.id).room = data;
-      client.join(data);
+      const user = this.users.getUserBySocketId(client.id);
+      if (user) {
+        user.room = data;
+      }
+      await client.join(data);
       return true;
     } catch (error) {
       throw new WsException(error);
@@ -108,9 +114,17 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
           (message) => message.user != request.user,
         );
 
+        if (!data) throw new WsException('NO_MESSAGE');
+
         const creator = this.users.getUserById(data.creator);
 
+        if (!creator) throw new WsException('NO_MESSAGE');
+
+        if (!data.user) throw new WsException('NO_MESSAGE');
+
         const userData = this.users.getUserById(data.user);
+
+        if (!userData) throw new WsException('NO_MESSAGE');
 
         if (userData) {
           try {
@@ -130,7 +144,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
                 },
                 tokens: userFcms,
               };
-              this.firebaseCloudMessagingService.sendToMultipleTokens(
+              await this.firebaseCloudMessagingService.sendToMultipleTokens(
                 notificationPayload,
               );
             }
@@ -172,7 +186,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
             },
             tokens: fcmTokens,
           };
-          this.firebaseCloudMessagingService.sendToMultipleTokens(
+          await this.firebaseCloudMessagingService.sendToMultipleTokens(
             notificationPayload,
           );
         }
@@ -241,7 +255,10 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
   handleDisconnectChat(@ConnectedSocket() client: Socket) {
     try {
       this.logger.debug(`Leaved the room: ${client.id}`);
-      this.users.getUserBySocketId(client.id).room = '';
+      const user = this.users.getUserBySocketId(client.id);
+      if (user) {
+        user.room = '';
+      }
       return true;
     } catch (error) {
       Logger.error(error);

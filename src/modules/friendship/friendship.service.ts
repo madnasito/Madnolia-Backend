@@ -17,8 +17,17 @@ export class FriendshipService {
       payload.user2,
     );
 
-    if (friendshipDB != null)
-      return this.updateStatusById(friendshipDB.id, FriendshipStatus.ALIVE);
+    if (friendshipDB != null) {
+      if (friendshipDB.status === FriendshipStatus.ALIVE) return friendshipDB;
+      const updatedFriendship = await this.updateStatusById(
+        friendshipDB._id,
+        FriendshipStatus.ALIVE,
+      );
+      if (!updatedFriendship) {
+        throw new Error('Friendship not found during update');
+      }
+      return updatedFriendship;
+    }
 
     const createFrindship = new this.friendshipModel(payload);
 

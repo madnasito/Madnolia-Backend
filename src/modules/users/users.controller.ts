@@ -16,6 +16,7 @@ import {
   BadRequestException,
   BadGatewayException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserGuard } from 'src/common/guards/user.guard';
@@ -132,6 +133,9 @@ export class UserController {
         resp.data.files.status === 'Duplicate'
       ) {
         const currentUser = await this.usersService.getInfo(req.user.id);
+
+        if (!currentUser) throw new NotFoundException('USER_NOT_FOUND');
+
         await this.usersService.update(req.user.id, {
           name: currentUser.name,
           username: currentUser.username,

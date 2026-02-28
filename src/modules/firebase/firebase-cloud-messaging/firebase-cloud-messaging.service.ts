@@ -11,28 +11,6 @@ export class FirebaseCloudMessagingService {
     // private readonly usersService: UsersService,
   ) {}
 
-  async sendNotification(payload: SendNotificationDto) {
-    try {
-      if (!this.firebaseApp) throw new Error('FIREBASE_NOT_INITIALIZED');
-
-      const message: messaging.Message = {
-        notification: {
-          title: payload.title,
-          body: payload.body,
-          imageUrl: payload.imageUrl,
-        },
-        data: payload.data,
-        token: payload.token, // Add this line to specify the target device
-      };
-
-      const response = await this.firebaseApp.messaging().send(message);
-      return response;
-    } catch (error) {
-      this.logger.error('Error sending notification', error);
-      throw new Error('FCM_ERROR');
-    }
-  }
-
   async sendToMultipleTokens(payload: SendNotificationDto) {
     try {
       if (!this.firebaseApp) throw new Error('FIREBASE_NOT_INITIALIZED');

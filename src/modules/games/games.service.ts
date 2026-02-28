@@ -51,13 +51,18 @@ export class GamesService {
     return await createdGame.save();
   };
 
-  findByRawId = async (gameId: number): Promise<any> =>
+  findByRawId = async (gameId: number): Promise<Game | null> =>
     await this.gameModel.findOne({ gameId });
 
-  findBySlug = async (slug: string): Promise<Game> =>
-    await this.gameModel.findOne({ slug });
+  findBySlug = async (slug: string): Promise<Game> => {
+    const game = await this.gameModel.findOne({ slug });
 
-  async findById(gameId: string): Promise<any> {
+    if (!game) throw new NotFoundException('GAME_NOT_FOUND');
+
+    return game;
+  };
+
+  async findById(gameId: string): Promise<Game> {
     const gameDb = await this.gameModel.findById(gameId);
 
     if (!gameDb) throw new NotFoundException();
@@ -85,6 +90,8 @@ export class GamesService {
   searchGames = async (payload: SearchGamesDto) => {
     try {
       const apiKey = this.config.get<string>('RAWG_API_KEY');
+
+      if (!apiKey) throw new Error('RAWG_API_KEY_NOT_FOUND');
 
       payload.key = apiKey;
 
