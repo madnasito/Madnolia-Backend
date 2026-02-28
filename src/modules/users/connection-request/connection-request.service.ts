@@ -70,30 +70,31 @@ export class ConnectionRequestService {
   ): Promise<{
     request: ConnectionRequest;
     friendship: Friendship;
-  } | null> {
-    try {
-      const requestDb = await this.connectionRequestModel.findOneAndUpdate(
-        { sender, receiver, status: ConnectionRequestStatus.PENDING },
-        {
-          status: ConnectionRequestStatus.ACCEPTED,
-          updatedAt: new Date(new Date().toISOString()),
-        },
-        { new: true },
+  }> {
+    const requestDb = await this.connectionRequestModel.findOneAndUpdate(
+      { sender, receiver, status: ConnectionRequestStatus.PENDING },
+      {
+        status: ConnectionRequestStatus.ACCEPTED,
+        updatedAt: new Date(new Date().toISOString()),
+      },
+      { new: true },
+    );
+
+    if (!requestDb) {
+      throw new NotFoundException(
+        `Connection request from ${sender} to ${receiver} not found`,
       );
-
-      const friendshipPayload: CreateFriendshipDto = {
-        user1: sender,
-        user2: receiver,
-        status: FriendshipStatus.ALIVE,
-      };
-
-      const friendshipDb =
-        await this.friendshipService.create(friendshipPayload);
-
-      return { request: requestDb, friendship: friendshipDb };
-    } catch (error) {
-      throw error;
     }
+
+    const friendshipPayload: CreateFriendshipDto = {
+      user1: sender,
+      user2: receiver,
+      status: FriendshipStatus.ALIVE,
+    };
+
+    const friendshipDb = await this.friendshipService.create(friendshipPayload);
+
+    return { request: requestDb, friendship: friendshipDb };
   }
 
   async rejectConnection(

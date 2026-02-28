@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Message } from './schemas/messages.schema';
-import mongoose, { ClientSession, Model, Types } from 'mongoose';
+import * as mongoose from 'mongoose';
 import { MessageDto } from './dtos/message.dto';
 import { MessageType } from './enums/message-type.enum';
 import { FriendshipService } from 'src/modules/friendship/friendship.service';
@@ -29,9 +29,9 @@ import { SyncMessagesDto } from './dtos/sync-messages.dto';
 export class MessagesService {
   constructor(
     @InjectConnection() private readonly connection: mongoose.Connection,
-    @InjectModel(Message.name) private messageModel: Model<Message>,
+    @InjectModel(Message.name) private messageModel: mongoose.Model<Message>,
     @InjectModel(MessageRecipient.name)
-    private messageRecipientModel: Model<MessageRecipient>,
+    private messageRecipientModel: mongoose.Model<MessageRecipient>,
     private readonly friendshipService: FriendshipService,
     private readonly matchesService: MatchesService,
     private readonly firebaseCloudMessagingService: FirebaseCloudMessagingService,
@@ -47,7 +47,7 @@ export class MessagesService {
         session,
       );
       const createdRecipients = await this.createMessageRecipient(
-        createdMessage.id,
+        createdMessage._id,
         createMessageDto.conversation,
         session,
       );
@@ -81,10 +81,10 @@ export class MessagesService {
 
   async createMessage(
     @MessageBody() createMessageDto: MessageDto,
-    session: ClientSession,
+    session: mongoose.ClientSession,
   ) {
     switch (createMessageDto.type) {
-      case MessageType.USER:
+      case MessageType.USER: {
         const friendshipDB = await this.friendshipService.fincFriendshipById(
           createMessageDto.conversation,
         );
@@ -97,7 +97,8 @@ export class MessagesService {
         )
           throw new UnauthorizedException();
         break;
-      case MessageType.MATCH:
+      }
+      case MessageType.MATCH: {
         const matchDb = await this.matchesService.verifyUserInMatch(
           createMessageDto.conversation,
           createMessageDto.creator,
@@ -105,7 +106,7 @@ export class MessagesService {
 
         if (!matchDb) throw new NotFoundException();
         break;
-
+      }
       default:
         throw new UnauthorizedException();
     }
@@ -119,18 +120,22 @@ export class MessagesService {
   }
 
   async createMessageRecipient(
-    messageId: Types.ObjectId,
-    conversationId: Types.ObjectId,
-    session: ClientSession,
+    messageId: mongoose.Types.ObjectId,
+    conversationId: mongoose.Types.ObjectId,
+    session: mongoose.ClientSession,
   ): Promise<MessageRecipient[]> {
     const messageDb = await this.messageModel
       .findById(messageId)
       .session(session);
 
+    if (!messageDb) throw new NotFoundException();
+
     switch (messageDb.type) {
-      case MessageType.USER:
+      case MessageType.USER: {
         const friendship =
           await this.friendshipService.fincFriendshipById(conversationId);
+
+        if (!friendship) throw new NotFoundException();
 
         const recipient1 = new this.messageRecipientModel({
           conversation: conversationId,
@@ -149,8 +154,8 @@ export class MessagesService {
         await recipient2.save({ session });
 
         return [recipient1, recipient2];
-
-      case MessageType.MATCH:
+      }
+      case MessageType.MATCH: {
         const newRecipient = new this.messageRecipientModel({
           conversation: conversationId,
           message: messageId,
@@ -158,7 +163,7 @@ export class MessagesService {
         });
         await newRecipient.save({ session });
         return [newRecipient];
-
+      }
       default:
         throw new Error('INVALID_MESSAGE_TYPE');
     }
@@ -167,7 +172,7 @@ export class MessagesService {
   async getRoomMessages(
     room: string,
     cursor: string | null,
-    user: Types.ObjectId = null,
+    user: mongoose.Types.ObjectId | null = null,
   ): Promise<MessageRecipientDTO[]> {
     const limit = 30;
     const query: any = {
@@ -194,7 +199,7 @@ export class MessagesService {
 
     const messages = recipients.map((recipient) => {
       const messageMapped: MessageRecipientDTO = {
-        id: recipient.id,
+        id: recipient._id,
         status: recipient.status,
         conversation: recipient.conversation,
         content: recipient.message.content,
@@ -209,7 +214,7 @@ export class MessagesService {
     return messages;
   }
 
-  async getUserChats(userId: Types.ObjectId, skip = 0) {
+  async getUserChats(userId: mongoose.Types.ObjectId, skip = 0) {
     try {
       // 1. Obtener todas las amistades del usuario
       const friendships =
@@ -218,7 +223,7 @@ export class MessagesService {
 
       // 2. Preparar IDs de conversaciones
       const conversationsIds = friendships.map(
-        (f) => new Types.ObjectId(f._id || f.id),
+        (f) => new mongoose.Types.ObjectId(f._id || f.id),
       );
 
       // 3. Agregación optimizada
@@ -305,7 +310,7 @@ export class MessagesService {
   }
 
   async getUserChatMessages(
-    user: Types.ObjectId,
+    user: mongoose.Types.ObjectId,
     conversation: string,
     cursor: string | null,
   ) {
@@ -320,7 +325,7 @@ export class MessagesService {
   }
 
   updateRecipientStatus = async (
-    user: Types.ObjectId,
+    user: mongoose.Types.ObjectId,
     body: UpdateRecipientStatusDTO,
   ) => {
     const recipientMessage = await this.messageRecipientModel.findOne({
@@ -360,19 +365,22 @@ export class MessagesService {
     return this.messageModel.findByIdAndUpdate(id, { text }, { new: true });
   }
 
-  delete(id: Types.ObjectId) {
+  delete(id: mongoose.Types.ObjectId) {
     return this.messageRecipientModel.findByIdAndUpdate(id, {
       status: MessageStatus.DELETED,
     });
   }
 
-  deleteAllUserMessages = (user: Types.ObjectId) =>
+  deleteAllUserMessages = (user: mongoose.Types.ObjectId) =>
     this.messageModel.deleteMany({ user });
 
-  deleteAllUserMessagesRecipients = (user: Types.ObjectId) =>
+  deleteAllUserMessagesRecipients = (user: mongoose.Types.ObjectId) =>
     this.messageRecipientModel.deleteMany({ user });
 
-  async syncMessages(userId: Types.ObjectId, syncMessagesDto: SyncMessagesDto) {
+  async syncMessages(
+    userId: mongoose.Types.ObjectId,
+    syncMessagesDto: SyncMessagesDto,
+  ) {
     const { date, limit = 50, skip = 0 } = syncMessagesDto;
     const fromDate = new Date(date);
 
@@ -385,7 +393,7 @@ export class MessagesService {
     const userMatches = await this.matchesService.getAllPlayerMatches(
       userId,
       filter,
-      null,
+      undefined,
     );
 
     const matchIds = userMatches.map((m) => m._id);

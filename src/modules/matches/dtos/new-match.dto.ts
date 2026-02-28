@@ -23,13 +23,13 @@ export class NewMatchDto {
   @IsNotEmpty()
   @IsDefined()
   @IsMongoId()
-  user: string;
+  user: Types.ObjectId;
 
   @IsInt()
   platform: number;
 
   @IsMongoId()
-  game: string;
+  game: Types.ObjectId;
 
   @IsDate()
   @MinDate(new Date())
@@ -45,11 +45,11 @@ export class NewMatchDto {
 
   @IsString()
   @IsOptional()
-  tournament: string;
+  tournament: string | null;
 
   @IsOptional()
   @IsMongoId()
-  group: string;
+  group: string | null;
 
   @IsDate()
   createdAt: Date;

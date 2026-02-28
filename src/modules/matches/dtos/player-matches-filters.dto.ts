@@ -5,7 +5,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { SortOrder } from 'mongoose';
+import * as mongoose from 'mongoose';
 import { Platform } from 'src/common/enums/platforms.enum';
 import { MatchStatus } from '../enums/status.enum';
 import { MatchesSortBy } from '../enums/matches-sort.enum';
@@ -22,7 +22,7 @@ export class PlayerMatchesFiltersDto {
   type: MatchesTypeFilter;
 
   @IsNotEmpty()
-  sort: SortOrder;
+  sort: mongoose.SortOrder;
 
   @IsOptional()
   @IsString()

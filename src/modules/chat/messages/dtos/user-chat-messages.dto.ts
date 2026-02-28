@@ -6,5 +6,5 @@ export class UserChatDto {
 
   @IsOptional()
   @IsMongoId()
-  cursor?: string;
+  cursor: string | null;
 }

@@ -42,7 +42,7 @@ export class MatchesService {
     private readonly users: Users,
   ) {}
 
-  create = async (createMatchDto: CreateMatchDto, user: string) => {
+  create = async (createMatchDto: CreateMatchDto, user: Types.ObjectId) => {
     const gameData: GameInterface = await this.gamesService.getGame(
       createMatchDto.game,
     );
@@ -102,11 +102,39 @@ export class MatchesService {
   getMatchWithGame = async (id: string): Promise<MatchWithGame> => {
     if (!Types.ObjectId.isValid(id))
       throw new ConflictException('NO_GAME_FOUND');
-    return this.matchModel.findOne(
+    const match = await this.matchModel.findOne(
       { _id: id },
       {},
       { populate: { path: 'game' } },
     );
+
+    if (!match) throw new NotFoundException('NO_MATCH_FOUND');
+
+    const gameDoc = match.game as any;
+
+    const matchWithGame: MatchWithGame = {
+      _id: match._id,
+      title: match.title,
+      description: match.description,
+      user: match.user,
+      platform: match.platform,
+      game: {
+        _id: gameDoc._id,
+        name: gameDoc.name,
+        background: gameDoc.background,
+        gameId: gameDoc.gameId,
+        slug: gameDoc.slug,
+        platforms: gameDoc.platforms,
+        screenshots: gameDoc.screenshots,
+        description: gameDoc.description,
+      } as any,
+      date: match.date,
+      inviteds: match.inviteds,
+      joined: match.joined,
+      tournament: match.tournament,
+    };
+
+    return matchWithGame;
   };
 
   getFullMatch = async (id: string) => {
@@ -207,6 +235,8 @@ export class MatchesService {
   getPlayersInMatch = async (id: Types.ObjectId): Promise<Types.ObjectId[]> => {
     const match = await this.getMatch(id);
 
+    if (!match) throw new NotFoundException('NO_MATCH_FOUND');
+
     const players = match.joined;
 
     players.push(match.user);
@@ -231,7 +261,7 @@ export class MatchesService {
       filters.push({ status: { $in: payload.status } });
     }
 
-    const sortField: string = payload.sortBy;
+    const sortField: any = payload.sortBy;
     const sortOrderVal = payload.sort === 'asc' ? 1 : -1;
     const sort: any = { [sortField]: sortOrderVal };
     if (sortField !== '_id') {
@@ -550,7 +580,7 @@ export class MatchesService {
   async recommendGamesForPlatform(
     user: string,
     platform: Platform,
-  ): Promise<GameInterface[] | unknown> {
+  ): Promise<GameInterface[]> {
     const recentGames = await this.getLatestGamesByUserAndPlatform(
       user,
       platform,
@@ -631,6 +661,7 @@ export class MatchesService {
     } catch (error) {
       Logger.error(error);
     } finally {
+      /* empty */
     }
   };
 

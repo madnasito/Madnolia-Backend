@@ -252,6 +252,8 @@ export class UsersService {
   async update(userId: string, updateData: UpdateUserDto): Promise<User> {
     const user = await this.userModel.findById(userId);
 
+    if (!user) throw new NotFoundException('USER_NOT_FOUND');
+
     if (user.email != updateData.email && updateData.email) {
       const dateLimit = new Date();
       dateLimit.setDate(dateLimit.getDate() - 15); // Restar 15 días
@@ -315,6 +317,8 @@ export class UsersService {
     const skip = (page - 1) * limit;
 
     const userInfo = await this.userModel.findOne({ _id: userId });
+
+    if (!userInfo) throw new NotFoundException('USER_NOT_FOUND');
 
     const partners = (
       await this.frienshipService.findFriendshipsByUser(userId)
@@ -398,6 +402,8 @@ export class UsersService {
     const skip = (page - 1) * limit;
 
     const userInfo = await this.userModel.findOne({ _id: userId });
+
+    if (!userInfo) throw new NotFoundException('USER_NOT_FOUND');
 
     const partners = (
       await this.frienshipService.findFriendshipsByUser(userId)
@@ -512,6 +518,8 @@ export class UsersService {
         user,
         partner,
       );
+
+      if (!friendshipDb) throw new NotFoundException('FRIENDSHIP_NOT_FOUND');
 
       return this.frienshipService.updateStatusById(
         friendshipDb.id,

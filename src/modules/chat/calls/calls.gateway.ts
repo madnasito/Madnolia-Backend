@@ -21,11 +21,13 @@ export class CallsGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('join_call_room')
-  handleJoinRoom(client: Socket, payload: { callRoom: string }) {
+  async handleJoinRoom(client: Socket, payload: { callRoom: string }) {
     try {
-      client.join(payload.callRoom);
+      await client.join(payload.callRoom);
       this.addUserToRoom(payload.callRoom, client.id);
       const user = this.users.getUserBySocketId(client.id);
+
+      if (!user) throw new Error('User not found');
       Logger.debug(`Client ${user.username} joined room ${payload.callRoom}`);
     } catch (error) {
       Logger.error('Error joining call room', error);
@@ -34,10 +36,18 @@ export class CallsGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('leave_call_room')
-  handleLeaveRoom(client: Socket, roomId: string) {
-    client.leave(roomId);
-    this.removeUserFromRoom(roomId, client.id);
-    console.log(`Client ${client.id} left room ${roomId}`);
+  async handleLeaveRoom(client: Socket, roomId: string) {
+    try {
+      await client.leave(roomId);
+      this.removeUserFromRoom(roomId, client.id);
+      const user = this.users.getUserBySocketId(client.id);
+
+      if (!user) throw new Error('User not found');
+      Logger.debug(`Client ${user.username} left room ${roomId}`);
+    } catch (error) {
+      Logger.error('Error leaving call room', error);
+      throw error;
+    }
   }
 
   @SubscribeMessage('make_room_call')
@@ -96,6 +106,8 @@ export class CallsGateway implements OnGatewayConnection {
     const { callee_id, sdp_offer } = data;
 
     const user = this.users.getUserByUsername(callee_id);
+
+    if (!user) throw new Error('User not found');
 
     user.devices.forEach((device) => {
       this.server.to(device.socketId).emit('new_call', {

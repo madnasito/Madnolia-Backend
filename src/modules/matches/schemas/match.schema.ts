@@ -3,6 +3,7 @@ import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { Group } from 'src/modules/groups/schema/group.schema';
 import { MatchStatus } from '../enums/status.enum';
 import { Platform } from 'src/common/enums/platforms.enum';
+import { Game } from 'src/modules/games/schemas/game.schema';
 
 export type MatchDocument = HydratedDocument<Match>;
 
@@ -13,7 +14,7 @@ export class Match {
     ref: 'Game',
     required: true,
   })
-  game: Types.ObjectId;
+  game: Types.ObjectId | Game;
 
   @Prop({
     required: true,

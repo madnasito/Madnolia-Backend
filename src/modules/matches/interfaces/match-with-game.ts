@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 import { GameInterface } from './game.interface';
 import { Platform } from 'src/common/enums/platforms.enum';
 
-export class MatchWithGame {
+export interface MatchWithGame {
   _id: Types.ObjectId;
 
   title: string;

@@ -1,10 +1,13 @@
+import { Types } from 'mongoose';
+import { Platform } from 'src/common/enums/platforms.enum';
+
 export interface GameInterface {
-  _id: string;
+  _id: Types.ObjectId;
   name: string;
   slug: string;
   gameId: number;
-  platforms: [];
+  platforms: Platform[];
   background: string;
-  screenshots: [];
+  screenshots: string[];
   description: string;
 }
