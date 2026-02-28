@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Group } from './schema/group.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateGroupDto } from './dtos/create-group.dto';
 import { JoinRequestApproval } from './enums/join-request-approval.enum';
 import { UserGroupDto } from './dtos/user-group.dto';
@@ -31,7 +31,9 @@ export class GroupsService {
   }
 
   getGroupInfo = async (id: string) => {
-    const group = await this.groupModel.findOne({ _id: id });
+    const group = await this.groupModel.findOne({
+      _id: new Types.ObjectId(id),
+    } as any);
 
     if (!group) throw new NotFoundException('NO_GROUP');
 
@@ -39,16 +41,20 @@ export class GroupsService {
   };
 
   update = async (user: string, body: UpdateGroupDto) => {
-    const groupDb = await this.groupModel.findOne({ _id: body.id });
+    const groupDb = await this.groupModel.findOne({
+      _id: new Types.ObjectId(body.id),
+    } as any);
 
     if (!groupDb) throw new NotFoundException('NO_GROUP');
 
-    if (groupDb.admin.toString() != user) throw new UnauthorizedException();
+    if ((groupDb.admin as any).toString() != user) {
+      throw new UnauthorizedException();
+    }
 
     return this.groupModel.findOneAndUpdate(
       {
-        _id: body.id,
-      },
+        _id: new Types.ObjectId(body.id),
+      } as any,
       { ...body, modifiedAt: new Date() },
       { new: true },
     );
@@ -56,11 +62,11 @@ export class GroupsService {
 
   addMember = async (userGroupDto: UserGroupDto, member: string) => {
     const groupDb = await this.groupModel.findOne({
-      _id: userGroupDto.group,
+      _id: new Types.ObjectId(userGroupDto.group),
       $or: [{ admin: member }, { members: member }],
       members: { $ne: userGroupDto.user },
       banned: { $ne: userGroupDto.user },
-    });
+    } as any);
 
     if (!groupDb) throw new NotFoundException('GROUP_NOT_FOUND');
 
@@ -68,18 +74,18 @@ export class GroupsService {
 
     if (
       groupDb.joinRequestApproval == JoinRequestApproval.ADMIN &&
-      groupDb.admin.toString() != member
+      (groupDb.admin as any).toString() != member
     ) {
       throw new UnauthorizedException('UNAUTHORIZED');
     }
 
     if (
-      groupDb.admin.toString() == member ||
+      (groupDb.admin as any).toString() == member ||
       groupDb.joinRequestApproval == JoinRequestApproval.MEMBERS ||
       groupDb.joinRequestApproval == JoinRequestApproval.NO
     ) {
       return this.groupModel.findOneAndUpdate(
-        { _id: userGroupDto.group },
+        { _id: new Types.ObjectId(userGroupDto.group) } as any,
         {
           $push: { members: userGroupDto.user },
           $pull: { requests: userGroupDto.user },
@@ -91,16 +97,22 @@ export class GroupsService {
 
   deleteMember = async (userGroupDto: UserGroupDto, admin: string) => {
     const groupDb = await this.groupModel.findOne({
-      _id: userGroupDto.group,
+      _id: new Types.ObjectId(userGroupDto.group),
       members: userGroupDto.user,
-    });
+    } as any);
 
     if (!groupDb) throw new NotFoundException('NOT_FOUND');
 
-    if (groupDb.admin.toString() != admin) throw new UnauthorizedException();
+    if ((groupDb.admin as any).toString() != admin) {
+      throw new UnauthorizedException();
+    }
 
     return this.groupModel.findOneAndUpdate(
-      { _id: userGroupDto.group, admin, members: userGroupDto.user },
+      {
+        _id: new Types.ObjectId(userGroupDto.group),
+        admin,
+        members: userGroupDto.user,
+      } as any,
       { $pull: { members: userGroupDto.user } },
       { new: true },
     );
@@ -108,9 +120,9 @@ export class GroupsService {
 
   requestToJoin = async (group: string, user: string) => {
     const groupDb = await this.groupModel.findOne({
-      _id: group,
+      _id: new Types.ObjectId(group),
       $nor: [{ banned: user }, { members: user }, { requests: user }],
-    });
+    } as any);
 
     if (!groupDb) throw new NotFoundException('NOT_FOUND');
 
@@ -120,18 +132,18 @@ export class GroupsService {
     ) {
       return this.groupModel.findOneAndUpdate(
         {
-          _id: group,
+          _id: new Types.ObjectId(group),
           $nor: [{ banned: user }, { members: user }],
-        },
+        } as any,
         { $push: { requests: user } },
         { new: true },
       );
     } else if (groupDb.joinRequestApproval == JoinRequestApproval.NO) {
       return this.groupModel.findOneAndUpdate(
         {
-          _id: group,
+          _id: new Types.ObjectId(group),
           $nor: [{ banned: user }, { members: user }],
-        },
+        } as any,
         { $push: { members: user } },
         { new: true },
       );
@@ -140,7 +152,11 @@ export class GroupsService {
 
   leaveGroup = async (group: string, user: string) => {
     return this.groupModel.findOneAndUpdate(
-      { _id: group, members: user, admin: { $ne: user } },
+      {
+        _id: new Types.ObjectId(group),
+        members: user,
+        admin: { $ne: user },
+      } as any,
       { $pull: { members: user } },
       { new: true },
     );
@@ -149,10 +165,10 @@ export class GroupsService {
   changeAdmin(userGroupDto: UserGroupDto, admin: string) {
     return this.groupModel.findOneAndUpdate(
       {
-        _id: userGroupDto.group,
+        _id: new Types.ObjectId(userGroupDto.group),
         admin,
         members: userGroupDto.user,
-      },
+      } as any,
       { admin: userGroupDto.user },
       { new: true },
     );

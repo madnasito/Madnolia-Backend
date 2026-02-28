@@ -1,10 +1,11 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { SignUpDto } from './dtos/sign-up.dtio';
-import { compare } from 'bcrypt';
+import { compare } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dtos/sign-in.dto';
 import { UsersService } from '../users/users.service';
@@ -37,7 +38,8 @@ export class AuthService {
       signInDto.username.toLocaleLowerCase(),
     );
 
-    if (!user || !user.status) throw new NotFoundException('INVALID_CREDENTIALS');
+    if (!user || !user.status)
+      throw new NotFoundException('INVALID_CREDENTIALS');
 
     const isMatch = await compare(signInDto.password, user.password);
 
@@ -73,7 +75,8 @@ export class AuthService {
         user,
       };
     } catch (error) {
-      throw error;
+      Logger.error(error);
+      throw new BadRequestException('INVALID_CREDENTIALS');
     }
   };
 }

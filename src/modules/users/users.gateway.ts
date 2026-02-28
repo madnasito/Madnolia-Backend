@@ -148,7 +148,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const alreadyRequested =
       await this.connectionRequestService.findOneByUserIds(
         request.user,
-        requested.id,
+        requested._id,
       );
 
     if (
@@ -159,11 +159,11 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const requestDb = await this.connectionRequestService.create(
       request.user,
-      requested.id,
+      requested._id,
     );
 
     const newNotification: CreateNotificationDto = {
-      user: requested.id,
+      user: requested._id,
       type: NotificationType.REQUEST,
       title: name,
       thumb,
@@ -230,11 +230,11 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       const senderUserSockets = this.users.getUserSocketsById(sender);
 
-      senderUserSockets.forEach((socketId) => {
+      senderUserSockets.forEach(async (socketId) => {
         client.to(socketId).emit('request_accepted', connectionRequestDb);
         const targetSocket = this.io.sockets.sockets.get(socketId);
         if (targetSocket) {
-          targetSocket.join(connectionRequestDb.request._id.toString());
+          await targetSocket.join(connectionRequestDb.request._id.toString());
         }
       });
 
@@ -262,7 +262,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.logger.error(error);
       }
 
-      client.join(connectionRequestDb.request._id.toString());
+      await client.join(connectionRequestDb.request._id.toString());
       // return connectionRequestDb;
     } catch (error) {
       Logger.error(error);
@@ -341,7 +341,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @UseGuards(UserSocketGuard)
   @SubscribeMessage('logout_device')
-  async logoutDevice(@ConnectedSocket() client: Socket) {
+  logoutDevice(@ConnectedSocket() client: Socket) {
     this.users.logoutDevice(client.id);
   }
 

@@ -7,7 +7,7 @@ import {
   NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
-import { compare, hashSync } from 'bcrypt';
+import { compare, hashSync } from 'bcryptjs';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import axios from 'axios';

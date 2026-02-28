@@ -36,7 +36,7 @@ export class Notification {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   })
-  sender: string;
+  sender: Types.ObjectId | string;
 
   @Prop({
     type: String,

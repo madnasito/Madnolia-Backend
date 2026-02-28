@@ -31,7 +31,7 @@ export class Group {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   })
-  admin: User;
+  admin: User | mongoose.Types.ObjectId;
 
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -41,7 +41,7 @@ export class Group {
       'Array of members must not exceed 2000 items',
     ],
   })
-  members: User[];
+  members: (User | mongoose.Types.ObjectId)[];
 
   @Prop({
     enum: Privacy,
@@ -57,7 +57,7 @@ export class Group {
       'There are many requests for this group',
     ],
   })
-  requests: User[];
+  requests: (User | mongoose.Types.ObjectId)[];
 
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -67,7 +67,7 @@ export class Group {
       'Array of banned users must not exceed 2000 items',
     ],
   })
-  banned: User[];
+  banned: (User | mongoose.Types.ObjectId)[];
 
   @Prop({
     type: String,

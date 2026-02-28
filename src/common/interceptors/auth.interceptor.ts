@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   NestInterceptor,
   UseInterceptors,
+  Logger,
 } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { map, Observable } from 'rxjs';
@@ -25,9 +26,14 @@ export class SerializeInterceptor implements NestInterceptor {
   ): Observable<any> | Promise<Observable<any>> {
     return next.handle().pipe(
       map((data: AuthResponseDto) => {
-        return plainToClass(this.dto, data, {
-          excludePrefixes: ['password', 'devices'],
-        });
+        try {
+          return plainToClass(this.dto, data, {
+            excludePrefixes: ['password', 'devices'],
+          });
+        } catch (error) {
+          Logger.error('Serialization failed in AuthInterceptor', error);
+          throw error;
+        }
       }),
     );
     // throw new Error("Method not implemented.");

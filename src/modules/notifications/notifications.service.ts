@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Notification } from './schemas/notification.schema';
-import { Model, RootFilterQuery, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateNotificationDto } from './dtos/create-notification.dto';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class NotificationsService {
   }
 
   deleteById = (id: Types.ObjectId) =>
-    this.notificationModel.findOneAndDelete({ id });
+    this.notificationModel.findOneAndDelete({ _id: id });
 
   deleteRequestConnection = (
     sender: Types.ObjectId,
@@ -31,7 +31,7 @@ export class NotificationsService {
           { user: sender, path: receiver },
           { user: receiver, path: sender },
         ],
-      },
+      } as any,
       { new: true },
     );
 
@@ -43,7 +43,7 @@ export class NotificationsService {
     cursor: string | null,
   ): Promise<Array<Notification>> => {
     const limit = 20;
-    const query: RootFilterQuery<Notification> = {
+    const query: any = {
       user,
     };
 
@@ -66,5 +66,7 @@ export class NotificationsService {
   deleteUserNotifications = (
     user: Types.ObjectId,
   ): Promise<{ acknowledged: boolean; deletedCount: number }> =>
-    this.notificationModel.deleteMany({ $or: [{ user }, { sender: user }] });
+    this.notificationModel.deleteMany({
+      $or: [{ user }, { sender: user }],
+    } as any);
 }
