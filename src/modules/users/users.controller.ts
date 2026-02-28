@@ -30,6 +30,18 @@ import axios from 'axios';
 import { Types } from 'mongoose';
 import { MultipleMongoIdsDto } from 'src/common/dto/mutiple-mongo-ids.dto';
 
+interface MulterFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  size: number;
+  destination: string;
+  filename: string;
+  path: string;
+  buffer: Buffer;
+}
+
 @Controller('user')
 @Serialize(UserDto)
 export class UserController {
@@ -102,7 +114,7 @@ export class UserController {
         validators: [new MaxFileSizeValidator({ maxSize: 1000 * 2048 })],
       }),
     )
-    image: Express.Multer.File,
+    image: MulterFile,
   ) {
     try {
       const validExtension = ['jpg', 'png', 'jpeg', 'webp', 'gif'];
@@ -121,7 +133,7 @@ export class UserController {
         image.originalname,
       );
 
-      form.append('apikey', apiKey);
+      form.append('apikey', apiKey || '');
 
       const resp = await axios.post(
         'https://beeimg.com/api/upload/file/json/',

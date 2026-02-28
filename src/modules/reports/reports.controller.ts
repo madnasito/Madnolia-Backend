@@ -20,6 +20,18 @@ import { ConfigService } from '@nestjs/config';
 import { CreateUserReportDto } from './dtos/create-user-report.dto';
 import { CreateBugReportDto } from './dtos/create-bug-report.dto';
 
+interface MulterFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  size: number;
+  destination: string;
+  filename: string;
+  path: string;
+  buffer: Buffer;
+}
+
 @Controller('reports')
 export class ReportsController {
   constructor(
@@ -41,7 +53,7 @@ export class ReportsController {
         ],
       }),
     )
-    media: Express.Multer.File, // Make it optional if needed
+    media: MulterFile, // Make it optional if needed
   ) {
     if (!media) {
       throw new BadRequestException('Media file is required');
@@ -55,7 +67,7 @@ export class ReportsController {
       new Blob([new Uint8Array(media.buffer)], { type: media.mimetype }),
       media.originalname,
     );
-    form.append('apikey', apiKey);
+    form.append('apikey', apiKey || '');
 
     try {
       const resp = await axios.post(
@@ -68,8 +80,8 @@ export class ReportsController {
         resp.data.files.status === 'Duplicate'
       ) {
         const createReportBody: CreateUserReportDto = {
-          media: resp.data.files.url,
           ...body,
+          media: resp.data.files.url,
         };
 
         return this.reportsService.createUserReport(
@@ -106,7 +118,7 @@ export class ReportsController {
         ],
       }),
     )
-    media: Express.Multer.File, // Make it optional if needed
+    media: MulterFile, // Make it optional if needed
   ) {
     if (!media) {
       throw new BadRequestException('Media file is required');
@@ -120,7 +132,7 @@ export class ReportsController {
       new Blob([new Uint8Array(media.buffer)], { type: media.mimetype }),
       media.originalname,
     );
-    form.append('apikey', apiKey);
+    form.append('apikey', apiKey || '');
 
     try {
       const resp = await axios.post(
@@ -135,8 +147,8 @@ export class ReportsController {
         resp.data.files.status === 'Duplicate'
       ) {
         const createReportBody: CreateBugReportDto = {
-          media: resp.data.files.url,
           ...body,
+          media: resp.data.files.url,
         };
 
         return this.reportsService.createBugReport(
