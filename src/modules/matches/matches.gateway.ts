@@ -77,14 +77,14 @@ export class MatchesGateway
   async handleMatchCreated(user: Types.ObjectId, payload: string) {
     const userSocketIds = this.users.getUserSocketsById(user);
 
-    userSocketIds.forEach((socketId) => {
+    userSocketIds.forEach(async (socketId) => {
       const client = this.io.sockets.sockets.get(socketId);
 
       if (client) {
         this.logger.debug(
           `Client id: ${client.id} has created a match and tries to join`,
         );
-        client.join(payload.toString());
+        await client.join(payload.toString());
         this.logger.debug(`Client id: ${client.id} joined to match`);
       }
     });
@@ -127,23 +127,23 @@ export class MatchesGateway
         },
         tokens: fcmTokens,
       };
-      this.firebaseCloudMessagingService.sendToMultipleTokens(
+      await this.firebaseCloudMessagingService.sendToMultipleTokens(
         notificationPayload,
       );
     }
   }
 
   @UseGuards(UserSocketGuard)
-  async handleJoinToMatch(user: Types.ObjectId, payload: Types.ObjectId) {
+  handleJoinToMatch(user: Types.ObjectId, payload: Types.ObjectId) {
     try {
       const userSocketIds = this.users.getUserSocketsById(user);
 
-      userSocketIds.forEach((socketId) => {
+      userSocketIds.forEach(async (socketId) => {
         const client = this.io.sockets.sockets.get(socketId);
 
         if (client) {
           this.logger.debug(`Client id: ${client.id} tries to join`);
-          client.join(payload.toString());
+          await client.join(payload.toString());
           this.logger.debug(`Client id: ${client.id} joined to match`);
         }
       });
@@ -171,12 +171,12 @@ export class MatchesGateway
 
       const userSocketIds = this.users.getUserSocketsById(user);
 
-      userSocketIds.forEach((socketId) => {
+      userSocketIds.forEach(async (socketId) => {
         const client = this.io.sockets.sockets.get(socketId);
 
         if (client) {
           this.logger.debug(`Client id: ${client.id} tries to leave`);
-          client.leave(payload.toString());
+          await client.leave(payload.toString());
           this.logger.debug(`Client id: ${client.id} leaved the match`);
         }
       });
@@ -192,7 +192,7 @@ export class MatchesGateway
     try {
       const matches: any = await this.matchesService.updatePastTimeMatches();
 
-      matches.forEach((match: MatchDto) => {
+      matches.forEach(async (match: MatchDto) => {
         const payload = {
           title: match.title,
           match: match._id,
@@ -244,7 +244,7 @@ export class MatchesGateway
               },
               tokens: fcmTokens,
             };
-            this.firebaseCloudMessagingService.sendToMultipleTokens(
+            await this.firebaseCloudMessagingService.sendToMultipleTokens(
               notificationPayload,
             );
           }

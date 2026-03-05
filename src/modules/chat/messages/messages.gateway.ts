@@ -114,17 +114,17 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
           (message) => message.user != request.user,
         );
 
-        if (!data) throw new WsException('NO_MESSAGE');
+        if (!data) throw new WsException('NO_DATA');
 
         const creator = this.users.getUserById(data.creator);
 
-        if (!creator) throw new WsException('NO_MESSAGE');
+        if (!creator) throw new WsException('NO_CREATOR');
 
-        if (!data.user) throw new WsException('NO_MESSAGE');
+        if (!data.user) throw new WsException('NO_USER');
 
         const userData = this.users.getUserById(data.user);
 
-        if (!userData) throw new WsException('NO_MESSAGE');
+        // if (!userData) throw new WsException('NO_USER_DATA');
 
         if (userData) {
           try {
