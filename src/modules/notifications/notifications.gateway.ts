@@ -11,6 +11,7 @@ import {
 import { Types } from 'mongoose';
 import { UserSocketGuard } from 'src/common/guards/user-sockets.guard';
 import { NotificationsService } from './notifications.service';
+import { NotificationEvents } from './enums/notification-events.enum';
 
 @WebSocketGateway()
 export class NotificationsGateway {
@@ -31,20 +32,21 @@ export class NotificationsGateway {
           `Emitting standart_notification to socket ID: ${socketId}`,
         );
 
-        client.emit('standard_notification', notification);
+        client.emit(NotificationEvents.STANDART_NOTIFICATION, notification);
       }
     });
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('delete_notification')
+  @SubscribeMessage(NotificationEvents.DELETE)
   async deleteNotification(
     @Request() request: any,
     @MessageBody() id: Types.ObjectId,
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
     try {
-      this.logger.debug('Deleting notification ' + id);
+      this.logger.debug('Deleting notification ', id);
+      this.logger.debug(request.user);
       await this.notificationsService.deleteUserNotification(id, request.user);
 
       // Get the user and validate
@@ -69,7 +71,7 @@ export class NotificationsGateway {
       // }
 
       // Also emit to the current client
-      client.emit('notification_deleted', id);
+      client.emit(NotificationEvents.NOTIFICATION_DELETED, id);
     } catch (error) {
       this.logger.error(`Error deleting notification ${id}:`, error);
       throw new WsException(

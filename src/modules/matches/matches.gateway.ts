@@ -18,6 +18,7 @@ import { FirebaseCloudMessagingService } from '../firebase/firebase-cloud-messag
 import { Types } from 'mongoose';
 import { NewPlayerToMatch } from './interfaces/player-to-match.interface';
 import { JwtService } from '@nestjs/jwt';
+import { MatchEvents } from './enums/match-events.enum';
 
 @WebSocketGateway()
 export class MatchesGateway
@@ -110,7 +111,7 @@ export class MatchesGateway
     const usersSockets = this.users.getUsersSockets(match.inviteds);
 
     usersSockets.forEach((socketId) =>
-      this.io.to(socketId).emit('invitation', eventPayload),
+      this.io.to(socketId).emit(MatchEvents.INVITATION, eventPayload),
     );
 
     const fcmTokens = this.users.getUsersFcmTokensWithoutSocketById(
@@ -154,14 +155,14 @@ export class MatchesGateway
       };
       this.io
         .to(payload.toString())
-        .emit('new_player_to_match', newPlayerToMatchPayload);
+        .emit(MatchEvents.NEW_PLAYER_TO_MATCH, newPlayerToMatchPayload);
     } catch (error) {
       throw new WsException(error);
     }
   }
 
   handleMatchCancelled(match: string) {
-    this.io.to(match).emit('match_cancelled', match);
+    this.io.to(match).emit(MatchEvents.CANCELLED, match);
   }
 
   @UseGuards(UserSocketGuard)
@@ -181,7 +182,7 @@ export class MatchesGateway
         }
       });
 
-      this.io.to(payload.toString()).emit('player_left_match', user);
+      this.io.to(payload.toString()).emit(MatchEvents.PLAYER_LEFT_MATCH, user);
     } catch (error) {
       throw new WsException(error);
     }
@@ -219,7 +220,7 @@ export class MatchesGateway
         this.logger.debug(usersSockets);
 
         usersSockets.forEach((socketId) =>
-          this.io.to(socketId).emit('match_ready', payload),
+          this.io.to(socketId).emit(MatchEvents.MATCH_READY, payload),
         );
 
         const userIds = match.joined;

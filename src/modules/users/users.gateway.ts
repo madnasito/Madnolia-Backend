@@ -24,6 +24,8 @@ import { Availability } from './enums/availability.enum';
 import { SendNotificationDto } from '../firebase/dtos/send-notification.dto';
 import { FirebaseCloudMessagingService } from '../firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
 import { ConnectionRequestStatus } from './connection-request/enums/connection-status.enum';
+import { UserEvents } from './enums/user-events.enum';
+import { NotificationEvents } from '../notifications/enums/notification-events.enum';
 
 @WebSocketGateway()
 export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -102,7 +104,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('update_availability')
+  @SubscribeMessage(UserEvents.UPDATE_AVAILABILITY)
   async updateAvailability(
     @MessageBody() availability: Availability,
     @ConnectedSocket() client: Socket,
@@ -112,13 +114,15 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.debug('Updating availability...' + availability);
       await this.usersService.updateAvailability(request.user, availability);
 
-      client.emit('update_availability', availability);
+      client.emit(UserEvents.UPDATE_AVAILABILITY, availability);
 
       const userSockets = this.users.getUserSocketsById(request.user);
 
       userSockets.forEach((socketId) => {
         if (socketId !== client.id) {
-          client.to(socketId).emit('update_availability', availability);
+          client
+            .to(socketId)
+            .emit(UserEvents.UPDATE_AVAILABILITY, availability);
         }
       });
 
@@ -130,7 +134,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('request_connection')
+  @SubscribeMessage(UserEvents.REQUEST_CONNECTION)
   async requestNewConnection(
     @MessageBody() requestedUser: Types.ObjectId,
     @ConnectedSocket() client: Socket,
@@ -173,13 +177,15 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const notificationDb =
       await this.notificationsService.create(newNotification);
-    client.emit('new_request_connection', requestDb);
+    client.emit(UserEvents.NEW_REQUEST_CONNECTION, requestDb);
 
     const requestedUserSockets = this.users.getUserSocketsById(requestedUser);
 
     requestedUserSockets.forEach((socketId) => {
-      client.to(socketId).emit('new_request_connection', requestDb);
-      client.to(socketId).emit('standard_notification', notificationDb);
+      client.to(socketId).emit(UserEvents.NEW_REQUEST_CONNECTION, requestDb);
+      client
+        .to(socketId)
+        .emit(NotificationEvents.STANDART_NOTIFICATION, notificationDb);
     });
 
     try {
@@ -208,7 +214,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('accept_request')
+  @SubscribeMessage(UserEvents.ACCEPT_REQUEST)
   async acceptConnection(
     @MessageBody() sender: Types.ObjectId,
     @ConnectedSocket() client: Socket,
@@ -226,12 +232,14 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
         connectionRequestDb.request.sender,
       );
 
-      client.emit('request_accepted', connectionRequestDb);
+      client.emit(UserEvents.REQUEST_ACCEPTED, connectionRequestDb);
 
       const senderUserSockets = this.users.getUserSocketsById(sender);
 
       senderUserSockets.forEach(async (socketId) => {
-        client.to(socketId).emit('request_accepted', connectionRequestDb);
+        client
+          .to(socketId)
+          .emit(UserEvents.REQUEST_ACCEPTED, connectionRequestDb);
         const targetSocket = this.io.sockets.sockets.get(socketId);
         if (targetSocket) {
           await targetSocket.join(connectionRequestDb.request._id.toString());
@@ -271,7 +279,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('reject_connection')
+  @SubscribeMessage(UserEvents.REJECT_CONNECTION)
   async rejectConnection(
     @MessageBody() sender: Types.ObjectId,
     @ConnectedSocket() client: Socket,
@@ -288,7 +296,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
         sender,
         request.user,
       );
-      client.emit('connection_rejected', connectionRequestDb);
+      client.emit(UserEvents.CONNECTION_REJECTED, connectionRequestDb);
       return connectionRequestDb;
     } catch (error) {
       Logger.error(error);
@@ -297,7 +305,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('cancel_connection')
+  @SubscribeMessage(UserEvents.CANCEL_CONNECTION)
   async cancelConnection(
     @MessageBody() requestedId: Types.ObjectId,
     @ConnectedSocket() client: Socket,
@@ -315,7 +323,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
         requestedId,
       );
 
-      client.emit('canceled_connection', connectionRequestDb);
+      client.emit(UserEvents.CONNECTION_CANCELED, connectionRequestDb);
       return connectionRequestDb;
     } catch (error) {
       Logger.error(error);
@@ -324,7 +332,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('remove_partner')
+  @SubscribeMessage(UserEvents.REMOVE_PARTNER)
   async removePartner(
     @MessageBody() userId: Types.ObjectId,
     @Request() request: any,
@@ -332,7 +340,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     try {
       await this.usersService.removePartner(request.user, userId);
-      client.emit('removed_partner', userId);
+      client.emit(UserEvents.REMOVED_PARTNER, userId);
     } catch (error) {
       Logger.error(error);
       throw new WsException('ERROR_REMOVING_PARTNER');
@@ -340,13 +348,13 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('logout_device')
+  @SubscribeMessage(UserEvents.LOGOUT_DEVICE)
   logoutDevice(@ConnectedSocket() client: Socket) {
     this.users.logoutDevice(client.id);
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('read_all_notifications')
+  @SubscribeMessage(UserEvents.READ_ALL_NOTIFICATIONS)
   async readAllNotifications(
     @Request() request: any,
     @ConnectedSocket() client: Socket,
@@ -355,13 +363,13 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.debug(`Reading all notifications for user ${request.user}`);
       await this.notificationsService.readAllUserNotifications(request.user);
 
-      client.emit('notifications_read');
+      client.emit(UserEvents.READ_NOTIFICATION);
 
       const userSockets = this.users.getUserSocketsById(request.user);
 
       userSockets.forEach((socketId) => {
         if (socketId !== client.id) {
-          client.to(socketId).emit('notifications_read');
+          client.to(socketId).emit(UserEvents.READ_NOTIFICATION);
         }
       });
     } catch (error) {

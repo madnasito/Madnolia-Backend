@@ -8,7 +8,7 @@ import {
 import {
   ConnectedSocket,
   MessageBody,
-  OnGatewayDisconnect,
+  // OnGatewayDisconnect,
   OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
@@ -22,11 +22,13 @@ import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dtos/create-message.dto';
 import { MessageDto } from './dtos/message.dto';
 import { Users } from '../../users/classes/user';
+import { UsersService } from 'src/modules/users/users.service';
 import { MatchesService } from 'src/modules/matches/matches.service';
 import { UpdateRecipientStatusDTO } from './dtos/update-recipient-status.dto';
 import { MessageType } from './enums/message-type.enum';
 import { FirebaseCloudMessagingService } from 'src/modules/firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
 import { SendNotificationDto } from 'src/modules/firebase/dtos/send-notification.dto';
+import { ChatMessageEvents } from './enums/message-events.enum';
 // import { SendNotificationDto } from 'src/modules/firebase/dtos/send-notification.dto';
 
 @UsePipes(
@@ -50,7 +52,7 @@ import { SendNotificationDto } from 'src/modules/firebase/dtos/send-notification
 @WebSocketGateway({
   // namespace: 'messages'
 })
-export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
+export class MessagesGateway implements OnGatewayInit {
   private readonly logger = new Logger(MessagesGateway.name);
 
   constructor(
@@ -58,6 +60,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
     private readonly matchesService: MatchesService,
     private users: Users,
     private firebaseCloudMessagingService: FirebaseCloudMessagingService,
+    private readonly usersService: UsersService,
   ) {}
 
   @WebSocketServer() io: Server;
@@ -67,13 +70,13 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
     this.logger.log(`Initialized`);
   }
 
-  handleDisconnect(client: any) {
-    this.users.deleteUserSocketId(client.id);
-    this.logger.debug(`Cliend id:${client.id} disconnected`);
-  }
+  // handleDisconnect(client: any) {
+  //   this.users.deleteUserSocketId(client.id);
+  //   this.logger.debug(`Cliend id:${client.id} disconnected`);
+  // }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('init_chat')
+  @SubscribeMessage(ChatMessageEvents.INIT_CHAT)
   async handleEvent(
     @MessageBody() data: string,
     @ConnectedSocket() client: Socket,
@@ -91,7 +94,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('message')
+  @SubscribeMessage(ChatMessageEvents.MESSAGE)
   async handleMessage(
     @Request() request: any,
     @MessageBody() payload: CreateMessageDto,
@@ -116,7 +119,20 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
 
         if (!data) throw new WsException('NO_DATA');
 
-        const creator = this.users.getUserById(data.creator);
+        this.logger.debug(data);
+
+        let creator: any = this.users.getUserById(data.creator as any);
+
+        if (!creator) {
+          try {
+            creator = await this.usersService.fincOneMinimalById(
+              data.creator as any,
+            );
+          } catch (e) {
+            this.logger.error(e);
+            this.logger.error(`Could not find creator in DB: ${data.creator}`);
+          }
+        }
 
         if (!creator) throw new WsException('NO_CREATOR');
 
@@ -155,8 +171,8 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
 
         client
           .to(messageRecipients[0].conversation.toString())
-          .emit('message', data);
-        client.emit('sended_message', {
+          .emit(ChatMessageEvents.MESSAGE, data);
+        client.emit(ChatMessageEvents.SENDED_MESSAGE, {
           uid: payload.id,
           message: messageRecipients.find(
             (message) => message.user == request.user,
@@ -193,8 +209,8 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
 
         client
           .to(messageRecipient.conversation.toString())
-          .emit('message', messageRecipient);
-        client.emit('sended_message', {
+          .emit(ChatMessageEvents.MESSAGE, messageRecipient);
+        client.emit(ChatMessageEvents.SENDED_MESSAGE, {
           uid: payload.id,
           message: messageRecipient,
         });
@@ -207,7 +223,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('update_recipient_status')
+  @SubscribeMessage(ChatMessageEvents.UPDATE_RECIPIENT_STATUS)
   async updateRecipientStatus(
     @Request() request: any,
     @MessageBody() payload: UpdateRecipientStatusDTO,
@@ -231,7 +247,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
       if (recipientForOthers) {
         client
           .to(recipientForOthers.conversation.toString())
-          .emit('message_recipient_update', {
+          .emit(ChatMessageEvents.MESSAGE_RECIPIENT_UPDATE, {
             id: recipientForOthers._id,
             status: recipientForOthers.status,
           });
@@ -239,7 +255,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
 
       // Emit to current user
       if (recipientForUser) {
-        client.emit('message_recipient_update', {
+        client.emit(ChatMessageEvents.MESSAGE_RECIPIENT_UPDATE, {
           id: recipientForUser._id,
           status: recipientForUser.status,
         });
@@ -251,7 +267,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayDisconnect {
   }
 
   @UseGuards(UserSocketGuard)
-  @SubscribeMessage('disconnect_chat')
+  @SubscribeMessage(ChatMessageEvents.DISCONNECT_CHAT)
   handleDisconnectChat(@ConnectedSocket() client: Socket) {
     try {
       this.logger.debug(`Leaved the room: ${client.id}`);

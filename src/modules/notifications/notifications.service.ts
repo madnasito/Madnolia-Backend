@@ -60,7 +60,7 @@ export class NotificationsService {
   getUserUnreadNotificationsCount = (user: Types.ObjectId) =>
     this.notificationModel.countDocuments({ user, read: false });
 
-  deleteUserNotification = (user: Types.ObjectId, id: Types.ObjectId) =>
+  deleteUserNotification = (id: Types.ObjectId, user: Types.ObjectId) =>
     this.notificationModel.findOneAndDelete({ _id: id, user }, { new: true });
 
   deleteUserNotifications = (

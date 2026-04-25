@@ -49,7 +49,7 @@ export class UserSocketGuard implements CanActivate {
 
       return auth.token;
     } catch (error) {
-      throw error;
+      throw new WsException(error);
     }
   }
 }

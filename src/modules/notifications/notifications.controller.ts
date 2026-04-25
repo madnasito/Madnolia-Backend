@@ -37,8 +37,8 @@ export class NotificationsController {
   @Delete('delete')
   deleteNotification(@Request() request: any, @Query('id') id: Types.ObjectId) {
     return this.notificationsService.deleteUserNotification(
-      request.user.id,
       id,
+      request.user.id,
     );
   }
 }
