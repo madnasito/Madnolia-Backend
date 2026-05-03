@@ -380,7 +380,7 @@ export class MatchesService {
   getMatchesByPlatform = async (
     platform: number,
     skip: number = 0,
-    limit: number = 30, // Default limit of 10 documents
+    limit: number = 9, // Default limit of 10 documents
   ): Promise<MatchesByPlatforms[]> => {
     const results = await this.matchModel.aggregate([
       {

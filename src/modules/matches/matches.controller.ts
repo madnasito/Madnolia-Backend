@@ -41,8 +41,8 @@ export class MatchesController {
   ) {
     return this.matchesService.getMatchesByPlatformParent(
       parent,
-      parseInt(skip),
-      parseInt(limit),
+      skip ? parseInt(skip) : 0,
+      limit ? parseInt(limit) : 30,
     );
   }
 
@@ -97,8 +97,8 @@ export class MatchesController {
   ) {
     return this.matchesService.getMatchesByPlatform(
       parseInt(platform),
-      parseInt(skip),
-      parseInt(limit),
+      skip ? parseInt(skip) : 0,
+      limit ? parseInt(limit) : 9,
     );
   }
 
@@ -111,7 +111,7 @@ export class MatchesController {
     return this.matchesService.getMatchesByGameAndPlatform(
       parseInt(platform),
       game,
-      parseInt(skip),
+      skip ? parseInt(skip) : 0,
     );
   }
 
@@ -124,7 +124,7 @@ export class MatchesController {
     return this.matchesService.getMatchesByGameSlugAndPlatform(
       parseInt(platform),
       game,
-      parseInt(skip),
+      skip ? parseInt(skip) : 0,
     );
   }
 
@@ -133,7 +133,7 @@ export class MatchesController {
   async create(@Request() req: any, @Body() body: CreateMatchDto) {
     const matchDb = await this.matchesService.create(body, req.user.id);
 
-    this.matchesGateway.handleMatchCreated(req.user.id, matchDb.id);
+    void this.matchesGateway.handleMatchCreated(req.user.id, matchDb.id);
 
     return matchDb;
   }
@@ -154,15 +154,11 @@ export class MatchesController {
   @UseGuards(UserGuard)
   @Patch('leave/:id')
   async leaveMatch(@Request() req: any, @Param('id') id: Types.ObjectId) {
-    try {
-      const match = await this.matchesService.leaveMatch(id, req.user.id);
+    const match = await this.matchesService.leaveMatch(id, req.user.id);
 
-      this.matchesGateway.handleLeaveMatch(id, req.user.id);
+    await this.matchesGateway.handleLeaveMatch(id, req.user.id);
 
-      return match;
-    } catch (error) {
-      throw error;
-    }
+    return match;
   }
 
   @UseGuards(UserGuard)
@@ -178,12 +174,8 @@ export class MatchesController {
   @UseGuards(UserGuard)
   @Delete('cancell/:id')
   async delete(@Request() req: any, @Param('id') id: string) {
-    try {
-      const match = await this.matchesService.delete(id, req.user.id);
-      this.matchesGateway.handleMatchCancelled(id);
-      return match;
-    } catch (error) {
-      throw error;
-    }
+    const match = await this.matchesService.delete(id, req.user.id);
+    this.matchesGateway.handleMatchCancelled(id);
+    return match;
   }
 }
