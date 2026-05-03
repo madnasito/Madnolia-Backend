@@ -3,19 +3,24 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Notification } from './schemas/notification.schema';
 import { Model, Types } from 'mongoose';
 import { CreateNotificationDto } from './dtos/create-notification.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class NotificationsService {
   constructor(
     @InjectModel(Notification.name)
     private notificationModel: Model<Notification>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async create(payload: CreateNotificationDto) {
     const newNotification = new this.notificationModel(payload);
     newNotification.date = new Date(new Date().toUTCString());
 
-    return await newNotification.save();
+    const savedNotification = await newNotification.save();
+    this.eventEmitter.emit('notification.created', savedNotification);
+
+    return savedNotification;
   }
 
   deleteById = (id: Types.ObjectId) =>

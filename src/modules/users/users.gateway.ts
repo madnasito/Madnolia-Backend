@@ -25,7 +25,6 @@ import { SendNotificationDto } from '../firebase/dtos/send-notification.dto';
 import { FirebaseCloudMessagingService } from '../firebase/firebase-cloud-messaging/firebase-cloud-messaging.service';
 import { ConnectionRequestStatus } from './connection-request/enums/connection-status.enum';
 import { UserEvents } from './enums/user-events.enum';
-import { NotificationEvents } from '../notifications/enums/notification-events.enum';
 
 @WebSocketGateway()
 export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -175,17 +174,13 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       path: id,
     };
 
-    const notificationDb =
-      await this.notificationsService.create(newNotification);
+    await this.notificationsService.create(newNotification);
     client.emit(UserEvents.NEW_REQUEST_CONNECTION, requestDb);
 
     const requestedUserSockets = this.users.getUserSocketsById(requestedUser);
 
     requestedUserSockets.forEach((socketId) => {
       client.to(socketId).emit(UserEvents.NEW_REQUEST_CONNECTION, requestDb);
-      client
-        .to(socketId)
-        .emit(NotificationEvents.STANDART_NOTIFICATION, notificationDb);
     });
 
     try {

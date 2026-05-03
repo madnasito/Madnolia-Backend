@@ -274,8 +274,7 @@ export class MatchesGateway
         // });
       });
     } catch (error) {
-      this.logger.error(error);
-      throw new WsException(error);
+      this.logger.error(`Error in handleCron: ${error.message}`, error.stack);
     }
   }
 }

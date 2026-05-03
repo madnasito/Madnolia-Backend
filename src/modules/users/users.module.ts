@@ -10,12 +10,13 @@ import { ConnectionRequestModule } from './connection-request/connection-request
 import { NotificationsModule } from '../notifications/notifications.module';
 import { FriendshipModule } from '../friendship/friendship.module';
 import { FirebaseModule } from '../firebase/firebase.module';
+import { forwardRef } from '@nestjs/common';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     ConnectionRequestModule,
-    NotificationsModule,
+    forwardRef(() => NotificationsModule),
     FriendshipModule,
     FirebaseModule,
   ],

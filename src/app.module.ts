@@ -22,6 +22,8 @@ import { PlatformsModule } from './modules/platforms/platforms.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { FirebaseModule } from './modules/firebase/firebase.module';
 import { SitemapModule } from './modules/sitemap/sitemap.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -44,6 +46,7 @@ import { SitemapModule } from './modules/sitemap/sitemap.module';
         };
       },
     }),
+    EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     UsersModule,
     JwtModule.registerAsync({

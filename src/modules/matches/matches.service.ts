@@ -68,8 +68,6 @@ export class MatchesService {
     // await this.gamesService.increaseAmountInPlatform(gameData.gameId, createMatchDto.platform)
 
     matchDb.inviteds.forEach(async (element) => {
-      const userSocketIds = this.users.getUserSocketsById(element);
-
       const newNotification: CreateNotificationDto = {
         path: matchDb.id,
         title: matchDb.title,
@@ -79,15 +77,7 @@ export class MatchesService {
         sender: matchDb.user.toString(),
       };
 
-      const notificationDb =
-        await this.notificationsService.create(newNotification);
-
-      Logger.debug(userSocketIds);
-      if (userSocketIds.length > 0)
-        this.notificationsGateway.emitStandartNotification(
-          userSocketIds,
-          notificationDb,
-        );
+      await this.notificationsService.create(newNotification);
     });
 
     return matchDb;

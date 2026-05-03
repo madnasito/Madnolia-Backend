@@ -12,11 +12,17 @@ import { Types } from 'mongoose';
 import { UserSocketGuard } from 'src/common/guards/user-sockets.guard';
 import { NotificationsService } from './notifications.service';
 import { NotificationEvents } from './enums/notification-events.enum';
+import { OnEvent } from '@nestjs/event-emitter';
+import { Users } from 'src/modules/users/classes/user';
+import { Notification } from './schemas/notification.schema';
 
 @WebSocketGateway()
 export class NotificationsGateway {
   private readonly logger = new Logger(NotificationsGateway.name);
-  constructor(private readonly notificationsService: NotificationsService) {}
+  constructor(
+    private readonly notificationsService: NotificationsService,
+    private readonly users: Users,
+  ) {}
 
   @WebSocketServer() io: Server;
 
@@ -24,6 +30,9 @@ export class NotificationsGateway {
     userSockets: Array<string>,
     notification: any,
   ): void {
+    this.logger.debug('Emitting standart_notification to user ', userSockets);
+    this.logger.debug(notification);
+
     userSockets.forEach((socketId) => {
       const client = this.io.sockets.sockets.get(socketId);
 
@@ -35,6 +44,18 @@ export class NotificationsGateway {
         client.emit(NotificationEvents.STANDART_NOTIFICATION, notification);
       }
     });
+  }
+
+  @OnEvent('notification.created')
+  handleNotificationCreated(notification: Notification) {
+    this.logger.debug(
+      `Received notification.created event for user ${notification.user}`,
+    );
+    const userSockets = this.users.getUserSocketsById(notification.user);
+    this.logger.debug('User sockets: ', userSockets);
+    if (userSockets && userSockets.length > 0) {
+      this.emitStandartNotification(userSockets, notification);
+    }
   }
 
   @UseGuards(UserSocketGuard)
