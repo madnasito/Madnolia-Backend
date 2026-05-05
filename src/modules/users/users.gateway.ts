@@ -231,13 +231,28 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       const senderUserSockets = this.users.getUserSocketsById(sender);
 
+      const receiverUserSockets = this.users.getUserSocketsById(
+        connectionRequestDb.request.receiver,
+      );
+
       senderUserSockets.forEach(async (socketId) => {
         client
           .to(socketId)
           .emit(UserEvents.REQUEST_ACCEPTED, connectionRequestDb);
         const targetSocket = this.io.sockets.sockets.get(socketId);
         if (targetSocket) {
-          await targetSocket.join(connectionRequestDb.request._id.toString());
+          await targetSocket.join(
+            connectionRequestDb.friendship._id.toString(),
+          );
+        }
+      });
+
+      receiverUserSockets.forEach(async (socketId) => {
+        const targetSocket = this.io.sockets.sockets.get(socketId);
+        if (targetSocket) {
+          await targetSocket.join(
+            connectionRequestDb.friendship._id.toString(),
+          );
         }
       });
 
@@ -265,7 +280,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.logger.error(error);
       }
 
-      await client.join(connectionRequestDb.request._id.toString());
+      await client.join(connectionRequestDb.friendship._id.toString());
       // return connectionRequestDb;
     } catch (error) {
       Logger.error(error);

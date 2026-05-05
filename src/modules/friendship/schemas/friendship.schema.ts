@@ -27,6 +27,7 @@ export class Friendship {
     default: new Date(),
   })
   createdAt: Date;
+  _id: Types.ObjectId;
 }
 
 export const FriendshipSchema = SchemaFactory.createForClass(Friendship);
