@@ -41,4 +41,4 @@ import { UsersModule } from '../users/users.module';
   exports: [MailService],
   controllers: [MailController],
 })
-export class MailModule {}
+export class MailModule { }
