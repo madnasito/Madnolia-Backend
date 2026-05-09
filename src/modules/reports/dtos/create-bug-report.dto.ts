@@ -1,9 +1,4 @@
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsString,
-  IsOptional,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { BugReportType } from '../enums/bug-report-type.enum';
 

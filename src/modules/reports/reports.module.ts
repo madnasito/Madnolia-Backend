@@ -10,8 +10,12 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: UserReport.name, schema: UserReportSchema }]),
-    MongooseModule.forFeature([{ name: BugReport.name, schema: BugReportSchema }]),
+    MongooseModule.forFeature([
+      { name: UserReport.name, schema: UserReportSchema },
+    ]),
+    MongooseModule.forFeature([
+      { name: BugReport.name, schema: BugReportSchema },
+    ]),
     UsersModule,
     MailModule,
     ConfigModule,

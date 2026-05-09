@@ -50,12 +50,11 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
         await this.usersService.handleUserDisconnection(user._id, client.id);
       }
     } catch (error) {
-      console.error(error);
-      throw new WsException('ERROR_HANDLING_DISCONNECTION');
+      this.logger.error(`Error handling disconnection for client ${client.id}:`, error);
+    } finally {
+      this.users.deleteUserSocketId(client.id);
+      this.logger.debug(`Client id:${client.id} disconnected`);
     }
-
-    this.users.deleteUserSocketId(client.id);
-    this.logger.debug(`Cliend id:${client.id} disconnected`);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

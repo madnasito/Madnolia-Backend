@@ -1,4 +1,4 @@
 export enum UserReportType {
-    SPAM,
-    CHILD_ABUSE
+  SPAM,
+  CHILD_ABUSE,
 }

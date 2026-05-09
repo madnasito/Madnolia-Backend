@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { ReportStatus } from './enums/report-status.enum';
@@ -49,7 +53,7 @@ export class ReportsService {
     // Send Email Notification
     const reporter = await this.usersService.findOneById(user);
     const reportsEmail = this.config.get<string>('REPORTS_EMAIL');
-    
+
     if (reportsEmail && reporter) {
       await this.mailService.sendReportNotification(reportsEmail, {
         reportType: 'User Report',
