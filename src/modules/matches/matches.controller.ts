@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -20,13 +21,15 @@ import { PlatformParent } from '../platforms/enums/platform-parent.enum';
 import { Types } from 'mongoose';
 import { PlayerMatchesFiltersDto } from './dtos/player-matches-filters.dto';
 import { MatchesGateway } from './matches.gateway';
+import { JoinLiveMatchRoomDto } from './dtos/join-live-match-room.dto';
+import { Room } from 'livekit-server-sdk';
 
 @Controller('match')
 export class MatchesController {
   constructor(
     private matchesService: MatchesService,
     private matchesGateway: MatchesGateway,
-  ) {}
+  ) { }
 
   @Get('info/:id')
   async getMatch(@Param('id') id: Types.ObjectId) {
@@ -136,6 +139,24 @@ export class MatchesController {
     void this.matchesGateway.handleMatchCreated(req.user.id, matchDb.id);
 
     return matchDb;
+  }
+
+  @UseGuards(UserGuard)
+  @Post('join-live-room')
+  async joinLiveRoom(@Request() req: any, @Body() body: JoinLiveMatchRoomDto) {
+    const existsRoom = await this.matchesService.getLiveKitRoom(body.match);
+    let room: Room | null = null;
+    if (existsRoom.length === 0) {
+      room = await this.matchesService.createLiveKitRoom(body.match);
+    } else {
+      room = existsRoom[0];
+    }
+
+    if (!room) throw new BadRequestException('ROOM_NOT_CREATED');
+
+    const token = await this.matchesService.createTokenForLivekitRoom(req.user.id, body);
+
+    return { token };
   }
 
   @UseGuards(UserGuard)

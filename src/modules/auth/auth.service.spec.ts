@@ -5,7 +5,7 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/schemas/user.schema';
 import { SignUpDto } from './dtos/sign-up.dtio';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { hashSync } from 'bcrypt';
+import { hashSync } from 'bcryptjs';
 // import { SignUpDto } from './dtos/sign-up.dtio';
 
 describe('AuthService', () => {
@@ -18,12 +18,12 @@ describe('AuthService', () => {
 
     fakeUsersService = {
       findOneByEmail: async (email: string) => {
-        const filteredUsers = users.find((user) => user.email === email);
-        return Promise.resolve(filteredUsers);
+        const filteredUsers = users.find((user) => user.email === email) || null;
+        return Promise.resolve(filteredUsers) as any;
       },
       fincOneByUsername: async (username: string) => {
-        const foundUser = users.find((user) => user.username === username);
-        return Promise.resolve(foundUser);
+        const foundUser = users.find((user) => user.username === username) || null;
+        return Promise.resolve(foundUser) as any;
       },
       create: async (signUpDto: SignUpDto) => {
         signUpDto.password = hashSync(signUpDto.password, 10);

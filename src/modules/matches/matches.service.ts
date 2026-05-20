@@ -29,9 +29,14 @@ import { Platform } from 'src/common/enums/platforms.enum';
 import { MatchWithGame } from './interfaces/match-with-game';
 import { Users } from '../users/classes/user';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
+import { AccessToken, RoomServiceClient, CreateOptions, Room } from 'livekit-server-sdk';
+import { ConfigService } from '@nestjs/config';
+import { JoinLiveMatchRoomDto } from './dtos/join-live-match-room.dto';
 
 @Injectable()
 export class MatchesService {
+  private readonly logger = new Logger(MatchesService.name);
+
   constructor(
     @InjectModel(Match.name) private matchModel: Model<Match>,
     private readonly gamesService: GamesService,
@@ -40,7 +45,8 @@ export class MatchesService {
     private readonly platformsService: PlatformsService,
     private readonly usersService: UsersService,
     private readonly users: Users,
-  ) {}
+    private readonly config: ConfigService,
+  ) { }
 
   create = async (createMatchDto: CreateMatchDto, user: Types.ObjectId) => {
     const gameData: GameInterface = await this.gamesService.getGame(
@@ -270,17 +276,17 @@ export class MatchesService {
         const cursorFilter =
           sortOrderVal === -1
             ? {
-                $or: [
-                  { [sortField]: { $lt: cursorValue } },
-                  { _id: { $lt: cursorId } },
-                ],
-              }
+              $or: [
+                { [sortField]: { $lt: cursorValue } },
+                { _id: { $lt: cursorId } },
+              ],
+            }
             : {
-                $or: [
-                  { [sortField]: { $gt: cursorValue } },
-                  { _id: { $gt: cursorId } },
-                ],
-              };
+              $or: [
+                { [sortField]: { $gt: cursorValue } },
+                { _id: { $gt: cursorId } },
+              ],
+            };
         filters.push(cursorFilter);
       }
     }
@@ -335,17 +341,17 @@ export class MatchesService {
         const cursorFilter =
           sortOrderVal === -1
             ? {
-                $or: [
-                  { [sortField]: { $lt: cursorValue } },
-                  { _id: { $lt: cursorId } },
-                ],
-              }
+              $or: [
+                { [sortField]: { $lt: cursorValue } },
+                { _id: { $lt: cursorId } },
+              ],
+            }
             : {
-                $or: [
-                  { [sortField]: { $gt: cursorValue } },
-                  { _id: { $gt: cursorId } },
-                ],
-              };
+              $or: [
+                { [sortField]: { $gt: cursorValue } },
+                { _id: { $gt: cursorId } },
+              ],
+            };
         filters.push(cursorFilter);
       }
     }
@@ -473,17 +479,17 @@ export class MatchesService {
         const cursorFilter =
           sortOrderVal === -1
             ? {
-                $or: [
-                  { [sortField]: { $lt: cursorValue } },
-                  { _id: { $lt: cursorId } },
-                ],
-              }
+              $or: [
+                { [sortField]: { $lt: cursorValue } },
+                { _id: { $lt: cursorId } },
+              ],
+            }
             : {
-                $or: [
-                  { [sortField]: { $gt: cursorValue } },
-                  { _id: { $gt: cursorId } },
-                ],
-              };
+              $or: [
+                { [sortField]: { $gt: cursorValue } },
+                { _id: { $gt: cursorId } },
+              ],
+            };
         filters.push(cursorFilter);
       }
     }
@@ -649,7 +655,7 @@ export class MatchesService {
         { $pull: { joined: user, inviteds: user } },
       );
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
     } finally {
       /* empty */
     }
@@ -678,4 +684,82 @@ export class MatchesService {
 
     return platformMatches;
   };
+
+  getLiveKitRoom = async (matchId: string): Promise<Room[]> => {
+    try {
+
+      const livekitHosts = this.config.get<string>('LIVEKIT_URL') || '';
+      const liveKitApiKey = this.config.get<string>('LIVEKIT_API_KEY');
+      const liveKitApiSecret = this.config.get<string>('LIVEKIT_API_SECRET');
+
+      const svc = new RoomServiceClient(livekitHosts, liveKitApiKey, liveKitApiSecret);
+
+      const rooms = await svc.listRooms([matchId.toString()]);
+
+      return rooms;
+
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  createLiveKitRoom = async (matchId: string): Promise<Room> => {
+    try {
+
+      const livekitHosts = this.config.get<string>('LIVEKIT_URL') || '';
+      const liveKitApiKey = this.config.get<string>('LIVEKIT_API_KEY');
+      const liveKitApiSecret = this.config.get<string>('LIVEKIT_API_SECRET');
+
+      const matchData = await this.getMatch(new Types.ObjectId(matchId));
+
+      if (!matchData) throw new NotFoundException('NO_MATCH_FOUND')
+
+      const svc = new RoomServiceClient(livekitHosts, liveKitApiKey, liveKitApiSecret);
+
+      const roomOptions: CreateOptions = {
+        name: matchData._id.toString(),
+        emptyTimeout: 10 * 60,
+        maxParticipants: 20,
+      };
+
+      const existsRoom = await this.getLiveKitRoom(matchId);
+
+      if (existsRoom.length > 0) return existsRoom[0];
+
+      const room = await svc.createRoom(roomOptions)
+
+      this.logger.log('Room created successfully', { matchId });
+
+      return room;
+
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  createTokenForLivekitRoom = async (userId: Types.ObjectId, payload: JoinLiveMatchRoomDto): Promise<string> => {
+    try {
+
+      const liveKitApiKey = this.config.get<string>('LIVEKIT_API_KEY');
+      const liveKitApiSecret = this.config.get<string>('LIVEKIT_API_SECRET');
+
+      const at = new AccessToken(liveKitApiKey, liveKitApiSecret, {
+        identity: userId.toString(),
+        name: userId.toString(),
+      });
+
+      at.addGrant({ room: payload.match, roomJoin: true })
+
+      const token = await at.toJwt();
+
+      return token;
+
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
 }

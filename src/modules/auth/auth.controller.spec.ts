@@ -7,9 +7,9 @@ import { UserDto } from '../users/dtos/user.dto';
 
 describe('AuthController', () => {
   let controller: AuthController;
-  let fakeAuthService: Partial<AuthService>;
-  let fakeUsersService: Partial<UsersService>;
-  let fakeUserDto: UserDto;
+  let fakeAuthService: Partial<AuthService> = {};
+  let fakeUsersService: Partial<UsersService> = {};
+  let fakeUserDto: Partial<UserDto> = {};
 
   beforeEach(async () => {
     fakeAuthService = {
