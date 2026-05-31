@@ -745,9 +745,11 @@ export class MatchesService {
       const liveKitApiKey = this.config.get<string>('LIVEKIT_API_KEY');
       const liveKitApiSecret = this.config.get<string>('LIVEKIT_API_SECRET');
 
+      const user = await this.usersService.findOneById(userId);
+
       const at = new AccessToken(liveKitApiKey, liveKitApiSecret, {
         identity: userId.toString(),
-        name: userId.toString(),
+        name: user.username,
       });
 
       at.addGrant({ room: payload.match, roomJoin: true })

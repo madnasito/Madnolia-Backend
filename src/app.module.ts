@@ -12,7 +12,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { APP_PIPE } from '@nestjs/core';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { AppVersionModule } from './modules/app-version/app-version.module';
 import { GroupsModule } from './modules/groups/groups.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { MailModule } from './modules/mail/mail.module';
@@ -64,7 +63,6 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     TournamentsModule,
     GamesModule,
     NotificationsModule,
-    AppVersionModule,
     GroupsModule,
     ChatModule,
     MailModule,
@@ -88,4 +86,4 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     // firebaseProvider, // Movido al FirebaseModule
   ],
 })
-export class AppModule {}
+export class AppModule { }
