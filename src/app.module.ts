@@ -22,6 +22,7 @@ import { ReportsModule } from './modules/reports/reports.module';
 import { FirebaseModule } from './modules/firebase/firebase.module';
 import { SitemapModule } from './modules/sitemap/sitemap.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AppReleaseModule } from './modules/app-release/app-release.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     // PushNotificationsModule, // Comentado porque ya existe FirebaseModule
     FirebaseModule,
     SitemapModule,
+    AppReleaseModule,
   ],
   controllers: [AppController],
   providers: [

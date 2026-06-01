@@ -29,18 +29,7 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { Types } from 'mongoose';
 import { MultipleMongoIdsDto } from 'src/common/dto/mutiple-mongo-ids.dto';
-
-interface MulterFile {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  size: number;
-  destination: string;
-  filename: string;
-  path: string;
-  buffer: Buffer;
-}
+import * as multerfileInterface from '../../common/interfaces/multerfile.interface';
 
 @Controller('user')
 @Serialize(UserDto)
@@ -48,7 +37,7 @@ export class UserController {
   constructor(
     private usersService: UsersService,
     private readonly config: ConfigService,
-  ) {}
+  ) { }
 
   @UseGuards(UserGuard)
   @Get('search/:username')
@@ -114,7 +103,7 @@ export class UserController {
         validators: [new MaxFileSizeValidator({ maxSize: 1000 * 2048 })],
       }),
     )
-    image: MulterFile,
+    image: multerfileInterface.MulterFile,
   ) {
     try {
       const validExtension = ['jpg', 'png', 'jpeg', 'webp', 'gif'];

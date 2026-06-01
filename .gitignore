@@ -9,6 +9,7 @@ firebase-service-account.json
 # compiled output
 /dist
 /node_modules
+/releases
 
 # Logs
 logs
