@@ -23,6 +23,7 @@ import { FirebaseModule } from './modules/firebase/firebase.module';
 import { SitemapModule } from './modules/sitemap/sitemap.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppReleaseModule } from './modules/app-release/app-release.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { AppReleaseModule } from './modules/app-release/app-release.module';
     FirebaseModule,
     SitemapModule,
     AppReleaseModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [
