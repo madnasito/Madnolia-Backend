@@ -6,6 +6,7 @@ import {
     Param,
     Post,
     UploadedFile,
+    UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -15,6 +16,7 @@ import { ReleasePlatform } from './enums/release-platform.enum';
 import { AppRelease } from './schemas/app-release.schema';
 import { CreateReleaseDto } from './dtos/create-release.dto';
 import * as multerfileInterface from 'src/common/interfaces/multerfile.interface';
+import { AdminUserGuard } from 'src/common/guards/admin-user.guard';
 
 @Controller('app-release')
 export class AppReleaseController {
@@ -25,6 +27,7 @@ export class AppReleaseController {
         return await this.appReleaseService.getCurrentPlatformRelease(platform);
     }
 
+    @UseGuards(AdminUserGuard)
     @Post('new-release')
     @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
     async createRelease(
