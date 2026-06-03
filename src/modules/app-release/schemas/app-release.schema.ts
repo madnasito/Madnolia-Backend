@@ -4,10 +4,10 @@ import { ReleasePlatform } from "../enums/release-platform.enum";
 
 @Schema()
 export class AppRelease {
-    @Prop({ required: true, unique: true })
+    @Prop({ required: true })
     version: string;
 
-    @Prop({ required: true, unique: true })
+    @Prop({ required: true })
     codeVersion: number;
 
     @Prop({ required: true })
@@ -18,7 +18,6 @@ export class AppRelease {
 
     @Prop({ type: [ReleaseChangesDto], required: true })
     changes: ReleaseChangesDto[];
-
 
     @Prop({ required: true })
     createdAt: Date;
