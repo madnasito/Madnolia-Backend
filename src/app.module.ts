@@ -24,12 +24,18 @@ import { SitemapModule } from './modules/sitemap/sitemap.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppReleaseModule } from './modules/app-release/app-release.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      exclude: ['/api*'], // Excludes all routes starting with /api
     }),
     MongooseModule.forRootAsync({
       inject: [ConfigService],
