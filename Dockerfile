@@ -23,6 +23,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --omit=dev
 COPY --from=build /app/dist ./dist
+RUN mkdir -p /app/public/releases && chown -R node:node /app/public
 # COPY --from=build /app/.env.production ./
 
 EXPOSE 3000
