@@ -35,7 +35,7 @@ import { join } from 'path';
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
-      exclude: ['/api*'], // Excludes all routes starting with /api
+      exclude: ['/api/{*any}'], // Exclude all routes starting with /api
     }),
     MongooseModule.forRootAsync({
       inject: [ConfigService],
